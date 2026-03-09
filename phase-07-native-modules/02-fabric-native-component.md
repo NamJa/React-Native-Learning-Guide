@@ -316,6 +316,26 @@ export default function XxxView({
 }
 ```
 
+```exercise
+type: code-arrange
+question: "Fabric Native Component의 TypeScript 스펙을 조립하세요"
+tokens:
+  - "import type { ViewProps } from 'react-native'"
+  - "import codegenNativeComponent from"
+  - "'react-native/Libraries/Utilities/codegenNativeComponent'"
+  - "interface NativeProps extends ViewProps {"
+  - "color?: string"
+  - "}"
+  - "export default codegenNativeComponent<NativeProps>('MyView')"
+distractors:
+  - "import { View } from 'react-native'"
+  - "class NativeProps"
+  - "createViewManager"
+answer: ["import type { ViewProps } from 'react-native'", "import codegenNativeComponent from", "'react-native/Libraries/Utilities/codegenNativeComponent'", "interface NativeProps extends ViewProps {", "color?: string", "}", "export default codegenNativeComponent<NativeProps>('MyView')"]
+hint: "Fabric 컴포넌트는 ViewProps를 확장하고 codegenNativeComponent로 등록합니다"
+xp: 8
+```
+
 ---
 
 ## 4. 예제 1: Custom ProgressBar

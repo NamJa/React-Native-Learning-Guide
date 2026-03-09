@@ -258,6 +258,31 @@
     if (isCorrect) existing.score += 1;
     data.quizResults[path] = existing;
     saveProgress(data);
+
+    // Gamification integration
+    if (window.GameCore) {
+      if (isCorrect) {
+        window.GameCore.addXP(5, 'quiz-mcq');
+        window.GameCore.recordExercise('mcq', true);
+        window.GameCore.incrementStreak();
+        if (window.GameSound) window.GameSound.correct();
+        // XP float
+        var rect = container.getBoundingClientRect();
+        var el = document.createElement('div');
+        el.className = 'xp-float';
+        el.textContent = '+5 XP';
+        el.style.left = (rect.right - 80) + 'px';
+        el.style.top = (rect.top + window.scrollY) + 'px';
+        document.body.appendChild(el);
+        setTimeout(function() { el.remove(); }, 1000);
+      } else {
+        window.GameCore.recordExercise('mcq', false);
+        window.GameCore.useHeart(path);
+        if (window.GameSound) window.GameSound.incorrect();
+      }
+      container.classList.add(isCorrect ? 'feedback-correct' : 'feedback-incorrect');
+      setTimeout(function() { container.classList.remove('feedback-correct', 'feedback-incorrect'); }, 600);
+    }
   };
 
   // Fill-in-the-blank check handler
@@ -299,6 +324,16 @@
     if (!data.quizResults) data.quizResults = {};
     data.quizResults[path] = { score: correct, total: total };
     saveProgress(data);
+
+    // Gamification integration
+    if (window.GameCore) {
+      var xp = correct * 5;
+      if (xp > 0) { window.GameCore.addXP(xp, 'quiz-fill'); window.GameCore.incrementStreak(); }
+      for (var gi = 0; gi < correct; gi++) window.GameCore.recordExercise('fill', true);
+      for (var gj = 0; gj < (total - correct); gj++) { window.GameCore.recordExercise('fill', false); window.GameCore.useHeart(path); }
+      if (allCorrect && window.GameSound) window.GameSound.correct();
+      else if (!allCorrect && window.GameSound) window.GameSound.incorrect();
+    }
   };
 
   // Toggle hints
@@ -411,6 +446,16 @@
       if (!data.quizResults) data.quizResults = {};
       data.quizResults[path] = { score: correctCount, total: total };
       saveProgress(data);
+
+      // Gamification integration
+      if (window.GameCore) {
+        var xp = correctCount * 5;
+        if (xp > 0) { window.GameCore.addXP(xp, 'quiz-match'); window.GameCore.incrementStreak(); }
+        for (var gi = 0; gi < correctCount; gi++) window.GameCore.recordExercise('match', true);
+        for (var gj = 0; gj < (total - correctCount); gj++) { window.GameCore.recordExercise('match', false); window.GameCore.useHeart(path); }
+        if (allCorrect && window.GameSound) window.GameSound.correct();
+        else if (!allCorrect && window.GameSound) window.GameSound.incorrect();
+      }
     }
   };
 

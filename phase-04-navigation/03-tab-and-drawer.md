@@ -178,6 +178,24 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 />
 ```
 
+```exercise
+type: word-bank
+question: "Bottom Tab Navigator 설정의 빈칸을 채우세요"
+code: |
+  const Tab = ___(
+    {
+      screens: {
+        Home: ___,
+        Settings: SettingsScreen,
+      }
+    }
+  );
+blanks: ["createBottomTabNavigator", "HomeScreen"]
+distractors: ["createStackNavigator", "createDrawerNavigator", "TabScreen", "Fragment"]
+hint: "Bottom Tab은 createBottomTabNavigator로 생성합니다"
+xp: 5
+```
+
 ---
 
 ## 2. Tab Bar 커스터마이징

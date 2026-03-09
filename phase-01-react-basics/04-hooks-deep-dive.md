@@ -648,6 +648,28 @@ function FixedWithRef() {
 }
 ```
 
+```exercise
+type: output-predict
+question: "다음 코드에서 컴포넌트 마운트 시 console.log 출력 순서는?"
+code: |
+  function MyComponent() {
+    console.log('1: render');
+    useEffect(() => {
+      console.log('2: effect');
+      return () => console.log('3: cleanup');
+    }, []);
+    return <Text>Hello</Text>;
+  }
+options:
+  - "1: render → 2: effect"
+  - "2: effect → 1: render"
+  - "1: render → 2: effect → 3: cleanup"
+  - "2: effect → 3: cleanup → 1: render"
+answer: "1: render → 2: effect"
+explanation: "useEffect는 렌더링 후에 실행됩니다. cleanup은 언마운트 시에만 실행되므로 마운트 시에는 1, 2 순서입니다."
+xp: 6
+```
+
 ---
 
 ## 5. useCallback

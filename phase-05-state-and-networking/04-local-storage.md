@@ -384,6 +384,26 @@ encryptedStorage.recrypt('new-encryption-key');
 encryptedStorage.recrypt(undefined);
 ```
 
+```exercise
+type: categorize
+question: "다음을 Android 로컬 저장소와 React Native 로컬 저장소로 분류하세요"
+categories: ["Android", "React Native"]
+items:
+  - text: "SharedPreferences"
+    category: "Android"
+  - text: "MMKV"
+    category: "React Native"
+  - text: "Room DB"
+    category: "Android"
+  - text: "AsyncStorage"
+    category: "React Native"
+  - text: "DataStore"
+    category: "Android"
+  - text: "WatermelonDB"
+    category: "React Native"
+xp: 6
+```
+
 ---
 
 ## 3. Zustand persist 미들웨어

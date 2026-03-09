@@ -331,6 +331,25 @@ function LogoutButton() {
 
 `reset()`은 전체 네비게이션 상태를 새로 설정한다. 로그아웃 시 모든 화면을 제거하고 로그인 화면만 남기는 패턴에 사용한다.
 
+```exercise
+type: code-arrange
+question: "Stack Navigator에서 화면 전환 코드를 조립하세요"
+tokens:
+  - "navigation"
+  - ".navigate"
+  - "('Detail'"
+  - ","
+  - "{ id: 42 }"
+  - ")"
+distractors:
+  - ".push"
+  - "startActivity"
+  - "Intent"
+answer: ["navigation", ".navigate", "('Detail'", ",", "{ id: 42 }", ")"]
+hint: "navigation.navigate()에 화면 이름과 params 객체를 전달합니다"
+xp: 8
+```
+
 ---
 
 ## 4. 파라미터 전달과 TypeScript 타입

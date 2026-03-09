@@ -114,6 +114,28 @@ const styles = StyleSheet.create({
 
 Android 비유: `<TextView style="@style/Base.Text" android:textColor="@color/error" />`처럼 기본 스타일에 개별 속성을 오버라이드하는 것과 유사합니다.
 
+```exercise
+type: bug-find
+question: "이 StyleSheet 코드에는 2개의 버그가 있습니다. 버그가 있는 라인을 클릭하세요."
+code: |
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      background-color: '#F5FCFF',
+      justifyContent: 'center',
+    },
+    title: {
+      font-size: 20,
+      fontWeight: 'bold',
+    },
+  });
+bugLines: [4, 8]
+explanations:
+  4: "React Native에서는 CSS의 kebab-case가 아닌 camelCase를 사용합니다: backgroundColor"
+  8: "fontSize로 작성해야 합니다. React Native 스타일은 camelCase입니다."
+xp: 10
+```
+
 ---
 
 ## 3. 모든 스타일 속성 상세 가이드

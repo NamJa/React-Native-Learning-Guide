@@ -252,6 +252,26 @@ class AuthServiceModule(
 └────────────────────────────────────────────────────────────────┘
 ```
 
+```exercise
+type: categorize
+question: "다음을 JavaScript 측 코드와 Kotlin 측 코드로 분류하세요"
+categories: ["JavaScript", "Kotlin"]
+items:
+  - text: "TurboModuleRegistry.getEnforcing"
+    category: "JavaScript"
+  - text: "ReactApplicationContext"
+    category: "Kotlin"
+  - text: "import type { TurboModule }"
+    category: "JavaScript"
+  - text: "override fun getName()"
+    category: "Kotlin"
+  - text: "Promise<number>"
+    category: "JavaScript"
+  - text: "promise.resolve()"
+    category: "Kotlin"
+xp: 6
+```
+
 ---
 
 ## 3. Android 라이브러리 통합

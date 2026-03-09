@@ -710,6 +710,45 @@ const OptimizedFlatList = () => {
 // recyclerView.setHasFixedSize(true)  // 비슷한 최적화
 ```
 
+```exercise
+type: code-arrange
+question: "FlatList의 기본 구조를 조립하세요"
+tokens:
+  - "<FlatList"
+  - "data={items}"
+  - "keyExtractor={(item) => item.id}"
+  - "renderItem={({ item }) =>"
+  - "<Text>{item.title}</Text>}"
+  - "/>"
+distractors:
+  - "adapter={items}"
+  - "onBindViewHolder"
+  - "ViewHolder"
+answer: ["<FlatList", "data={items}", "keyExtractor={(item) => item.id}", "renderItem={({ item }) =>", "<Text>{item.title}</Text>}", "/>"]
+hint: "FlatList는 data, keyExtractor, renderItem 3가지 핵심 props가 필요합니다"
+xp: 8
+```
+
+```exercise
+type: categorize
+question: "다음을 Android 리스트와 React Native 리스트로 분류하세요"
+categories: ["Android", "React Native"]
+items:
+  - text: "RecyclerView.Adapter"
+    category: "Android"
+  - text: "renderItem"
+    category: "React Native"
+  - text: "ViewHolder"
+    category: "Android"
+  - text: "keyExtractor"
+    category: "React Native"
+  - text: "DiffUtil"
+    category: "Android"
+  - text: "getItemLayout"
+    category: "React Native"
+xp: 6
+```
+
 ---
 
 ## 3. SectionList — 섹션별 리스트

@@ -7,6 +7,21 @@
 
 ---
 
+<!-- 오늘의 학습 현황 -->
+<div class="dashboard-stats-mount"></div>
+
+<!-- Skill Tree 학습 경로 -->
+<div class="skill-tree-mount"></div>
+
+---
+
+<!-- 뱃지 컬렉션 -->
+### 🏆 내 업적
+
+<div class="badge-preview-mount"></div>
+
+---
+
 ## 기술 스택 Overview (2026 기준)
 
 | 영역 | 기술 | 비고 |

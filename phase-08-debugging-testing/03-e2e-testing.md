@@ -29,6 +29,26 @@ Appium      | ★★★    | 다양     | 범용, 크로스 플랫폼       | Ap
 - 크로스 플랫폼 (iOS + Android + Web): Appium
 ```
 
+```exercise
+type: categorize
+question: "다음 테스트 도구를 테스트 유형별로 분류하세요"
+categories: ["단위 테스트", "E2E 테스트"]
+items:
+  - text: "Jest"
+    category: "단위 테스트"
+  - text: "Detox"
+    category: "E2E 테스트"
+  - text: "React Native Testing Library"
+    category: "단위 테스트"
+  - text: "Maestro"
+    category: "E2E 테스트"
+  - text: "Jest Snapshot"
+    category: "단위 테스트"
+  - text: "Appium"
+    category: "E2E 테스트"
+xp: 6
+```
+
 ---
 
 ## 2. Maestro — 간단하고 강력한 E2E 테스트

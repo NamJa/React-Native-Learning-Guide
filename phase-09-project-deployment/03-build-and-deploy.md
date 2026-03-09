@@ -205,6 +205,23 @@ npx react-native run-android --mode release
 # 8. 성능이 디버그보다 향상되었는가?
 ```
 
+```exercise
+type: code-arrange
+question: "Android Release 빌드 명령어를 조립하세요"
+tokens:
+  - "cd android"
+  - "&&"
+  - "./gradlew"
+  - "bundleRelease"
+distractors:
+  - "assembleDebug"
+  - "npm run build"
+  - "expo build"
+answer: ["cd android", "&&", "./gradlew", "bundleRelease"]
+hint: "Android 빌드는 android 디렉토리에서 gradlew를 사용합니다"
+xp: 8
+```
+
 ---
 
 ## 4. ProGuard/R8 설정

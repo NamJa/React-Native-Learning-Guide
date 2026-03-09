@@ -516,6 +516,26 @@ adb:     Android Debug Bridge version 1.0.41
 === 확인 완료 ===
 ```
 
+```exercise
+type: categorize
+question: "다음 도구를 React Native 개발에 필수인 것과 선택인 것으로 분류하세요"
+categories: ["필수", "선택"]
+items:
+  - text: "Node.js"
+    category: "필수"
+  - text: "Watchman"
+    category: "필수"
+  - text: "JDK 17"
+    category: "필수"
+  - text: "Yarn"
+    category: "선택"
+  - text: "Expo CLI"
+    category: "선택"
+  - text: "Android Studio"
+    category: "필수"
+xp: 6
+```
+
 ---
 
 ## 8. 자주 발생하는 설치 오류와 해결 방법

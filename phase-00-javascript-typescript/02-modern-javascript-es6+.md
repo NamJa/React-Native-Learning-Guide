@@ -150,6 +150,23 @@ fun printUser(user: UserInfo) {
 }
 ```
 
+```exercise
+type: code-arrange
+question: "배열 구조 분해 할당으로 firstName과 lastName을 추출하는 코드를 조립하세요"
+tokens:
+  - "const"
+  - "[firstName, lastName]"
+  - "="
+  - "['Kim', 'React']"
+distractors:
+  - "let"
+  - "{firstName, lastName}"
+  - "new Array"
+answer: ["const", "[firstName, lastName]", "=", "['Kim', 'React']"]
+hint: "배열 구조 분해는 대괄호[]를 사용합니다"
+xp: 8
+```
+
 ---
 
 ## 2. 스프레드 연산자 (Spread Operator: ...)
@@ -254,6 +271,23 @@ println(updatedUser) // User(name=홍길동, age=31, city=서울)
 val defaults = mapOf("theme" to "dark", "fontSize" to 16)
 val userPrefs = mapOf("fontSize" to 20)
 val settings = defaults + userPrefs // fontSize가 20으로 덮어씌워짐
+```
+
+```exercise
+type: output-predict
+question: "다음 코드의 출력은?"
+code: |
+  const arr = [1, 2, 3];
+  const copy = [...arr, 4, 5];
+  console.log(copy.length);
+options:
+  - "3"
+  - "5"
+  - "8"
+  - "에러 발생"
+answer: "5"
+explanation: "스프레드 연산자로 arr의 요소를 펼친 뒤 4, 5를 추가하므로 총 5개의 요소가 됩니다."
+xp: 6
 ```
 
 ---

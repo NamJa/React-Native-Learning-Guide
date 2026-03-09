@@ -376,6 +376,29 @@ function TabScreen() {
 }
 ```
 
+```exercise
+type: output-predict
+question: "useTransition을 사용한 다음 코드에서 검색어 입력 시 어떤 일이 발생하나요?"
+code: |
+  const [query, setQuery] = useState('');
+  const [isPending, startTransition] = useTransition();
+
+  const handleSearch = (text) => {
+    setQuery(text);
+    startTransition(() => {
+      setResults(filterItems(text));
+    });
+  };
+options:
+  - "query 즉시 업데이트, results는 낮은 우선순위로 업데이트"
+  - "query와 results 모두 즉시 업데이트"
+  - "query와 results 모두 지연 업데이트"
+  - "에러 발생: startTransition 내에서 setState 불가"
+answer: "query 즉시 업데이트, results는 낮은 우선순위로 업데이트"
+explanation: "startTransition 안의 상태 업데이트는 낮은 우선순위로 처리되어 UI 응답성을 유지합니다."
+xp: 6
+```
+
 ---
 
 ## 4. Suspense

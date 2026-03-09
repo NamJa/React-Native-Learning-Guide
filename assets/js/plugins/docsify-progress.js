@@ -117,7 +117,8 @@
     var data = loadProgress();
     var completed = data.completedPages || [];
     var idx = completed.indexOf(path);
-    if (idx >= 0) {
+    var wasCompleted = idx >= 0;
+    if (wasCompleted) {
       completed.splice(idx, 1);
     } else {
       completed.push(path);
@@ -133,6 +134,12 @@
       var isCompleted = completed.includes(path);
       btn.className = 'completion-btn ' + (isCompleted ? 'completed' : '');
       btn.textContent = isCompleted ? '\u2705 \uD559\uC2B5 \uC644\uB8CC!' : '\uD83D\uDCDD \uC774 \uBB38\uC11C \uD559\uC2B5 \uC644\uB8CC\uB85C \uD45C\uC2DC';
+    }
+    // Award XP for completing a page
+    if (!wasCompleted && window.GameCore) {
+      window.GameCore.addXP(10, 'page-complete');
+      window.GameCore.incrementStreak();
+      window.GameCore.checkAndAwardBadges();
     }
   };
 

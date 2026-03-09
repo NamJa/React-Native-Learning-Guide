@@ -16,6 +16,12 @@
   <link rel="stylesheet" href="assets/css/compare-viewer.css">
   <link rel="stylesheet" href="assets/css/playground.css">
   <link rel="stylesheet" href="assets/css/flexbox-playground.css">
+  <!-- Gamification CSS -->
+  <link rel="stylesheet" href="assets/css/gamification.css">
+  <link rel="stylesheet" href="assets/css/exercises.css">
+  <link rel="stylesheet" href="assets/css/lesson-mode.css">
+  <link rel="stylesheet" href="assets/css/skill-tree.css">
+  <link rel="stylesheet" href="assets/css/review.css">
   <style>
     :root {
       --base-font-size: 15px;
@@ -50,6 +56,10 @@
 </head>
 <body>
   <div id="app"></div>
+  <!-- Gamification Core (load FIRST) -->
+  <script src="assets/js/core/gamification-core.js"></script>
+  <script src="assets/js/core/sound.js"></script>
+  <script src="assets/js/core/confetti.js"></script>
   <!-- Custom Plugins (load BEFORE docsify so $docsify.plugins is set) -->
   <script src="assets/js/plugins/docsify-theme-toggle.js"></script>
   <script src="assets/js/plugins/docsify-progress.js"></script>
@@ -57,7 +67,12 @@
   <script src="assets/js/plugins/docsify-quiz.js"></script>
   <script src="assets/js/plugins/docsify-compare.js"></script>
   <script src="assets/js/plugins/docsify-playground.js"></script>
+  <script src="assets/js/plugins/docsify-exercises.js"></script>
+  <script src="assets/js/plugins/docsify-gamification-ui.js"></script>
+  <script src="assets/js/plugins/docsify-lesson-mode.js"></script>
+  <script src="assets/js/plugins/docsify-review.js"></script>
   <script src="assets/js/components/flexbox-playground.js"></script>
+  <script src="assets/js/components/skill-tree.js"></script>
   <script>
     window.$docsify = window.$docsify || {};
     Object.assign(window.$docsify, {

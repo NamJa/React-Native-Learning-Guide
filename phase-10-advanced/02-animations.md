@@ -345,6 +345,25 @@ function ParallaxHeader() {
 }
 ```
 
+```exercise
+type: code-arrange
+question: "Reanimated의 useSharedValue + useAnimatedStyle 패턴을 조립하세요"
+tokens:
+  - "const offset = useSharedValue(0)"
+  - "const animatedStyle = useAnimatedStyle(() => ({"
+  - "transform: [{ translateX:"
+  - "withSpring(offset.value)"
+  - "}]"
+  - "}))"
+distractors:
+  - "useState(0)"
+  - "Animated.Value"
+  - "setNativeProps"
+answer: ["const offset = useSharedValue(0)", "const animatedStyle = useAnimatedStyle(() => ({", "transform: [{ translateX:", "withSpring(offset.value)", "}]", "}))"]
+hint: "Reanimated는 useSharedValue로 값을 생성하고 useAnimatedStyle로 스타일에 바인딩합니다"
+xp: 8
+```
+
 ---
 
 ## 4. 제스처 + 애니메이션

@@ -465,6 +465,26 @@ function ProductList({ products }: { products: Product[] }) {
 }
 ```
 
+```exercise
+type: categorize
+question: "다음 디버깅 도구를 Android과 React Native로 분류하세요"
+categories: ["Android", "React Native"]
+items:
+  - text: "Logcat"
+    category: "Android"
+  - text: "LogBox"
+    category: "React Native"
+  - text: "Layout Inspector"
+    category: "Android"
+  - text: "React DevTools"
+    category: "React Native"
+  - text: "Android Profiler"
+    category: "Android"
+  - text: "Performance Monitor"
+    category: "React Native"
+xp: 6
+```
+
 ---
 
 ## 6. 네이티브 코드 디버깅

@@ -167,6 +167,26 @@ const styles = StyleSheet.create({
 });
 ```
 
+```exercise
+type: code-arrange
+question: "Zustand 스토어를 생성하는 코드를 조립하세요"
+tokens:
+  - "const useStore"
+  - "= create"
+  - "((set) => ({"
+  - "count: 0,"
+  - "increment: () =>"
+  - "set((state) => ({ count: state.count + 1 }))"
+  - "}))"
+distractors:
+  - "new Store"
+  - "this.setState"
+  - "MutableStateFlow"
+answer: ["const useStore", "= create", "((set) => ({", "count: 0,", "increment: () =>", "set((state) => ({ count: state.count + 1 }))", "}))"]
+hint: "Zustand는 create 함수에 set을 받는 콜백을 전달합니다"
+xp: 8
+```
+
 ---
 
 ## 3. Store에서 상태 읽기: Selector 패턴

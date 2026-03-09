@@ -682,6 +682,29 @@ function UpdaterExample() {
 // React에서는 updater function을 명시적으로 사용해야 함
 ```
 
+```exercise
+type: bug-find
+question: "이 코드에는 2개의 버그가 있습니다. 버그가 있는 라인을 클릭하세요."
+code: |
+  function Counter() {
+    let [count, setCount] = useState(0);
+    return (
+      <View>
+        <Text>{count}</Text>
+        <Button
+          onPress={setCount(count + 1)}
+          title="증가"
+        />
+      </View>
+    );
+  }
+bugLines: [2, 7]
+explanations:
+  2: "let 대신 const를 사용해야 합니다. useState의 반환값은 재할당하면 안 됩니다."
+  7: "onPress에 함수 호출 결과가 아닌 화살표 함수를 전달해야 합니다: () => setCount(count + 1)"
+xp: 10
+```
+
 ---
 
 ## 8. State 불변성 규칙

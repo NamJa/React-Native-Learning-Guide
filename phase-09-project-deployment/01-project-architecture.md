@@ -190,6 +190,22 @@ res/values/strings             → shared/constants/ 또는 i18n
 build.gradle                   → package.json
 ```
 
+```exercise
+type: word-bank
+question: "프로젝트 아키텍처 구성의 빈칸을 채우세요"
+code: |
+  src/
+  ├── ___/          ← 재사용 UI 컴포넌트
+  ├── ___/          ← 화면 컴포넌트 (페이지)
+  ├── hooks/         ← 커스텀 훅
+  ├── ___/          ← Zustand 스토어
+  └── services/      ← API 호출 로직
+blanks: ["components", "screens", "stores"]
+distractors: ["views", "pages", "models", "utils"]
+hint: "일반적인 React Native 프로젝트는 components, screens, stores 디렉토리를 사용합니다"
+xp: 5
+```
+
 ---
 
 ## 3. API 레이어 설정

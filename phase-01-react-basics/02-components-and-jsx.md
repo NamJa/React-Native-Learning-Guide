@@ -410,6 +410,26 @@ function NullRendering() {
 }
 ```
 
+```exercise
+type: code-arrange
+question: "함수형 컴포넌트를 올바르게 조립하세요"
+tokens:
+  - "function"
+  - "Greeting"
+  - "({ name })"
+  - "{"
+  - "return"
+  - "<Text>Hello {name}</Text>"
+  - "}"
+distractors:
+  - "class"
+  - "render()"
+  - "this.props"
+answer: ["function", "Greeting", "({ name })", "{", "return", "<Text>Hello {name}</Text>", "}"]
+hint: "React Native에서는 함수형 컴포넌트를 사용하며, props를 구조 분해로 받습니다"
+xp: 8
+```
+
 ---
 
 ## 4. 조건부 렌더링 패턴

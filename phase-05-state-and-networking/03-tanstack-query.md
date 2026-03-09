@@ -414,6 +414,20 @@ function UserListScreen() {
 }
 ```
 
+```exercise
+type: word-bank
+question: "useQuery 호출의 빈칸을 채우세요"
+code: |
+  const { data, ___, error } = useQuery({
+    queryKey: ['users'],
+    queryFn: ___,
+  });
+blanks: ["isLoading", "fetchUsers"]
+distractors: ["isPending", "useState", "getUsers", "async"]
+hint: "useQuery는 isLoading으로 로딩 상태를, queryFn으로 데이터 fetching 함수를 제공합니다"
+xp: 5
+```
+
 ---
 
 ## 4. useMutation 상세

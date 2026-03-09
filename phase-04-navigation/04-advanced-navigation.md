@@ -190,6 +190,26 @@ function App() {
 }
 ```
 
+```exercise
+type: categorize
+question: "다음을 Android Navigation과 React Navigation으로 분류하세요"
+categories: ["Android Navigation", "React Navigation"]
+items:
+  - text: "NavGraph"
+    category: "Android Navigation"
+  - text: "Navigator"
+    category: "React Navigation"
+  - text: "SafeArgs"
+    category: "Android Navigation"
+  - text: "route.params"
+    category: "React Navigation"
+  - text: "NavController"
+    category: "Android Navigation"
+  - text: "useNavigation()"
+    category: "React Navigation"
+xp: 6
+```
+
 ---
 
 ## 2. 네비게이션 상태 영속화

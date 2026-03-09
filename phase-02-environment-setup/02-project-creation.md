@@ -264,6 +264,19 @@ info Building the app...
 info Successfully installed the app on the device.
 ```
 
+```exercise
+type: word-bank
+question: "Expo로 프로젝트를 생성하는 명령어의 빈칸을 채우세요"
+code: |
+  npx ___ MyApp
+  cd MyApp
+  npx ___ start
+blanks: ["create-expo-app@latest", "expo"]
+distractors: ["react-native", "init", "create-react-app", "npm"]
+hint: "Expo는 create-expo-app으로 프로젝트를 생성하고, expo start로 실행합니다"
+xp: 5
+```
+
 ---
 
 ## 4. Android 에뮬레이터에서 실행하기

@@ -15,7 +15,9 @@
 
   function getPreferredTheme() {
     var data = loadProgress();
-    if (data.theme) return data.theme;
+    // Support both v1 (data.theme) and v2 (data.settings.theme)
+    var theme = (data.settings && data.settings.theme) || data.theme;
+    if (theme) return theme;
 
     // Check system preference
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
@@ -38,10 +40,13 @@
 
   function toggleTheme() {
     var data = loadProgress();
-    var currentTheme = data.theme || getPreferredTheme();
+    var currentTheme = (data.settings && data.settings.theme) || data.theme || getPreferredTheme();
     var newTheme = currentTheme === 'dark' ? 'light' : 'dark';
 
+    // Save in both v1 and v2 paths for compatibility
     data.theme = newTheme;
+    if (!data.settings) data.settings = {};
+    data.settings.theme = newTheme;
     saveProgress(data);
     applyTheme(newTheme);
   }

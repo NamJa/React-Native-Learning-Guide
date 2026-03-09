@@ -268,6 +268,24 @@ ls android/app/build/generated/source/codegen/java/
 └──────────────────┴─────────────────────────────────────────┘
 ```
 
+```exercise
+type: word-bank
+question: "TurboModule TypeScript 스펙의 빈칸을 채우세요"
+code: |
+  import type { ___ } from 'react-native';
+  import { ___ } from 'react-native';
+
+  export interface Spec extends TurboModule {
+    getDeviceModel(): string;
+  }
+
+  export default TurboModuleRegistry.getEnforcing<Spec>('DeviceInfo');
+blanks: ["TurboModule", "TurboModuleRegistry"]
+distractors: ["NativeModule", "ReactModule", "BridgeModule", "FabricModule"]
+hint: "TurboModule 스펙은 TurboModule 타입과 TurboModuleRegistry를 import합니다"
+xp: 5
+```
+
 ---
 
 ## 2. TurboModules

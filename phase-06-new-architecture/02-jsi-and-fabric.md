@@ -288,6 +288,26 @@ useLayoutEffect(() => {
 }, []);
 ```
 
+```exercise
+type: categorize
+question: "다음을 Legacy Architecture와 New Architecture로 분류하세요"
+categories: ["Legacy Architecture", "New Architecture"]
+items:
+  - text: "Bridge (JSON 직렬화)"
+    category: "Legacy Architecture"
+  - text: "JSI (C++ 직접 바인딩)"
+    category: "New Architecture"
+  - text: "비동기 통신만 가능"
+    category: "Legacy Architecture"
+  - text: "동기/비동기 모두 가능"
+    category: "New Architecture"
+  - text: "Legacy Renderer"
+    category: "Legacy Architecture"
+  - text: "Fabric"
+    category: "New Architecture"
+xp: 6
+```
+
 ---
 
 ## 2. Fabric 렌더러

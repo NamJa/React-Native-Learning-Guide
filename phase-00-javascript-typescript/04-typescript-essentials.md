@@ -388,6 +388,41 @@ type ButtonProps = {
 };
 ```
 
+```exercise
+type: word-bank
+question: "TypeScript 타입 정의의 빈칸을 채우세요"
+code: |
+  type User = {
+    id: ___;
+    name: ___;
+    email?: ___;
+  };
+blanks: ["number", "string", "string"]
+distractors: ["boolean", "any", "void", "undefined"]
+hint: "id는 숫자, name과 email은 문자열 타입입니다. email은 선택적(optional) 속성입니다."
+xp: 5
+```
+
+```exercise
+type: categorize
+question: "다음 키워드를 Kotlin과 TypeScript로 분류하세요"
+categories: ["Kotlin", "TypeScript"]
+items:
+  - text: "data class"
+    category: "Kotlin"
+  - text: "interface"
+    category: "TypeScript"
+  - text: "sealed class"
+    category: "Kotlin"
+  - text: "union type (|)"
+    category: "TypeScript"
+  - text: "val / var"
+    category: "Kotlin"
+  - text: "const / let"
+    category: "TypeScript"
+xp: 6
+```
+
 ---
 
 ## 4. 유니온 타입과 인터섹션 타입
