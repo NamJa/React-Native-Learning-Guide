@@ -153,10 +153,29 @@
 }
 
 /* ==========================================================================
+   Offset sidebar toggle & content for sticky progress bar
+   ========================================================================== */
+
+.sidebar-toggle {
+  top: 44px !important;
+}
+
+.sidebar {
+  padding-top: 36px;
+}
+
+/* ==========================================================================
    Mobile Responsive
    ========================================================================== */
 
 @media (max-width: 768px) {
+  .sidebar-toggle {
+    top: 36px !important;
+  }
+
+  .sidebar {
+    padding-top: 28px;
+  }
   .progress-bar-container {
     height: 28px;
     padding: 0 10px;
