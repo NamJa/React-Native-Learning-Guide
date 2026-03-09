@@ -1364,3 +1364,64 @@ describe('DeviceInfoScreen', () => {
 │                                                                 │
 └────────────────────────────────────────────────────────────────┘
 ```
+
+## 🔄 Kotlin ↔ React Native 비교 뷰어
+
+```compare
+left_lang: kotlin
+left_title: "Kotlin — TurboModule 구현"
+right_lang: typescript
+right_title: "TypeScript — TurboModule Spec 정의"
+note: "TypeScript로 스펙을 정의하면 Codegen이 Kotlin 인터페이스를 자동 생성하고, 개발자는 이를 구현합니다."
+---left---
+class DeviceInfoModule(
+  reactContext: ReactApplicationContext
+) : NativeDeviceInfoSpec(reactContext) {
+
+  override fun getName() = "DeviceInfo"
+
+  override fun getBatteryLevel(promise: Promise) {
+    val bm = reactApplicationContext
+      .getSystemService(Context.BATTERY_SERVICE)
+      as BatteryManager
+    val level = bm.getIntProperty(
+      BatteryManager.BATTERY_PROPERTY_CAPACITY
+    )
+    promise.resolve(level.toDouble())
+  }
+
+  override fun getDeviceModel(): String {
+    return android.os.Build.MODEL
+  }
+}
+---right---
+// specs/NativeDeviceInfo.ts
+import type { TurboModule } from 'react-native';
+import { TurboModuleRegistry } from 'react-native';
+
+export interface Spec extends TurboModule {
+  getBatteryLevel(): Promise<number>;
+  getDeviceModel(): string;
+}
+
+export default TurboModuleRegistry
+  .getEnforcing<Spec>('DeviceInfo');
+
+// 사용
+const model = DeviceInfo.getDeviceModel();
+const battery = await DeviceInfo.getBatteryLevel();
+```
+
+## ✅ 학습 확인 퀴즈
+
+```quiz
+type: mcq
+question: "TurboModule에서 동기 호출이 가능한 이유는?"
+options:
+  - "Bridge가 최적화되었기 때문"
+  - "JSI를 통해 C++ 레벨에서 직접 함수를 호출하기 때문"
+  - "JavaScript가 멀티스레드를 지원하기 때문"
+  - "Kotlin coroutine을 사용하기 때문"
+answer: "JSI를 통해 C++ 레벨에서 직접 함수를 호출하기 때문"
+explanation: "JSI는 JavaScript 엔진에 C++ 객체를 직접 바인딩하여 JSON 직렬화/역직렬화 없이 네이티브 함수를 동기적으로 호출할 수 있게 합니다."
+```

@@ -1290,4 +1290,36 @@ const HorizontalScrollRow = () => {
 | `position` | `'relative'` | — | 위치 모드 |
 | `zIndex` | `0` | `elevation` / `translationZ` | 겹침 순서 |
 
+## 🎮 Flexbox 인터랙티브 Playground
+
+아래에서 Flexbox 속성을 직접 조작하고 결과를 확인하세요:
+
+<div class="flexbox-playground-mount"></div>
+
+## ✅ 학습 확인 퀴즈
+
+```quiz
+type: mcq
+question: "React Native의 기본 flexDirection 값은?"
+options:
+  - "row"
+  - "column"
+  - "row-reverse"
+  - "column-reverse"
+answer: "column"
+explanation: "React Native는 웹과 달리 기본 flexDirection이 'column'입니다. 웹 CSS의 기본값은 'row'이므로 주의하세요."
+```
+
+```quiz
+type: mcq
+question: "Android의 layout_weight와 가장 유사한 React Native 스타일 속성은?"
+options:
+  - "width"
+  - "flex"
+  - "flexGrow"
+  - "alignSelf"
+answer: "flex"
+explanation: "flex 속성은 Android의 layout_weight처럼 사용 가능한 공간을 비율로 분배합니다."
+```
+
 > 다음: [03-lists-and-scrolling.md](./03-lists-and-scrolling.md) — 리스트와 스크롤

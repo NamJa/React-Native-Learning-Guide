@@ -929,4 +929,32 @@ src/
 | `node_modules/` | 설치된 패키지 | `.gradle/caches/` |
 | `package-lock.json` | 의존성 버전 잠금 | `gradle.lockfile` |
 
+## 📊 프로젝트 구조 다이어그램
+
+```mermaid
+graph TB
+    Root["MyFirstRNApp/"]
+    Android["android/<br/>(네이티브 Android)"]
+    iOS["ios/<br/>(네이티브 iOS)"]
+    AppTsx["App.tsx<br/>(앱 진입점)"]
+    Components["components/<br/>(재사용 컴포넌트)"]
+    Pkg["package.json<br/>(의존성 관리)"]
+    Metro["metro.config.js<br/>(번들러 설정)"]
+    TSConfig["tsconfig.json<br/>(TypeScript 설정)"]
+
+    Root --> Android
+    Root --> iOS
+    Root --> AppTsx
+    Root --> Components
+    Root --> Pkg
+    Root --> Metro
+    Root --> TSConfig
+
+    style Root fill:#282c34,stroke:#61dafb,color:#61dafb
+    style Android fill:#1a1a2e,stroke:#4ecdc4,color:#4ecdc4
+    style iOS fill:#1a1a2e,stroke:#a0a0b0,color:#a0a0b0
+    style AppTsx fill:#1a1a2e,stroke:#e94560,color:#e94560
+    style Components fill:#1a1a2e,stroke:#f5a623,color:#f5a623
+```
+
 > 다음: [phase-03-core-components/01-basic-components.md](../phase-03-core-components/01-basic-components.md) — 기본 컴포넌트 완전 가이드

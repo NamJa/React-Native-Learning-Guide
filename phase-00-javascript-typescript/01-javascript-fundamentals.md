@@ -993,4 +993,57 @@ println(42 is Int)         // true
 
 ---
 
+## 🎮 인터랙티브 연습
+
+아래 코드를 직접 수정하고 실행해보세요:
+
+```javascript [playground]
+// 구조 분해 할당 연습
+const user = {
+  name: 'Kim',
+  age: 30,
+  address: { city: 'Seoul', zip: '06000' }
+};
+
+// 객체 구조 분해
+const { name, age } = user;
+console.log(`이름: ${name}, 나이: ${age}`);
+
+// 중첩 구조 분해
+const { address: { city } } = user;
+console.log(`도시: ${city}`);
+
+// 배열 구조 분해
+const [first, second, ...rest] = [1, 2, 3, 4, 5];
+console.log(`first: ${first}, rest: ${rest}`);
+```
+
+## ✅ 학습 확인 퀴즈
+
+```quiz
+type: mcq
+question: "JavaScript에서 변수를 선언할 때 재할당이 불가능한 키워드는?"
+options:
+  - "var"
+  - "let"
+  - "const"
+  - "function"
+answer: "const"
+explanation: "const로 선언한 변수는 재할당이 불가능합니다. Kotlin의 val과 유사합니다."
+```
+
+```quiz
+type: mcq
+question: "다음 중 Kotlin의 data class와 가장 유사한 TypeScript 개념은?"
+options:
+  - "class"
+  - "interface / type"
+  - "enum"
+  - "namespace"
+answer: "interface / type"
+explanation: "TypeScript의 interface와 type은 데이터 구조를 정의하며, Kotlin의 data class처럼 데이터 형태를 선언하는 데 사용됩니다."
+```
+
+---
+
 > **다음 문서**: [02-modern-javascript-es6+.md](./02-modern-javascript-es6+.md) — 모던 JavaScript (ES6+) 핵심 문법 완전 정리

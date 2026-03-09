@@ -1679,4 +1679,29 @@ const styles = StyleSheet.create({
 
 ---
 
+## ✅ 학습 확인 퀴즈
+
+```quiz
+type: match
+question: "Android 컴포넌트와 React Native 대응을 연결하세요"
+pairs:
+  - ["ViewGroup / FrameLayout", "View"]
+  - ["TextView", "Text"]
+  - ["ImageView", "Image"]
+  - ["EditText", "TextInput"]
+  - ["RecyclerView", "FlatList"]
+```
+
+```quiz
+type: mcq
+question: "React Native에서 터치 이벤트를 처리하기 위해 권장되는 컴포넌트는?"
+options:
+  - "TouchableOpacity"
+  - "Button"
+  - "Pressable"
+  - "TouchableHighlight"
+answer: "Pressable"
+explanation: "Pressable은 React Native에서 공식 권장하는 터치 처리 컴포넌트로, press 상태에 따른 세밀한 스타일 제어가 가능합니다."
+```
+
 > 다음: [02-flexbox-layout.md](./02-flexbox-layout.md) — Flexbox 레이아웃 완전 정복

@@ -974,4 +974,51 @@ DrawerLayout + NavigationView    createDrawerNavigator
 ViewPager2 + TabLayout           createMaterialTopTabNavigator
 ```
 
+## 📊 네비게이션 구조 다이어그램
+
+```mermaid
+graph TB
+    App["App<br/>(NavigationContainer)"]
+    Stack["Stack Navigator"]
+    Tabs["Tab Navigator"]
+    Drawer["Drawer Navigator"]
+
+    Home["HomeScreen"]
+    Detail["DetailScreen"]
+    Tab1["Tab1Screen"]
+    Tab2["Tab2Screen"]
+    Settings["SettingsScreen"]
+
+    App --> Stack
+    App --> Tabs
+    App --> Drawer
+
+    Stack --> Home
+    Stack --> Detail
+
+    Tabs --> Tab1
+    Tabs --> Tab2
+
+    Drawer --> Settings
+    Drawer --> Stack
+
+    style App fill:#282c34,stroke:#61dafb,color:#61dafb
+    style Stack fill:#1a1a2e,stroke:#e94560,color:#e94560
+    style Tabs fill:#1a1a2e,stroke:#4ecdc4,color:#4ecdc4
+    style Drawer fill:#1a1a2e,stroke:#f5a623,color:#f5a623
+```
+
+## ✅ 학습 확인 퀴즈
+
+```quiz
+type: match
+question: "Android 네비게이션 개념과 React Navigation 대응을 연결하세요"
+pairs:
+  - ["NavGraph", "Navigator 정의"]
+  - ["NavController.navigate()", "navigation.navigate()"]
+  - ["Bundle / SafeArgs", "route.params"]
+  - ["BottomNavigationView", "createBottomTabNavigator"]
+  - ["DrawerLayout", "createDrawerNavigator"]
+```
+
 다음 문서에서는 Stack Navigation을 깊이 있게 다루며, Fragment Transaction에서 전환하는 방법을 상세히 설명한다.

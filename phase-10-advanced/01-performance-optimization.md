@@ -986,3 +986,29 @@ function App() {
 [ ] 애니메이션은 Reanimated (UI 스레드)
 [ ] 무거운 계산은 네이티브 모듈로
 ```
+
+## ✅ 학습 확인 퀴즈
+
+```quiz
+type: mcq
+question: "FlatList에서 항목 높이가 고정일 때 성능을 크게 향상시키는 prop은?"
+options:
+  - "windowSize"
+  - "maxToRenderPerBatch"
+  - "getItemLayout"
+  - "removeClippedSubviews"
+answer: "getItemLayout"
+explanation: "getItemLayout을 제공하면 FlatList가 항목의 위치를 미리 계산할 수 있어, 동적 측정 비용을 제거하고 스크롤 성능을 크게 향상시킵니다."
+```
+
+```quiz
+type: mcq
+question: "React.memo의 역할은?"
+options:
+  - "컴포넌트의 state를 메모이제이션"
+  - "props가 변경되지 않으면 re-render를 건너뜀"
+  - "useEffect의 실행을 최적화"
+  - "네트워크 응답을 캐싱"
+answer: "props가 변경되지 않으면 re-render를 건너뜀"
+explanation: "React.memo는 고차 컴포넌트로, 이전 props와 새 props를 얕은 비교(shallow comparison)하여 변경이 없으면 re-render를 건너뜁니다."
+```

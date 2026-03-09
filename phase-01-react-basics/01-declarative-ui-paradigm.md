@@ -1156,4 +1156,54 @@ function App() {
 
 ---
 
+## 🔄 Kotlin ↔ React Native 비교 뷰어
+
+```compare
+left_lang: kotlin
+left_title: "Android (Kotlin) — 명령형"
+right_lang: typescript
+right_title: "React Native (TypeScript) — 선언형"
+note: "Android에서는 View를 직접 찾아 속성을 변경하지만, React에서는 상태에 따라 UI를 선언합니다."
+---left---
+// Activity에서 View를 직접 조작
+val textView = findViewById<TextView>(R.id.title)
+textView.text = "Hello"
+textView.visibility = View.VISIBLE
+
+val button = findViewById<Button>(R.id.btn)
+button.setOnClickListener {
+    textView.text = "Clicked!"
+}
+---right---
+// 상태에 따라 UI를 선언
+function App() {
+  const [text, setText] = useState('Hello');
+
+  return (
+    <View>
+      <Text>{text}</Text>
+      <Pressable onPress={() => setText('Clicked!')}>
+        <Text>버튼</Text>
+      </Pressable>
+    </View>
+  );
+}
+```
+
+## ✅ 학습 확인 퀴즈
+
+```quiz
+type: mcq
+question: "React의 선언형 UI에서 화면을 업데이트하는 올바른 방법은?"
+options:
+  - "DOM 요소를 직접 찾아서 속성을 변경한다"
+  - "상태(State)를 변경하면 React가 자동으로 UI를 업데이트한다"
+  - "화면 전체를 수동으로 다시 그린다"
+  - "XML 레이아웃 파일을 수정한다"
+answer: "상태(State)를 변경하면 React가 자동으로 UI를 업데이트한다"
+explanation: "React는 선언형 패러다임으로, 개발자가 State를 변경하면 React가 변경 사항을 감지하고 필요한 부분만 자동으로 re-render합니다."
+```
+
+---
+
 > **다음 문서:** [02-components-and-jsx.md](./02-components-and-jsx.md) — 컴포넌트와 JSX 완전 가이드

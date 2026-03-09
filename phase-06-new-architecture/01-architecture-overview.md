@@ -824,3 +824,55 @@ UI Thread:
 │                                                                   │
 └──────────────────────────────────────────────────────────────────┘
 ```
+
+## 📊 New Architecture 구조 다이어그램
+
+```mermaid
+graph TB
+    JS["JavaScript Layer<br/>(React 19.2 + Hermes V1)"]
+    JSI["JSI<br/>(JavaScript Interface — C++ Direct Binding)"]
+    Fabric["Fabric<br/>(새 렌더러)"]
+    TM["TurboModules<br/>(새 네이티브 모듈 시스템)"]
+    CG["Codegen<br/>(TS → Native 타입 자동 생성)"]
+    Native["Native Platform<br/>(Android / iOS)"]
+
+    JS --> JSI
+    JSI --> Fabric
+    JSI --> TM
+    Fabric --> CG
+    TM --> CG
+    CG --> Native
+
+    style JS fill:#282c34,stroke:#61dafb,color:#61dafb
+    style JSI fill:#1a1a2e,stroke:#e94560,color:#e94560
+    style Fabric fill:#1a1a2e,stroke:#4ecdc4,color:#4ecdc4
+    style TM fill:#1a1a2e,stroke:#f5a623,color:#f5a623
+    style CG fill:#1a1a2e,stroke:#a855f7,color:#a855f7
+    style Native fill:#1a1a2e,stroke:#0f3460,color:#0f3460
+```
+
+## ✅ 학습 확인 퀴즈
+
+```quiz
+type: mcq
+question: "New Architecture에서 Bridge를 대체하는 핵심 기술은?"
+options:
+  - "WebSocket"
+  - "JSI (JavaScript Interface)"
+  - "REST API"
+  - "gRPC"
+answer: "JSI (JavaScript Interface)"
+explanation: "JSI는 C++ 기반으로 JavaScript와 네이티브 코드 간 직접 동기/비동기 호출을 가능하게 합니다. 기존 Bridge의 JSON 직렬화 오버헤드를 제거합니다."
+```
+
+```quiz
+type: mcq
+question: "Codegen의 역할은?"
+options:
+  - "JavaScript 코드를 네이티브 코드로 컴파일"
+  - "TypeScript 스펙에서 네이티브 타입과 인터페이스를 자동 생성"
+  - "앱을 자동으로 빌드하고 배포"
+  - "테스트 코드를 자동 생성"
+answer: "TypeScript 스펙에서 네이티브 타입과 인터페이스를 자동 생성"
+explanation: "Codegen은 TypeScript로 정의한 TurboModule/Fabric Component 스펙을 읽어 Kotlin/ObjC 네이티브 인터페이스를 자동 생성하여 타입 안전성을 컴파일 타임에 보장합니다."
+```

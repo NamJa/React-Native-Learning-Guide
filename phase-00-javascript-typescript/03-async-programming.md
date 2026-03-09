@@ -1138,4 +1138,47 @@ try {
 
 ---
 
+## 🎮 인터랙티브 연습
+
+```javascript [playground]
+// async/await 연습
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function fetchUserData() {
+  console.log('데이터 요청 시작...');
+  await delay(100);
+  console.log('사용자 데이터 수신 완료');
+  return { id: 1, name: 'Kim', role: 'Android Developer' };
+}
+
+async function main() {
+  try {
+    const user = await fetchUserData();
+    console.log('사용자:', JSON.stringify(user));
+  } catch (error) {
+    console.error('에러 발생:', error.message);
+  }
+}
+
+main();
+```
+
+## ✅ 학습 확인 퀴즈
+
+```quiz
+type: mcq
+question: "Kotlin의 coroutine과 가장 유사한 JavaScript 비동기 패턴은?"
+options:
+  - "callback"
+  - "Promise.then()"
+  - "async/await"
+  - "setTimeout"
+answer: "async/await"
+explanation: "async/await는 Kotlin의 coroutine처럼 비동기 코드를 동기적으로 읽히도록 작성할 수 있게 해줍니다."
+```
+
+---
+
 > **다음 문서**: [04-typescript-essentials.md](./04-typescript-essentials.md) — TypeScript 핵심: Kotlin 개발자가 빠르게 익히는 타입 시스템

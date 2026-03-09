@@ -1498,3 +1498,29 @@ WorkManager                → expo-task-manager
 Hilt/Koin (DI)             → React Context / zustand (DI 불필요)
 Paging 3                   → @tanstack/react-query useInfiniteQuery
 ```
+
+## ✅ 학습 확인 퀴즈
+
+```quiz
+type: mcq
+question: "React Native에서 Android의 SharedPreferences를 대체하는 고속 저장소 라이브러리는?"
+options:
+  - "AsyncStorage"
+  - "react-native-mmkv"
+  - "SQLite"
+  - "Realm"
+answer: "react-native-mmkv"
+explanation: "MMKV는 WeChat이 개발한 고성능 key-value 저장소로, AsyncStorage보다 30배 이상 빠릅니다. Android의 SharedPreferences를 대체합니다."
+```
+
+```quiz
+type: mcq
+question: "2026년 기준 React Native 애니메이션에 권장되는 라이브러리는?"
+options:
+  - "Animated API (내장)"
+  - "react-native-reanimated"
+  - "react-spring"
+  - "Lottie"
+answer: "react-native-reanimated"
+explanation: "react-native-reanimated v3는 네이티브 드리븐 애니메이션을 지원하여 JS 스레드를 차단하지 않고 60fps 애니메이션을 구현할 수 있습니다."
+```

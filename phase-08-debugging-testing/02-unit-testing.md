@@ -1423,3 +1423,31 @@ jobs:
         with:
           file: ./coverage/lcov.info
 ```
+
+## ✅ 학습 확인 퀴즈
+
+```quiz
+type: fill
+question: "다음 빈칸을 채워 React Native 컴포넌트 테스트를 완성하세요"
+code: |
+  import { render, screen, ___ } from '@testing-library/react-native';
+
+  test('버튼 클릭 시 카운트 증가', () => {
+    render(<Counter />);
+    const button = screen.getByText('증가');
+    ___.press(button);
+    expect(screen.getByText('1')).toBeTruthy();
+  });
+answers: ["fireEvent", "fireEvent"]
+hints: ["이벤트를 발생시키는 유틸리티를 import합니다", "터치 이벤트를 시뮬레이션하는 메서드입니다"]
+```
+
+```quiz
+type: match
+question: "테스트 도구와 Android 대응을 연결하세요"
+pairs:
+  - ["Jest", "JUnit"]
+  - ["React Native Testing Library", "Espresso"]
+  - ["Detox / Maestro", "UI Automator"]
+  - ["Jest Snapshot", "(해당 없음)"]
+```

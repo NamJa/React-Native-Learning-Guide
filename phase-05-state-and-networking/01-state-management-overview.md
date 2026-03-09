@@ -816,4 +816,51 @@ viewModelScope.launch               useMutation / 비동기 action
 Flow.map / combine                  Zustand selector / useMemo
 ```
 
+## 📊 상태 관리 데이터 흐름
+
+```mermaid
+sequenceDiagram
+    participant C as Component
+    participant Z as Zustand Store
+    participant TQ as TanStack Query
+    participant API as REST API
+    participant LS as Local Storage
+
+    C->>Z: dispatch action
+    Z-->>C: state 업데이트 → re-render
+
+    C->>TQ: useQuery() 호출
+    TQ->>API: fetch 요청
+    API-->>TQ: JSON 응답
+    TQ-->>C: data, isLoading, error
+    TQ->>TQ: 캐시 저장 (staleTime)
+
+    C->>LS: MMKV.set()
+    LS-->>C: MMKV.get()
+```
+
+## ✅ 학습 확인 퀴즈
+
+```quiz
+type: mcq
+question: "React Native에서 서버 데이터 캐싱과 동기화를 담당하는 라이브러리는?"
+options:
+  - "Zustand"
+  - "Redux"
+  - "TanStack Query"
+  - "AsyncStorage"
+answer: "TanStack Query"
+explanation: "TanStack Query(React Query)는 서버 상태를 관리하며, 자동 캐싱, 재시도, 백그라운드 리페칭 등을 제공합니다. Retrofit + Repository 패턴을 대체합니다."
+```
+
+```quiz
+type: match
+question: "Android 아키텍처와 React Native 대응을 연결하세요"
+pairs:
+  - ["ViewModel + StateFlow", "useState + Zustand"]
+  - ["Repository + Retrofit", "TanStack Query + fetch"]
+  - ["Room DB", "AsyncStorage / MMKV"]
+  - ["Hilt / Koin", "React Context"]
+```
+
 다음 문서에서는 Zustand를 사용한 전역 상태 관리를 상세히 다룬다.
