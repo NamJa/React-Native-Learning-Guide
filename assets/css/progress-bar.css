@@ -161,7 +161,7 @@
 }
 
 .sidebar {
-  padding-top: 36px;
+  padding-top: 44px !important;
 }
 
 /* ==========================================================================
@@ -174,7 +174,7 @@
   }
 
   .sidebar {
-    padding-top: 28px;
+    padding-top: 36px !important;
   }
   .progress-bar-container {
     height: 28px;
