@@ -282,6 +282,9 @@
         var textarea = container.querySelector('.playground-textarea');
         if (textarea && !container.getAttribute('data-original')) {
           container.setAttribute('data-original', textarea.value);
+          // Set textarea height to fit all lines (line-height:1.6 * font-size:13px ≈ 20.8px, padding:12px*2)
+          var lineCount = textarea.value.split('\n').length;
+          textarea.style.height = Math.ceil(lineCount * 20.8 + 24) + 'px';
         }
       });
 
