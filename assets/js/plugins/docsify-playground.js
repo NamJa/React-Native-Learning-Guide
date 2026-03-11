@@ -37,6 +37,39 @@
       '</div>';
   }
 
+  // Detect third-party dependencies from import statements
+  function detectDependencies(code) {
+    var deps = {};
+    var importRegex = /from\s+['"]([^'"./][^'"]*)['"]/g;
+    var match;
+    while ((match = importRegex.exec(code)) !== null) {
+      var pkg = match[1];
+      // Handle scoped packages (@org/pkg)
+      if (pkg.startsWith('@')) {
+        pkg = pkg.split('/').slice(0, 2).join('/');
+      } else {
+        pkg = pkg.split('/')[0];
+      }
+      // Skip built-in packages
+      if (pkg !== 'react' && pkg !== 'react-native') {
+        deps[pkg] = '*';
+      }
+    }
+    // Add peer dependencies for react-navigation
+    if (deps['@react-navigation/native'] || deps['@react-navigation/native-stack'] ||
+        deps['@react-navigation/bottom-tabs'] || deps['@react-navigation/drawer']) {
+      deps['@react-navigation/native'] = '*';
+      deps['react-native-screens'] = '*';
+      deps['react-native-safe-area-context'] = '*';
+    }
+    if (deps['@react-navigation/drawer']) {
+      deps['react-native-gesture-handler'] = '*';
+      deps['react-native-reanimated'] = '*';
+    }
+    var result = Object.keys(deps).map(function(k) { return k + '@' + deps[k]; }).join(',');
+    return result;
+  }
+
   // Render Expo Snack embed placeholder
   function renderSnack(code, id) {
     var encodedCode = encodeURIComponent(code);
@@ -158,7 +191,9 @@
     container.querySelector('.playground-output').style.display = 'none';
   };
 
-  // Load Expo Snack iframe
+  // Load Expo Snack inside an isolated srcdoc iframe with embed.js
+  // Each snack gets its own iframe + embed.js instance → no cross-snack interference
+  // embed.js uses postMessage to deliver code → no URL length limit → Android/iOS work
   window.__playgroundLoadSnack = function(id) {
     var container = document.getElementById(id);
     if (!container) return;
@@ -170,13 +205,32 @@
     if (placeholder) placeholder.style.display = 'none';
     if (iframeContainer) iframeContainer.style.display = 'block';
 
+    // Skip if already loaded
+    if (iframe.getAttribute('data-loaded')) return;
+    iframe.setAttribute('data-loaded', 'true');
+
     var code = decodeURIComponent(iframe.getAttribute('data-code'));
-    var snackUrl = 'https://snack.expo.dev/embedded' +
-      '?code=' + encodeURIComponent(code) +
-      '&platform=web' +
-      '&theme=dark' +
-      '&preview=true';
-    iframe.src = snackUrl;
+    var deps = detectDependencies(code);
+    var files = JSON.stringify({ 'App.js': { type: 'CODE', contents: code } });
+
+    // Escape for safe embedding inside a <script> tag
+    var safeFiles = JSON.stringify(files).replace(/<\//g, '<\\/');
+
+    var html = '<!DOCTYPE html><html><head>' +
+      '<style>*{margin:0;padding:0;}html,body{height:100%;overflow:hidden;}</style></head><body>' +
+      '<div id="snack"' +
+      ' data-snack-name="RN Learning Example"' +
+      ' data-snack-sdkversion="52.0.0"' +
+      ' data-snack-platform="web"' +
+      ' data-snack-theme="dark"' +
+      ' data-snack-preview="true"' +
+      (deps ? ' data-snack-dependencies="' + deps.replace(/"/g, '&quot;') + '"' : '') +
+      ' style="overflow:hidden;height:100%;width:100%;"></div>' +
+      '<script>document.getElementById("snack").setAttribute("data-snack-files",' + safeFiles + ');<\/script>' +
+      '<script src="https://snack.expo.dev/embed.js"><\/script>' +
+      '</body></html>';
+
+    iframe.srcdoc = html;
   };
 
   // Register Docsify plugin
