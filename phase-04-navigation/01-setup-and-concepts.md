@@ -173,6 +173,59 @@ function App() {
 export default App;
 ```
 
+```jsx [snack]
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+function HomeScreen() {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Home Screen</Text>
+      <Text style={styles.subtitle}>NavigationContainer 기본 설정 예제</Text>
+    </View>
+  );
+}
+
+const Stack = createNativeStackNavigator();
+
+function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{ title: '홈' }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5F5F5',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#212121',
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#757575',
+    marginTop: 8,
+  },
+});
+
+export default App;
+```
+
 ### 4-2. Android 비교: NavHostFragment 설정
 
 Android에서의 동일한 개념:
@@ -263,6 +316,84 @@ function AppStack() {
 }
 ```
 
+```jsx [snack]
+import React from 'react';
+import { View, Text, Button, StyleSheet } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+function HomeScreen({ navigation }) {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Home</Text>
+      <View style={styles.buttonWrap}>
+        <Button
+          title="Go to Detail"
+          onPress={() => navigation.navigate('Detail')}
+        />
+      </View>
+      <View style={styles.buttonWrap}>
+        <Button
+          title="Go to Settings"
+          onPress={() => navigation.navigate('Settings')}
+        />
+      </View>
+    </View>
+  );
+}
+
+function DetailScreen({ navigation }) {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Detail</Text>
+      <Button title="Go Back" onPress={() => navigation.goBack()} />
+    </View>
+  );
+}
+
+function SettingsScreen({ navigation }) {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Settings</Text>
+      <Button title="Go Back" onPress={() => navigation.goBack()} />
+    </View>
+  );
+}
+
+const Stack = createNativeStackNavigator();
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Detail" component={DetailScreen} />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5F5F5',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    color: '#212121',
+  },
+  buttonWrap: {
+    marginTop: 10,
+    width: '60%',
+  },
+});
+```
+
 ### 5-2. Bottom Tab Navigator
 
 ```
@@ -287,6 +418,79 @@ function MainTabs() {
     </Tab.Navigator>
   );
 }
+```
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+
+function HomeScreen() {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.icon}>🏠</Text>
+      <Text style={styles.title}>Home</Text>
+    </View>
+  );
+}
+
+function SearchScreen() {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.icon}>🔍</Text>
+      <Text style={styles.title}>Search</Text>
+    </View>
+  );
+}
+
+function ProfileScreen() {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.icon}>👤</Text>
+      <Text style={styles.title}>Profile</Text>
+    </View>
+  );
+}
+
+const Tab = createBottomTabNavigator();
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          tabBarIcon: () => {
+            const icons = { Home: '🏠', Search: '🔍', Profile: '👤' };
+            return <Text style={{ fontSize: 20 }}>{icons[route.name]}</Text>;
+          },
+        })}
+      >
+        <Tab.Screen name="Home" component={HomeScreen} />
+        <Tab.Screen name="Search" component={SearchScreen} />
+        <Tab.Screen name="Profile" component={ProfileScreen} />
+      </Tab.Navigator>
+    </NavigationContainer>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5F5F5',
+  },
+  icon: {
+    fontSize: 48,
+    marginBottom: 10,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#212121',
+  },
+});
 ```
 
 ### 5-3. Drawer Navigator
@@ -408,6 +612,92 @@ function HomeScreen({ navigation, route }) {
 }
 ```
 
+```jsx [snack]
+import React from 'react';
+import { View, Text, Button, StyleSheet } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+function HomeScreen({ navigation }) {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Home</Text>
+      <Text style={styles.subtitle}>route.params로 데이터를 전달합니다</Text>
+      <View style={styles.buttonWrap}>
+        <Button
+          title="Detail로 이동 (id: 42)"
+          onPress={() => navigation.navigate('Detail', { id: 42 })}
+        />
+      </View>
+      <View style={styles.buttonWrap}>
+        <Button
+          title="Detail로 이동 (id: 99)"
+          onPress={() => navigation.navigate('Detail', { id: 99 })}
+        />
+      </View>
+    </View>
+  );
+}
+
+function DetailScreen({ navigation, route }) {
+  const { id } = route.params;
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Detail Screen</Text>
+      <Text style={styles.param}>받은 파라미터 id: {id}</Text>
+      <View style={styles.buttonWrap}>
+        <Button title="뒤로 가기" onPress={() => navigation.goBack()} />
+      </View>
+    </View>
+  );
+}
+
+const Stack = createNativeStackNavigator();
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Home" component={HomeScreen} options={{ title: '홈' }} />
+        <Stack.Screen name="Detail" component={DetailScreen} options={{ title: '상세' }} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#F5F5F5',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#212121',
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#757575',
+    marginTop: 4,
+    marginBottom: 20,
+  },
+  param: {
+    fontSize: 18,
+    color: '#6200EE',
+    fontWeight: '600',
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  buttonWrap: {
+    marginTop: 10,
+    width: '70%',
+  },
+});
+```
+
 ### 6-3. navigation.navigate() ↔ NavController.navigate()
 
 ```kotlin
@@ -430,6 +720,103 @@ navigation.navigate('Detail', { id: 42 });
 
 // push: 항상 스택에 새로 쌓음 (Android navigate()와 유사)
 navigation.push('Detail', { id: 42 });
+```
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, Button, StyleSheet } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+function HomeScreen({ navigation }) {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>navigate vs push 차이</Text>
+      <Text style={styles.desc}>navigate: 스택에 같은 화면이 있으면 그곳으로 돌아감</Text>
+      <Text style={styles.desc}>push: 항상 새 화면을 스택에 쌓음</Text>
+      <View style={styles.buttonWrap}>
+        <Button
+          title="Detail로 navigate"
+          onPress={() => navigation.navigate('Detail', { id: 1 })}
+        />
+      </View>
+    </View>
+  );
+}
+
+function DetailScreen({ navigation, route }) {
+  const { id } = route.params;
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Detail #{id}</Text>
+      <View style={styles.buttonWrap}>
+        <Button
+          title={`navigate로 Detail (id: ${id + 1})`}
+          onPress={() => navigation.navigate('Detail', { id: id + 1 })}
+        />
+      </View>
+      <View style={styles.buttonWrap}>
+        <Button
+          title={`push로 Detail (id: ${id + 1})`}
+          onPress={() => navigation.push('Detail', { id: id + 1 })}
+        />
+      </View>
+      <View style={styles.buttonWrap}>
+        <Button title="뒤로 가기" onPress={() => navigation.goBack()} />
+      </View>
+      <Text style={styles.hint}>push를 여러 번 누른 후 뒤로가기를 눌러보세요!</Text>
+    </View>
+  );
+}
+
+const Stack = createNativeStackNavigator();
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Home" component={HomeScreen} options={{ title: '홈' }} />
+        <Stack.Screen
+          name="Detail"
+          component={DetailScreen}
+          options={({ route }) => ({ title: `Detail #${route.params.id}` })}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#F5F5F5',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#212121',
+    marginBottom: 10,
+  },
+  desc: {
+    fontSize: 13,
+    color: '#757575',
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  hint: {
+    fontSize: 12,
+    color: '#9E9E9E',
+    marginTop: 20,
+    fontStyle: 'italic',
+  },
+  buttonWrap: {
+    marginTop: 10,
+    width: '80%',
+  },
+});
 ```
 
 ### 6-4. route.params ↔ Bundle/SafeArgs
@@ -901,6 +1288,155 @@ function App() {
 // ========================================
 // 5. 스타일 (Android XML layout 대체)
 // ========================================
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#F5F5F5',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#212121',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#757575',
+    marginBottom: 30,
+    textAlign: 'center',
+  },
+  body: {
+    fontSize: 16,
+    color: '#424242',
+    marginBottom: 10,
+  },
+  buttonContainer: {
+    marginTop: 10,
+    width: '80%',
+  },
+});
+
+export default App;
+```
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, Button, StyleSheet } from 'react-native';
+import { NavigationContainer, useNavigation, useRoute } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+// Home 화면
+function HomeScreen() {
+  const navigation = useNavigation();
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>홈 화면</Text>
+      <Text style={styles.subtitle}>
+        Android Navigation에서 온 개발자를 환영합니다!
+      </Text>
+
+      <View style={styles.buttonContainer}>
+        <Button
+          title="아이템 상세 보기"
+          onPress={() =>
+            navigation.navigate('Detail', {
+              itemId: 42,
+              itemTitle: 'React Navigation 학습',
+            })
+          }
+        />
+      </View>
+
+      <View style={styles.buttonContainer}>
+        <Button
+          title="설정"
+          onPress={() => navigation.navigate('Settings')}
+        />
+      </View>
+    </View>
+  );
+}
+
+// Detail 화면 - 파라미터를 받는 화면
+function DetailScreen() {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const { itemId, itemTitle } = route.params;
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>상세 화면</Text>
+      <Text style={styles.body}>아이템 ID: {itemId}</Text>
+      <Text style={styles.body}>아이템 제목: {itemTitle}</Text>
+
+      <View style={styles.buttonContainer}>
+        <Button
+          title="다른 상세 페이지로 (push)"
+          onPress={() =>
+            navigation.push('Detail', {
+              itemId: itemId + 1,
+              itemTitle: `아이템 ${itemId + 1}`,
+            })
+          }
+        />
+      </View>
+
+      <View style={styles.buttonContainer}>
+        <Button title="뒤로 가기" onPress={() => navigation.goBack()} />
+      </View>
+    </View>
+  );
+}
+
+// Settings 화면
+function SettingsScreen() {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>설정 화면</Text>
+      <Text style={styles.body}>앱 설정을 여기서 관리합니다.</Text>
+    </View>
+  );
+}
+
+const Stack = createNativeStackNavigator();
+
+function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator
+        initialRouteName="Home"
+        screenOptions={{
+          headerStyle: { backgroundColor: '#6200EE' },
+          headerTintColor: '#FFFFFF',
+          headerTitleStyle: { fontWeight: 'bold' },
+        }}
+      >
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{ title: '홈' }}
+        />
+        <Stack.Screen
+          name="Detail"
+          component={DetailScreen}
+          options={({ route }) => ({
+            title: route.params.itemTitle,
+          })}
+        />
+        <Stack.Screen
+          name="Settings"
+          component={SettingsScreen}
+          options={{ title: '설정' }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

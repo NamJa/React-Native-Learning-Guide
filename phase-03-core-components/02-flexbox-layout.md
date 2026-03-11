@@ -154,6 +154,75 @@ const styles = StyleSheet.create({
 });
 ```
 
+> **직접 실행해 보세요** — 아래 Expo Snack에서 `flexDirection` 값을 바꿔보세요:
+
+```jsx [snack]
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
+
+const DIRECTIONS = ['column', 'row', 'column-reverse', 'row-reverse'];
+
+const FlexDirectionDemo = () => {
+  const [dirIndex, setDirIndex] = useState(0);
+  const direction = DIRECTIONS[dirIndex];
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.heading}>flexDirection: '{direction}'</Text>
+      <Pressable
+        style={styles.button}
+        onPress={() => setDirIndex((dirIndex + 1) % DIRECTIONS.length)}
+      >
+        <Text style={styles.buttonText}>다음 방향</Text>
+      </Pressable>
+
+      <View style={[styles.box, { flexDirection: direction }]}>
+        <View style={[styles.child, { backgroundColor: '#FF6B6B' }]}>
+          <Text style={styles.childText}>1</Text>
+        </View>
+        <View style={[styles.child, { backgroundColor: '#4ECDC4' }]}>
+          <Text style={styles.childText}>2</Text>
+        </View>
+        <View style={[styles.child, { backgroundColor: '#45B7D1' }]}>
+          <Text style={styles.childText}>3</Text>
+        </View>
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 20, backgroundColor: '#fff' },
+  heading: { fontSize: 18, fontWeight: 'bold', marginBottom: 12 },
+  button: {
+    backgroundColor: '#6C5CE7',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+    marginBottom: 16,
+  },
+  buttonText: { color: '#fff', fontWeight: 'bold', fontSize: 14 },
+  box: {
+    flex: 1,
+    backgroundColor: '#f0f0f0',
+    padding: 8,
+    borderRadius: 8,
+  },
+  child: {
+    width: 60,
+    height: 60,
+    margin: 4,
+    borderRadius: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  childText: { color: '#fff', fontWeight: 'bold', fontSize: 18 },
+});
+
+export default FlexDirectionDemo;
+```
+
 ---
 
 ## 3. justifyContent — 주축 정렬
@@ -337,6 +406,59 @@ const styles = StyleSheet.create({
 });
 ```
 
+> **직접 실행해 보세요** — 6가지 `justifyContent` 값을 한눈에 비교합니다:
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+
+const JustifyContentDemo = () => {
+  const values = [
+    'flex-start', 'flex-end', 'center',
+    'space-between', 'space-around', 'space-evenly',
+  ];
+
+  return (
+    <ScrollView style={styles.scroll}>
+      <Text style={styles.heading}>justifyContent 비교</Text>
+      <View style={styles.grid}>
+        {values.map((value) => (
+          <View key={value} style={styles.column}>
+            <Text style={styles.label}>{value}</Text>
+            <View style={[styles.box, { justifyContent: value }]}>
+              <View style={[styles.child, { backgroundColor: '#FF6B6B' }]} />
+              <View style={[styles.child, { backgroundColor: '#4ECDC4' }]} />
+              <View style={[styles.child, { backgroundColor: '#45B7D1' }]} />
+            </View>
+          </View>
+        ))}
+      </View>
+    </ScrollView>
+  );
+};
+
+const styles = StyleSheet.create({
+  scroll: { flex: 1, backgroundColor: '#fff' },
+  heading: { fontSize: 18, fontWeight: 'bold', padding: 16, paddingBottom: 8 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', padding: 8 },
+  column: { width: '33%', padding: 4 },
+  label: { fontSize: 10, textAlign: 'center', marginBottom: 4, fontWeight: 'bold' },
+  box: {
+    height: 200,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 4,
+    padding: 4,
+  },
+  child: {
+    width: '100%',
+    height: 30,
+    borderRadius: 4,
+  },
+});
+
+export default JustifyContentDemo;
+```
+
 ---
 
 ## 4. alignItems — 교차축 정렬
@@ -442,6 +564,82 @@ flexDirection: 'row', alignItems: 'baseline'
 | `alignItems: 'center'` | `android:layout_gravity="center"` |
 | `alignItems: 'baseline'` | `android:layout_gravity="baseline"` (LinearLayout) |
 
+> **직접 실행해 보세요** — `alignItems` 값을 전환하면서 교차축 정렬을 확인하세요:
+
+```jsx [snack]
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
+
+const VALUES = ['stretch', 'flex-start', 'flex-end', 'center', 'baseline'];
+
+const AlignItemsDemo = () => {
+  const [index, setIndex] = useState(0);
+  const value = VALUES[index];
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.heading}>alignItems: '{value}'</Text>
+      <Pressable
+        style={styles.button}
+        onPress={() => setIndex((index + 1) % VALUES.length)}
+      >
+        <Text style={styles.buttonText}>다음 값</Text>
+      </Pressable>
+
+      <View style={[styles.box, { alignItems: value }]}>
+        <View style={[styles.child, { height: 40, backgroundColor: '#FF6B6B' }]}>
+          <Text style={[styles.childText, { fontSize: 14 }]}>Small</Text>
+        </View>
+        <View style={[styles.child, { height: 70, backgroundColor: '#4ECDC4' }]}>
+          <Text style={[styles.childText, { fontSize: 20 }]}>Medium</Text>
+        </View>
+        <View style={[styles.child, { height: 50, backgroundColor: '#45B7D1' }]}>
+          <Text style={[styles.childText, { fontSize: 16 }]}>Normal</Text>
+        </View>
+      </View>
+      <Text style={styles.hint}>
+        {value === 'stretch'
+          ? "stretch: 자식의 width를 지정하지 않으면 부모 너비에 맞게 늘어납니다"
+          : value === 'baseline'
+          ? "baseline: flexDirection 'row'에서 텍스트 기준선에 맞춰 정렬됩니다"
+          : `${value}: 교차축 방향으로 ${value} 위치에 정렬됩니다`}
+      </Text>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 20, backgroundColor: '#fff' },
+  heading: { fontSize: 18, fontWeight: 'bold', marginBottom: 12 },
+  button: {
+    backgroundColor: '#6C5CE7',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+    marginBottom: 16,
+  },
+  buttonText: { color: '#fff', fontWeight: 'bold', fontSize: 14 },
+  box: {
+    flex: 1,
+    backgroundColor: '#f0f0f0',
+    padding: 8,
+    borderRadius: 8,
+  },
+  child: {
+    padding: 8,
+    margin: 4,
+    borderRadius: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  childText: { color: '#fff', fontWeight: 'bold' },
+  hint: { marginTop: 12, fontSize: 13, color: '#666', lineHeight: 18 },
+});
+
+export default AlignItemsDemo;
+```
+
 ---
 
 ## 5. alignSelf — 개별 아이템 교차축 정렬
@@ -536,6 +734,66 @@ const styles = StyleSheet.create({
   },
   chipText: { color: '#1565C0', fontSize: 14 },
 });
+```
+
+> **직접 실행해 보세요** — 태그 칩이 자동으로 줄바꿈되는 모습을 확인하세요:
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+
+const FlexWrapDemo = () => {
+  const tags = [
+    'React Native', 'Flexbox', 'Layout', 'Android',
+    'Kotlin', 'TypeScript', 'Hermes', 'Expo',
+  ];
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>flexWrap: 'wrap' — 태그 칩 예제</Text>
+      <View style={styles.wrapContainer}>
+        {tags.map((tag) => (
+          <View key={tag} style={styles.chip}>
+            <Text style={styles.chipText}>{tag}</Text>
+          </View>
+        ))}
+      </View>
+
+      <Text style={[styles.title, { marginTop: 24 }]}>flexWrap: 'nowrap' (기본) — 잘림</Text>
+      <View style={[styles.wrapContainer, { flexWrap: 'nowrap' }]}>
+        {tags.map((tag) => (
+          <View key={tag} style={styles.chip}>
+            <Text style={styles.chipText}>{tag}</Text>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 16, backgroundColor: '#fff' },
+  title: { fontSize: 16, fontWeight: 'bold', marginBottom: 8 },
+  wrapContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    backgroundColor: '#f0f0f0',
+    padding: 8,
+    borderRadius: 8,
+  },
+  chip: {
+    backgroundColor: '#E3F2FD',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#90CAF9',
+  },
+  chipText: { color: '#1565C0', fontSize: 14 },
+});
+
+export default FlexWrapDemo;
 ```
 
 ---
@@ -754,6 +1012,75 @@ const styles = StyleSheet.create({
 });
 ```
 
+> **직접 실행해 보세요** — `gap`, `rowGap`, `columnGap`의 차이를 확인하세요:
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+
+const GapDemo = () => {
+  const items = [1, 2, 3, 4, 5, 6];
+
+  return (
+    <ScrollView style={styles.scroll}>
+      <View style={styles.container}>
+        <Text style={styles.title}>gap: 12 (모든 방향 동일)</Text>
+        <View style={styles.gapBox}>
+          {items.map((i) => (
+            <View key={i} style={styles.item}>
+              <Text style={styles.itemText}>{i}</Text>
+            </View>
+          ))}
+        </View>
+
+        <Text style={styles.title}>rowGap: 20, columnGap: 4</Text>
+        <View style={[styles.gapBox, { gap: 0, rowGap: 20, columnGap: 4 }]}>
+          {items.map((i) => (
+            <View key={i} style={styles.item}>
+              <Text style={styles.itemText}>{i}</Text>
+            </View>
+          ))}
+        </View>
+
+        <Text style={styles.title}>gap: 0 (간격 없음)</Text>
+        <View style={[styles.gapBox, { gap: 0 }]}>
+          {items.map((i) => (
+            <View key={i} style={styles.item}>
+              <Text style={styles.itemText}>{i}</Text>
+            </View>
+          ))}
+        </View>
+      </View>
+    </ScrollView>
+  );
+};
+
+const styles = StyleSheet.create({
+  scroll: { flex: 1, backgroundColor: '#fff' },
+  container: { padding: 16 },
+  title: { fontSize: 16, fontWeight: 'bold', marginTop: 16, marginBottom: 8 },
+  gapBox: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    backgroundColor: '#f0f0f0',
+    padding: 8,
+    borderRadius: 8,
+  },
+  item: {
+    width: 80,
+    height: 60,
+    backgroundColor: '#4ECDC4',
+    borderRadius: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  itemText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+});
+
+export default GapDemo;
+```
+
 > **이전 방식**: `gap`이 지원되기 전에는 각 자식에 `margin`을 개별적으로 설정해야 했습니다. `gap`은 훨씬 깔끔합니다.
 
 ---
@@ -845,6 +1172,92 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+```
+
+> **직접 실행해 보세요** — FAB과 배지가 절대 위치로 배치되는 모습을 확인하세요:
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+
+const AbsolutePositionDemo = () => {
+  return (
+    <View style={styles.container}>
+      <View style={styles.content}>
+        <Text style={styles.contentText}>일반 콘텐츠 영역</Text>
+        <Text style={styles.sub}>position: 'absolute'로 FAB과 배지가 겹쳐 배치됩니다</Text>
+      </View>
+
+      <View style={styles.fab}>
+        <Text style={styles.fabText}>+</Text>
+      </View>
+
+      <View style={styles.badge}>
+        <Text style={styles.badgeText}>3</Text>
+      </View>
+
+      <View style={styles.topBar}>
+        <Text style={styles.topBarText}>상단 바 (absolute)</Text>
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  contentText: { fontSize: 18, fontWeight: 'bold', color: '#333' },
+  sub: { fontSize: 13, color: '#888', marginTop: 8, textAlign: 'center', paddingHorizontal: 32 },
+  fab: {
+    position: 'absolute',
+    bottom: 24,
+    right: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#FF4081',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  fabText: { color: '#fff', fontSize: 24, fontWeight: 'bold' },
+  badge: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#F44336',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  badgeText: { color: '#fff', fontSize: 12, fontWeight: 'bold' },
+  topBar: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 50,
+    backgroundColor: '#2196F3',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  topBarText: { color: '#fff', fontWeight: 'bold' },
+});
+
+export default AbsolutePositionDemo;
 ```
 
 ---
@@ -985,6 +1398,58 @@ const styles = StyleSheet.create({
 });
 ```
 
+> **직접 실행해 보세요** — Header / Content / Footer 3단 구조:
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+
+const HeaderContentFooter = () => {
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerText}>Header (고정 60px)</Text>
+      </View>
+      <View style={styles.content}>
+        <Text style={styles.contentText}>Content 영역</Text>
+        <Text style={styles.sub}>flex: 1 로 남은 공간을 모두 차지합니다</Text>
+      </View>
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>Footer (고정 50px)</Text>
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  header: {
+    height: 60,
+    backgroundColor: '#2196F3',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  headerText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+  },
+  contentText: { fontSize: 20, fontWeight: 'bold', color: '#333' },
+  sub: { fontSize: 13, color: '#888', marginTop: 8 },
+  footer: {
+    height: 50,
+    backgroundColor: '#333',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  footerText: { color: '#fff' },
+});
+
+export default HeaderContentFooter;
+```
+
 ### 패턴 2: 카드 레이아웃
 
 ```tsx
@@ -1053,6 +1518,93 @@ const cardStyles = StyleSheet.create({
 });
 ```
 
+> **직접 실행해 보세요** — 이미지 / 본문 / 액션 3단 카드 레이아웃:
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+
+const CardDemo = () => {
+  return (
+    <ScrollView style={styles.scroll}>
+      <View style={styles.card}>
+        <View style={styles.imageContainer}>
+          <Text style={styles.imagePlaceholder}>Image Placeholder</Text>
+        </View>
+        <View style={styles.body}>
+          <Text style={styles.title}>카드 제목</Text>
+          <Text style={styles.description}>
+            카드 설명 텍스트입니다. Flexbox의 column 방향으로 이미지, 본문, 액션 영역이 배치됩니다.
+          </Text>
+        </View>
+        <View style={styles.actions}>
+          <Pressable style={styles.actionButton}>
+            <Text style={styles.actionText}>더 보기</Text>
+          </Pressable>
+          <Pressable style={styles.actionButton}>
+            <Text style={styles.actionText}>공유</Text>
+          </Pressable>
+        </View>
+      </View>
+
+      <View style={styles.card}>
+        <View style={[styles.imageContainer, { backgroundColor: '#E8F5E9' }]}>
+          <Text style={[styles.imagePlaceholder, { color: '#4CAF50' }]}>Second Card</Text>
+        </View>
+        <View style={styles.body}>
+          <Text style={styles.title}>두 번째 카드</Text>
+          <Text style={styles.description}>
+            카드 컴포넌트를 재사용하면 일관된 UI를 구성할 수 있습니다.
+          </Text>
+        </View>
+        <View style={styles.actions}>
+          <Pressable style={styles.actionButton}>
+            <Text style={styles.actionText}>더 보기</Text>
+          </Pressable>
+        </View>
+      </View>
+    </ScrollView>
+  );
+};
+
+const styles = StyleSheet.create({
+  scroll: { flex: 1, backgroundColor: '#f5f5f5' },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    margin: 16,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    overflow: 'hidden',
+  },
+  imageContainer: {
+    height: 160,
+    backgroundColor: '#e0e0e0',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  imagePlaceholder: { color: '#999', fontSize: 16 },
+  body: { padding: 16 },
+  title: { fontSize: 18, fontWeight: 'bold', marginBottom: 8 },
+  description: { fontSize: 14, color: '#666', lineHeight: 20 },
+  actions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    padding: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#f0f0f0',
+    gap: 8,
+  },
+  actionButton: { padding: 8 },
+  actionText: { color: '#2196F3', fontWeight: '600' },
+});
+
+export default CardDemo;
+```
+
 ### 패턴 3: 그리드 레이아웃
 
 ```tsx
@@ -1094,6 +1646,55 @@ const gridStyles = StyleSheet.create({
   },
   gridText: { color: '#fff', fontSize: 24, fontWeight: 'bold' },
 });
+```
+
+> **직접 실행해 보세요** — flexWrap + 퍼센트 너비로 만드는 3열 그리드:
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+
+const GridLayoutDemo = () => {
+  const items = Array.from({ length: 9 }, (_, i) => i + 1);
+  const colors = [
+    '#FF6B6B', '#4ECDC4', '#45B7D1',
+    '#96CEB4', '#FFEAA7', '#DDA0DD',
+    '#98D8C8', '#F7DC6F', '#BB8FCE',
+  ];
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.heading}>3열 그리드 레이아웃</Text>
+      <View style={styles.grid}>
+        {items.map((item, idx) => (
+          <View key={item} style={[styles.gridItem, { backgroundColor: colors[idx] }]}>
+            <Text style={styles.gridText}>{item}</Text>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 16, backgroundColor: '#fff' },
+  heading: { fontSize: 18, fontWeight: 'bold', marginBottom: 12 },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  gridItem: {
+    width: '31%',
+    aspectRatio: 1,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  gridText: { color: '#fff', fontSize: 24, fontWeight: 'bold' },
+});
+
+export default GridLayoutDemo;
 ```
 
 ### 패턴 4: 정가운데 배치

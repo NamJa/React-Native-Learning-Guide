@@ -560,6 +560,110 @@ function Counter() {
 }
 ```
 
+**React Native에서 직접 실행해보세요:**
+
+```jsx [snack]
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>useState 카운터</Text>
+      <Text style={styles.count}>{count}</Text>
+
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={[styles.button, styles.danger]}
+          onPress={() => setCount(prev => prev - 1)}
+        >
+          <Text style={styles.buttonText}>-1</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.button, styles.secondary]}
+          onPress={() => setCount(0)}
+        >
+          <Text style={styles.buttonText}>리셋</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.button, styles.primary]}
+          onPress={() => setCount(prev => prev + 1)}
+        >
+          <Text style={styles.buttonText}>+1</Text>
+        </TouchableOpacity>
+      </View>
+
+      <TouchableOpacity
+        style={[styles.button, styles.accent]}
+        onPress={() => setCount(10)}
+      >
+        <Text style={styles.buttonText}>10으로 설정</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.hint}>
+        updater 함수: setCount(prev =&gt; prev + 1){'\n'}
+        직접 설정: setCount(10)
+      </Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#f5f5f5',
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  count: {
+    fontSize: 64,
+    fontWeight: 'bold',
+    color: '#007AFF',
+    marginBottom: 20,
+  },
+  row: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 12,
+  },
+  button: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    minWidth: 80,
+    alignItems: 'center',
+  },
+  primary: { backgroundColor: '#007AFF' },
+  secondary: { backgroundColor: '#6C757D' },
+  danger: { backgroundColor: '#DC3545' },
+  accent: { backgroundColor: '#FF9500' },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  hint: {
+    marginTop: 20,
+    fontSize: 13,
+    color: '#888',
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+});
+
+export default Counter;
+```
+
 ### 예제 9: 다양한 타입의 state
 
 ```typescript
@@ -1167,6 +1271,156 @@ function TemperatureCalculator() {
 }
 ```
 
+**React Native 온도 변환기를 직접 실행해보세요:**
+
+```jsx [snack]
+import React, { useState } from 'react';
+import { View, Text, TextInput, StyleSheet } from 'react-native';
+
+function toCelsius(fahrenheit) {
+  return ((fahrenheit - 32) * 5) / 9;
+}
+
+function toFahrenheit(celsius) {
+  return (celsius * 9) / 5 + 32;
+}
+
+function TemperatureInput({ scale, temperature, onTemperatureChange }) {
+  const unit = scale === '섭씨' ? '°C' : '°F';
+  return (
+    <View style={styles.inputGroup}>
+      <Text style={styles.label}>{scale} ({unit})</Text>
+      <TextInput
+        style={styles.input}
+        value={temperature}
+        onChangeText={onTemperatureChange}
+        keyboardType="numeric"
+        placeholder={`${scale} 온도 입력`}
+      />
+    </View>
+  );
+}
+
+function TemperatureCalculator() {
+  const [temperature, setTemperature] = useState('');
+  const [scale, setScale] = useState('C');
+
+  const handleCelsiusChange = (temp) => {
+    setScale('C');
+    setTemperature(temp);
+  };
+
+  const handleFahrenheitChange = (temp) => {
+    setScale('F');
+    setTemperature(temp);
+  };
+
+  const celsius =
+    scale === 'F' && temperature
+      ? toCelsius(parseFloat(temperature)).toFixed(2)
+      : temperature;
+  const fahrenheit =
+    scale === 'C' && temperature
+      ? toFahrenheit(parseFloat(temperature)).toFixed(2)
+      : temperature;
+
+  const celsiusNum = parseFloat(celsius);
+  const isBoiling = !isNaN(celsiusNum) && celsiusNum >= 100;
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>온도 변환기</Text>
+      <Text style={styles.subtitle}>상태 끌어올리기 (Lifting State Up)</Text>
+
+      <TemperatureInput
+        scale="섭씨"
+        temperature={String(celsius)}
+        onTemperatureChange={handleCelsiusChange}
+      />
+      <TemperatureInput
+        scale="화씨"
+        temperature={String(fahrenheit)}
+        onTemperatureChange={handleFahrenheitChange}
+      />
+
+      {temperature !== '' && (
+        <View style={[styles.result, isBoiling && styles.resultBoiling]}>
+          <Text style={styles.resultText}>
+            {isBoiling ? '🔥 물이 끓습니다!' : '❄️ 물이 끓지 않습니다.'}
+          </Text>
+        </View>
+      )}
+
+      <Text style={styles.hint}>
+        두 입력이 하나의 state를 공유합니다.{'\n'}
+        부모가 state를 관리하고, 자식은 props로 받습니다.
+      </Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 24,
+    backgroundColor: '#f5f5f5',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  inputGroup: {
+    marginBottom: 16,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 6,
+    color: '#333',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 18,
+    backgroundColor: 'white',
+  },
+  result: {
+    marginTop: 20,
+    padding: 16,
+    borderRadius: 8,
+    backgroundColor: '#E3F2FD',
+    alignItems: 'center',
+  },
+  resultBoiling: {
+    backgroundColor: '#FFEBEE',
+  },
+  resultText: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  hint: {
+    marginTop: 24,
+    fontSize: 13,
+    color: '#888',
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+});
+
+export default TemperatureCalculator;
+```
+
 ### 예제 17: SharedViewModel 패턴과 비교
 
 ```kotlin
@@ -1304,6 +1558,205 @@ function UncontrolledForm() {
 }
 ```
 
+**React Native Controlled Form을 직접 실행해보세요:**
+
+```jsx [snack]
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+
+function ControlledForm() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const [result, setResult] = useState(null);
+
+  const emailValid = email.length === 0 || email.includes('@');
+  const canSubmit = name.length > 0 && email.includes('@');
+
+  const handleSubmit = () => {
+    setSubmitted(true);
+    if (canSubmit) {
+      setResult({ name, email });
+    }
+  };
+
+  const handleReset = () => {
+    setName('');
+    setEmail('');
+    setSubmitted(false);
+    setResult(null);
+  };
+
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>Controlled Component</Text>
+      <Text style={styles.subtitle}>React state가 "진실의 근원"</Text>
+
+      <View style={styles.field}>
+        <Text style={styles.label}>이름</Text>
+        <TextInput
+          style={[styles.input, submitted && !name && styles.inputError]}
+          value={name}
+          onChangeText={setName}
+          placeholder="이름을 입력하세요"
+        />
+        {submitted && !name && (
+          <Text style={styles.error}>이름을 입력해주세요</Text>
+        )}
+      </View>
+
+      <View style={styles.field}>
+        <Text style={styles.label}>이메일</Text>
+        <TextInput
+          style={[styles.input, submitted && !emailValid && styles.inputError]}
+          value={email}
+          onChangeText={setEmail}
+          placeholder="email@example.com"
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+        {!emailValid && (
+          <Text style={styles.error}>유효한 이메일을 입력하세요</Text>
+        )}
+      </View>
+
+      <View style={styles.statePreview}>
+        <Text style={styles.previewTitle}>현재 State:</Text>
+        <Text style={styles.previewText}>name: "{name}"</Text>
+        <Text style={styles.previewText}>email: "{email}"</Text>
+        <Text style={styles.previewText}>
+          canSubmit: {canSubmit ? 'true ✅' : 'false ❌'}
+        </Text>
+      </View>
+
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={[styles.button, !canSubmit && styles.buttonDisabled]}
+          onPress={handleSubmit}
+        >
+          <Text style={styles.buttonText}>제출</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.button, styles.buttonSecondary]}
+          onPress={handleReset}
+        >
+          <Text style={styles.buttonText}>초기화</Text>
+        </TouchableOpacity>
+      </View>
+
+      {result && (
+        <View style={styles.resultBox}>
+          <Text style={styles.resultTitle}>제출 완료!</Text>
+          <Text style={styles.resultText}>이름: {result.name}</Text>
+          <Text style={styles.resultText}>이메일: {result.email}</Text>
+        </View>
+      )}
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    padding: 24,
+    backgroundColor: '#f5f5f5',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  field: {
+    marginBottom: 16,
+  },
+  label: {
+    fontSize: 15,
+    fontWeight: '600',
+    marginBottom: 6,
+    color: '#333',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: 'white',
+  },
+  inputError: {
+    borderColor: '#DC3545',
+  },
+  error: {
+    color: '#DC3545',
+    fontSize: 13,
+    marginTop: 4,
+  },
+  statePreview: {
+    backgroundColor: '#E8F5E9',
+    padding: 14,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  previewTitle: {
+    fontWeight: 'bold',
+    marginBottom: 4,
+    fontSize: 14,
+  },
+  previewText: {
+    fontSize: 13,
+    fontFamily: 'monospace',
+    color: '#333',
+    lineHeight: 20,
+  },
+  row: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  button: {
+    flex: 1,
+    backgroundColor: '#007AFF',
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  buttonSecondary: {
+    backgroundColor: '#6C757D',
+  },
+  buttonDisabled: {
+    opacity: 0.5,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  resultBox: {
+    marginTop: 20,
+    backgroundColor: '#E3F2FD',
+    padding: 16,
+    borderRadius: 8,
+  },
+  resultTitle: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginBottom: 6,
+  },
+  resultText: {
+    fontSize: 14,
+    color: '#333',
+  },
+});
+
+export default ControlledForm;
+```
+
 ### 언제 어떤 것을 사용할까?
 
 ```
@@ -1433,6 +1886,171 @@ function UserList({ users }: { users: User[] }) {
 function Summary({ total, filtered }: { total: number; filtered: number }) {
   return <p>전체 {total}명 중 {filtered}명 표시</p>;
 }
+```
+
+**React Native 단방향 데이터 흐름을 직접 실행해보세요:**
+
+```jsx [snack]
+import React, { useState } from 'react';
+import { View, Text, TextInput, FlatList, StyleSheet } from 'react-native';
+
+const USERS = [
+  { id: '1', name: '김철수', department: '개발팀' },
+  { id: '2', name: '이영희', department: '디자인팀' },
+  { id: '3', name: '박민수', department: '개발팀' },
+  { id: '4', name: '최지영', department: '기획팀' },
+  { id: '5', name: '정하늘', department: '디자인팀' },
+  { id: '6', name: '강다솜', department: '기획팀' },
+];
+
+function SearchBar({ value, onChange }) {
+  return (
+    <TextInput
+      style={styles.searchInput}
+      value={value}
+      onChangeText={onChange}
+      placeholder="이름 또는 부서 검색..."
+    />
+  );
+}
+
+function UserItem({ user }) {
+  return (
+    <View style={styles.userItem}>
+      <Text style={styles.userName}>{user.name}</Text>
+      <Text style={styles.userDept}>{user.department}</Text>
+    </View>
+  );
+}
+
+function Summary({ total, filtered }) {
+  return (
+    <Text style={styles.summary}>
+      전체 {total}명 중 {filtered}명 표시
+    </Text>
+  );
+}
+
+function App() {
+  const [filter, setFilter] = useState('');
+
+  const filteredUsers = USERS.filter(
+    (u) => u.name.includes(filter) || u.department.includes(filter)
+  );
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>단방향 데이터 흐름</Text>
+      <Text style={styles.subtitle}>
+        데이터 ↓ (props) / 이벤트 ↑ (콜백)
+      </Text>
+
+      {/* 데이터 ↓: filter, onChange를 props로 전달 */}
+      <SearchBar value={filter} onChange={setFilter} />
+
+      {/* 데이터 ↓: 필터링 결과를 props로 전달 */}
+      <Summary total={USERS.length} filtered={filteredUsers.length} />
+
+      <FlatList
+        data={filteredUsers}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => <UserItem user={item} />}
+        ListEmptyComponent={
+          <Text style={styles.empty}>검색 결과가 없습니다</Text>
+        }
+      />
+
+      <View style={styles.flowDiagram}>
+        <Text style={styles.flowTitle}>데이터 흐름:</Text>
+        <Text style={styles.flowText}>App (state: filter)</Text>
+        <Text style={styles.flowArrow}>  ↓ props     ↑ onChange 콜백</Text>
+        <Text style={styles.flowText}>SearchBar / UserList / Summary</Text>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    paddingTop: 50,
+    backgroundColor: '#f5f5f5',
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 13,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  searchInput: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: 'white',
+    marginBottom: 8,
+  },
+  summary: {
+    fontSize: 14,
+    color: '#555',
+    marginBottom: 12,
+    textAlign: 'right',
+  },
+  userItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor: 'white',
+    padding: 14,
+    borderRadius: 8,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#eee',
+  },
+  userName: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  userDept: {
+    fontSize: 14,
+    color: '#007AFF',
+  },
+  empty: {
+    textAlign: 'center',
+    color: '#999',
+    marginTop: 20,
+    fontSize: 15,
+  },
+  flowDiagram: {
+    marginTop: 16,
+    backgroundColor: '#E8EAF6',
+    padding: 14,
+    borderRadius: 8,
+  },
+  flowTitle: {
+    fontWeight: 'bold',
+    fontSize: 13,
+    marginBottom: 4,
+  },
+  flowText: {
+    fontSize: 12,
+    fontFamily: 'monospace',
+    color: '#333',
+  },
+  flowArrow: {
+    fontSize: 12,
+    fontFamily: 'monospace',
+    color: '#666',
+  },
+});
+
+export default App;
 ```
 
 ---

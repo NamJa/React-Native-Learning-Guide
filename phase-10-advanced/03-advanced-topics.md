@@ -513,6 +513,131 @@ function AccessibleForm() {
 }
 ```
 
+```jsx [snack]
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, ScrollView, Switch } from 'react-native';
+
+function AccessibleCard({ title, author, readTime, onPress }) {
+  return (
+    <TouchableOpacity
+      accessible={true}
+      accessibilityLabel={`${title}, ${author}의 기사`}
+      accessibilityHint="기사 상세 화면으로 이동합니다"
+      accessibilityRole="button"
+      onPress={onPress}
+      style={styles.card}
+    >
+      <View style={styles.cardImage}>
+        <Text style={styles.cardImageText}>이미지</Text>
+      </View>
+      <View style={styles.cardBody}>
+        <Text accessibilityRole="header" style={styles.cardTitle}>{title}</Text>
+        <Text accessibilityLabel={`작성자: ${author}`} style={styles.cardAuthor}>{author}</Text>
+        <Text accessibilityLabel={`${readTime}분 소요`} style={styles.cardTime}>{readTime}분 읽기</Text>
+      </View>
+    </TouchableOpacity>
+  );
+}
+
+function AccessibleForm() {
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
+
+  const validate = () => {
+    if (!email.includes('@')) {
+      setError('올바른 이메일 형식을 입력하세요');
+    } else {
+      setError('');
+    }
+  };
+
+  return (
+    <View style={styles.form}>
+      <Text nativeID="email-label" style={styles.label}>이메일</Text>
+      <TextInput
+        value={email}
+        onChangeText={(t) => { setEmail(t); setError(''); }}
+        onBlur={validate}
+        accessibilityLabel="이메일 입력"
+        accessibilityLabelledBy="email-label"
+        keyboardType="email-address"
+        autoComplete="email"
+        placeholder="example@email.com"
+        style={[styles.input, error ? styles.inputError : null]}
+      />
+      {error ? (
+        <Text accessibilityRole="alert" accessibilityLiveRegion="assertive" style={styles.error}>{error}</Text>
+      ) : null}
+    </View>
+  );
+}
+
+export default function App() {
+  const [darkMode, setDarkMode] = useState(false);
+  const [selected, setSelected] = useState(null);
+
+  return (
+    <ScrollView style={[styles.container, darkMode && styles.dark]}>
+      <Text style={[styles.title, darkMode && styles.darkText]}>접근성 (Accessibility) 데모</Text>
+
+      <View style={styles.row}>
+        <Text style={[styles.switchLabel, darkMode && styles.darkText]}>다크 모드</Text>
+        <Switch
+          value={darkMode}
+          onValueChange={setDarkMode}
+          accessibilityLabel="다크 모드 토글"
+          accessibilityRole="switch"
+          accessibilityState={{ checked: darkMode }}
+        />
+      </View>
+
+      <AccessibleCard
+        title="React Native 성능 최적화 가이드"
+        author="홍길동"
+        readTime={5}
+        onPress={() => setSelected('성능 최적화')}
+      />
+      <AccessibleCard
+        title="애니메이션 완전 정복"
+        author="김개발"
+        readTime={8}
+        onPress={() => setSelected('애니메이션')}
+      />
+
+      {selected && (
+        <Text accessibilityRole="alert" accessibilityLiveRegion="polite" style={styles.selectedText}>
+          선택됨: {selected}
+        </Text>
+      )}
+
+      <AccessibleForm />
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 20, paddingTop: 50, backgroundColor: '#f5f5f5' },
+  dark: { backgroundColor: '#1a1a1a' },
+  title: { fontSize: 22, fontWeight: 'bold', marginBottom: 16 },
+  darkText: { color: '#fff' },
+  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 },
+  switchLabel: { fontSize: 16 },
+  card: { backgroundColor: '#fff', borderRadius: 14, marginBottom: 14, overflow: 'hidden', elevation: 2 },
+  cardImage: { height: 100, backgroundColor: '#4A90D9', justifyContent: 'center', alignItems: 'center' },
+  cardImageText: { color: '#fff', fontWeight: 'bold' },
+  cardBody: { padding: 14 },
+  cardTitle: { fontSize: 16, fontWeight: 'bold', marginBottom: 4 },
+  cardAuthor: { fontSize: 14, color: '#666' },
+  cardTime: { fontSize: 12, color: '#999', marginTop: 4 },
+  selectedText: { textAlign: 'center', color: '#4A90D9', fontWeight: 'bold', fontSize: 15, marginVertical: 10 },
+  form: { marginTop: 10, backgroundColor: '#fff', padding: 16, borderRadius: 14 },
+  label: { fontSize: 15, fontWeight: '600', marginBottom: 6 },
+  input: { borderWidth: 1, borderColor: '#ddd', borderRadius: 10, padding: 12, fontSize: 16 },
+  inputError: { borderColor: '#e53935' },
+  error: { color: '#e53935', fontSize: 13, marginTop: 6 },
+});
+```
+
 ### 스크린 리더 테스트
 
 ```bash
@@ -742,6 +867,116 @@ function OfflineBanner() {
     </View>
   );
 }
+```
+
+```jsx [snack]
+import React, { useState } from 'react';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Switch } from 'react-native';
+
+// 오프라인 배너 컴포넌트
+function OfflineBanner({ visible }) {
+  if (!visible) return null;
+  return (
+    <View style={styles.banner}>
+      <Text style={styles.bannerText}>
+        오프라인 모드 — 캐시된 데이터를 표시합니다
+      </Text>
+    </View>
+  );
+}
+
+// 낙관적 UI 업데이트 시뮬레이션
+const ARTICLES = [
+  { id: '1', title: 'React Native 시작하기', liked: false, likes: 12 },
+  { id: '2', title: '성능 최적화 가이드', liked: false, likes: 28 },
+  { id: '3', title: '애니메이션 완전 정복', liked: true, likes: 45 },
+  { id: '4', title: 'TypeScript 팁 모음', liked: false, likes: 19 },
+];
+
+export default function App() {
+  const [isOffline, setIsOffline] = useState(false);
+  const [articles, setArticles] = useState(ARTICLES);
+  const [syncQueue, setSyncQueue] = useState([]);
+
+  const toggleLike = (id) => {
+    // 낙관적 업데이트: UI를 즉시 변경
+    setArticles(prev => prev.map(a =>
+      a.id === id ? { ...a, liked: !a.liked, likes: a.liked ? a.likes - 1 : a.likes + 1 } : a
+    ));
+
+    if (isOffline) {
+      // 오프라인이면 동기화 큐에 추가
+      setSyncQueue(prev => [...prev, { action: 'toggleLike', id, time: new Date().toLocaleTimeString() }]);
+    }
+  };
+
+  const syncAll = () => {
+    setSyncQueue([]);
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>오프라인 퍼스트 데모</Text>
+      <View style={styles.toggleRow}>
+        <Text style={styles.toggleLabel}>오프라인 시뮬레이션</Text>
+        <Switch value={isOffline} onValueChange={setIsOffline} />
+      </View>
+
+      <OfflineBanner visible={isOffline} />
+
+      <FlatList
+        data={articles}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>{item.title}</Text>
+            <View style={styles.cardFooter}>
+              <TouchableOpacity onPress={() => toggleLike(item.id)} style={styles.likeBtn}>
+                <Text style={{ fontSize: 20 }}>{item.liked ? '❤️' : '🤍'}</Text>
+                <Text style={styles.likeCount}>{item.likes}</Text>
+              </TouchableOpacity>
+              {isOffline && <Text style={styles.cached}>캐시됨</Text>}
+            </View>
+          </View>
+        )}
+      />
+
+      {syncQueue.length > 0 && (
+        <View style={styles.queue}>
+          <Text style={styles.queueTitle}>동기화 대기열 ({syncQueue.length})</Text>
+          {syncQueue.map((item, i) => (
+            <Text key={i} style={styles.queueItem}>• {item.action} (ID: {item.id}) - {item.time}</Text>
+          ))}
+          {!isOffline && (
+            <TouchableOpacity onPress={syncAll} style={styles.syncBtn}>
+              <Text style={styles.syncBtnText}>지금 동기화</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 16, paddingTop: 50, backgroundColor: '#f5f5f5' },
+  title: { fontSize: 22, fontWeight: 'bold', textAlign: 'center', marginBottom: 12 },
+  toggleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, backgroundColor: '#fff', padding: 14, borderRadius: 12 },
+  toggleLabel: { fontSize: 15, fontWeight: '500' },
+  banner: { backgroundColor: '#FF9800', padding: 10, borderRadius: 10, marginBottom: 12 },
+  bannerText: { color: '#fff', textAlign: 'center', fontWeight: '600', fontSize: 13 },
+  card: { backgroundColor: '#fff', padding: 16, borderRadius: 12, marginBottom: 10, elevation: 1 },
+  cardTitle: { fontSize: 16, fontWeight: '600', marginBottom: 10 },
+  cardFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  likeBtn: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  likeCount: { fontSize: 14, color: '#666' },
+  cached: { fontSize: 11, color: '#FF9800', fontWeight: 'bold' },
+  queue: { backgroundColor: '#FFF3E0', padding: 14, borderRadius: 12, marginTop: 8 },
+  queueTitle: { fontWeight: 'bold', fontSize: 14, marginBottom: 6 },
+  queueItem: { fontSize: 12, color: '#555', lineHeight: 20 },
+  syncBtn: { marginTop: 10, backgroundColor: '#4CAF50', padding: 10, borderRadius: 8, alignItems: 'center' },
+  syncBtnText: { color: '#fff', fontWeight: 'bold' },
+});
 ```
 
 ### TanStack Query + 오프라인 지원

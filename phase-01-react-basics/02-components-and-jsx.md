@@ -102,6 +102,108 @@ function ProfileScreen() {
 }
 ```
 
+> **React Native로 직접 실행해보기:** 아래 Snack에서 같은 개념을 React Native 컴포넌트로 구현했습니다.
+
+```jsx [snack]
+import React, { useState, useEffect } from 'react';
+import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+
+// 가짜 API 호출 (실제 앱에서는 fetch/axios 사용)
+function fetchProfile() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({ name: '김철수', email: 'kim@example.com' });
+    }, 1500);
+  });
+}
+
+function ProfileScreen() {
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    fetchProfile().then(setProfile);
+  }, []);
+
+  if (!profile) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#6200ee" />
+        <Text style={styles.loadingText}>로딩 중...</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.card}>
+        <View style={styles.avatar}>
+          <Text style={styles.avatarText}>{profile.name[0]}</Text>
+        </View>
+        <Text style={styles.name}>{profile.name}</Text>
+        <Text style={styles.email}>{profile.email}</Text>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#666',
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 32,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  avatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#6200ee',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  avatarText: {
+    fontSize: 32,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  name: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  email: {
+    fontSize: 16,
+    color: '#666',
+    marginTop: 4,
+  },
+});
+
+export default ProfileScreen;
+```
+
 ---
 
 ## 2. Function Component
@@ -483,6 +585,186 @@ function LoginStatus({ isLoggedIn }: { isLoggedIn: boolean }) {
 }
 ```
 
+> **React Native로 직접 실행해보기:** 조건부 렌더링(&&, 삼항 연산자)을 React Native에서 실습합니다. 버튼으로 로그인 상태와 알림 수를 변경해보세요.
+
+```jsx [snack]
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+
+function ConditionalRenderingDemo() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(0);
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>조건부 렌더링 데모</Text>
+
+      {/* 패턴 1: && 연산자 — 조건이 true일 때만 렌더링 */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>패턴 1: && 연산자</Text>
+        <View style={styles.row}>
+          <Text style={styles.label}>알림: </Text>
+          {notificationCount > 0 && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{notificationCount}개의 새 알림</Text>
+            </View>
+          )}
+          {notificationCount === 0 && (
+            <Text style={styles.muted}>알림 없음</Text>
+          )}
+        </View>
+        <View style={styles.buttonRow}>
+          <TouchableOpacity
+            style={styles.smallButton}
+            onPress={() => setNotificationCount(prev => prev + 1)}
+          >
+            <Text style={styles.smallButtonText}>알림 +1</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.smallButton, styles.resetButton]}
+            onPress={() => setNotificationCount(0)}
+          >
+            <Text style={styles.smallButtonText}>초기화</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* 패턴 2: 삼항 연산자 — true/false에 따라 다른 UI */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>패턴 2: 삼항 연산자</Text>
+        {isLoggedIn ? (
+          <View style={styles.statusBox}>
+            <Text style={styles.statusEmoji}>👋</Text>
+            <Text style={styles.statusText}>환영합니다!</Text>
+            <TouchableOpacity
+              style={[styles.authButton, styles.logoutButton]}
+              onPress={() => setIsLoggedIn(false)}
+            >
+              <Text style={styles.authButtonText}>로그아웃</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={styles.statusBox}>
+            <Text style={styles.statusEmoji}>🔒</Text>
+            <Text style={styles.statusText}>로그인이 필요합니다</Text>
+            <TouchableOpacity
+              style={styles.authButton}
+              onPress={() => setIsLoggedIn(true)}
+            >
+              <Text style={styles.authButtonText}>로그인</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+    paddingTop: 60,
+    paddingHorizontal: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 24,
+  },
+  section: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#6200ee',
+    marginBottom: 12,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  label: {
+    fontSize: 16,
+    color: '#333',
+  },
+  muted: {
+    fontSize: 14,
+    color: '#999',
+    fontStyle: 'italic',
+  },
+  badge: {
+    backgroundColor: '#ff5252',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  badgeText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  smallButton: {
+    backgroundColor: '#6200ee',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  resetButton: {
+    backgroundColor: '#999',
+  },
+  smallButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  statusBox: {
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  statusEmoji: {
+    fontSize: 40,
+    marginBottom: 8,
+  },
+  statusText: {
+    fontSize: 18,
+    color: '#333',
+    marginBottom: 16,
+  },
+  authButton: {
+    backgroundColor: '#6200ee',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 12,
+  },
+  logoutButton: {
+    backgroundColor: '#999',
+  },
+  authButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+});
+
+export default ConditionalRenderingDemo;
+```
+
 ### 패턴 3: 조기 반환 (Early Return)
 
 ```typescript
@@ -663,6 +945,122 @@ function TodoList() {
     </ul>
   );
 }
+```
+
+> **React Native로 직접 실행해보기:** 리스트 렌더링을 React Native의 `FlatList`로 구현한 예제입니다. 항목을 탭하면 완료 토글됩니다.
+
+```jsx [snack]
+import React, { useState } from 'react';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+
+function TodoList() {
+  const [todos, setTodos] = useState([
+    { id: '1', text: '리액트 배우기', completed: false },
+    { id: '2', text: '프로젝트 만들기', completed: false },
+    { id: '3', text: '배포하기', completed: true },
+  ]);
+
+  const toggleTodo = (id) => {
+    setTodos(prev =>
+      prev.map(todo =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      )
+    );
+  };
+
+  const renderItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.item}
+      onPress={() => toggleTodo(item.id)}
+    >
+      <View style={[styles.checkbox, item.completed && styles.checked]}>
+        {item.completed && <Text style={styles.checkmark}>✓</Text>}
+      </View>
+      <Text
+        style={[
+          styles.text,
+          item.completed && styles.completedText,
+        ]}
+      >
+        {item.text}
+      </Text>
+    </TouchableOpacity>
+  );
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>할 일 목록</Text>
+      <Text style={styles.subtitle}>항목을 탭하면 완료 토글됩니다</Text>
+      <FlatList
+        data={todos}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+    paddingTop: 60,
+    paddingHorizontal: 20,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#999',
+    marginBottom: 20,
+  },
+  item: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#ddd',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  checked: {
+    backgroundColor: '#4caf50',
+    borderColor: '#4caf50',
+  },
+  checkmark: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  text: {
+    fontSize: 16,
+    color: '#333',
+  },
+  completedText: {
+    textDecorationLine: 'line-through',
+    color: '#999',
+  },
+});
+
+export default TodoList;
 ```
 
 ### key가 왜 중요한가?
@@ -1001,6 +1399,135 @@ function RNEventExamples() {
 }
 ```
 
+> **React Native로 직접 실행해보기:** 다양한 이벤트 핸들링을 직접 테스트해볼 수 있습니다. 각 버튼/입력을 터치하면 로그가 화면에 표시됩니다.
+
+```jsx [snack]
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, TextInput, Pressable, ScrollView, StyleSheet } from 'react-native';
+
+function RNEventExamples() {
+  const [logs, setLogs] = useState([]);
+
+  const addLog = (message) => {
+    setLogs(prev => [`[${new Date().toLocaleTimeString()}] ${message}`, ...prev].slice(0, 15));
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>React Native 이벤트 핸들링</Text>
+
+      {/* TouchableOpacity: onPress */}
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => addLog('TouchableOpacity: onPress (탭!)')}
+      >
+        <Text style={styles.buttonText}>TouchableOpacity (탭)</Text>
+      </TouchableOpacity>
+
+      {/* Pressable: 세밀한 터치 이벤트 */}
+      <Pressable
+        style={({ pressed }) => [styles.button, styles.pressable, pressed && styles.pressed]}
+        onPress={() => addLog('Pressable: onPress (짧은 탭)')}
+        onLongPress={() => addLog('Pressable: onLongPress (길게 누름!)')}
+        onPressIn={() => addLog('Pressable: onPressIn (손가락 닿음)')}
+        onPressOut={() => addLog('Pressable: onPressOut (손가락 뗌)')}
+      >
+        <Text style={styles.buttonText}>Pressable (길게 눌러보세요)</Text>
+      </Pressable>
+
+      {/* TextInput: onChangeText, onFocus, onBlur */}
+      <TextInput
+        style={styles.input}
+        onChangeText={(text) => addLog(`TextInput: "${text}"`)}
+        onFocus={() => addLog('TextInput: onFocus (포커스 획득)')}
+        onBlur={() => addLog('TextInput: onBlur (포커스 잃음)')}
+        placeholder="여기에 입력해보세요"
+        placeholderTextColor="#999"
+      />
+
+      {/* 이벤트 로그 표시 */}
+      <Text style={styles.logTitle}>이벤트 로그:</Text>
+      <ScrollView style={styles.logContainer}>
+        {logs.map((log, index) => (
+          <Text key={index} style={styles.logText}>{log}</Text>
+        ))}
+        {logs.length === 0 && (
+          <Text style={styles.emptyLog}>위 요소들을 터치하면 로그가 표시됩니다</Text>
+        )}
+      </ScrollView>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+    paddingTop: 60,
+    paddingHorizontal: 20,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 20,
+  },
+  button: {
+    backgroundColor: '#6200ee',
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  pressable: {
+    backgroundColor: '#03dac6',
+  },
+  pressed: {
+    opacity: 0.6,
+    transform: [{ scale: 0.97 }],
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  input: {
+    backgroundColor: '#fff',
+    padding: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    fontSize: 16,
+    marginBottom: 20,
+  },
+  logTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8,
+  },
+  logContainer: {
+    flex: 1,
+    backgroundColor: '#1e1e1e',
+    borderRadius: 12,
+    padding: 12,
+  },
+  logText: {
+    color: '#4caf50',
+    fontSize: 13,
+    fontFamily: 'monospace',
+    marginBottom: 4,
+  },
+  emptyLog: {
+    color: '#666',
+    fontSize: 14,
+    fontStyle: 'italic',
+  },
+});
+
+export default RNEventExamples;
+```
+
 ---
 
 ## 8. 컴포넌트 합성과 children
@@ -1055,6 +1582,164 @@ function App() {
     </div>
   );
 }
+```
+
+> **React Native로 직접 실행해보기:** `children` props를 사용한 재사용 가능한 Card 컴포넌트를 React Native로 구현했습니다.
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
+
+// Card 컴포넌트 — children을 받아 내부에 렌더링
+function Card({ title, children }) {
+  return (
+    <View style={styles.card}>
+      <Text style={styles.cardTitle}>{title}</Text>
+      <View style={styles.cardContent}>
+        {children}
+      </View>
+    </View>
+  );
+}
+
+// InfoRow 컴포넌트 — 라벨-값 쌍 표시
+function InfoRow({ label, value }) {
+  return (
+    <View style={styles.infoRow}>
+      <Text style={styles.infoLabel}>{label}</Text>
+      <Text style={styles.infoValue}>{value}</Text>
+    </View>
+  );
+}
+
+// StatusBadge 컴포넌트
+function StatusBadge({ isOnline }) {
+  return (
+    <View style={[styles.statusBadge, isOnline ? styles.online : styles.offline]}>
+      <Text style={styles.statusText}>
+        {isOnline ? '● 온라인' : '● 오프라인'}
+      </Text>
+    </View>
+  );
+}
+
+// App — Card 사이에 넣은 모든 것이 children으로 전달됨
+function App() {
+  return (
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <Text style={styles.title}>컴포넌트 합성 (children)</Text>
+      <Text style={styles.subtitle}>
+        Card 컴포넌트에 다양한 children을 전달합니다
+      </Text>
+
+      <Card title="사용자 정보">
+        <InfoRow label="이름" value="김철수" />
+        <InfoRow label="이메일" value="kim@example.com" />
+        <InfoRow label="직업" value="Android 개발자" />
+        <StatusBadge isOnline={true} />
+      </Card>
+
+      <Card title="주문 내역">
+        <InfoRow label="주문번호" value="#2026-0311" />
+        <InfoRow label="상품" value="React Native 완전 정복" />
+        <InfoRow label="금액" value="35,000원" />
+        <StatusBadge isOnline={false} />
+      </Card>
+
+      <Card title="빈 카드">
+        <Text style={styles.emptyText}>
+          children에는 어떤 JSX든 전달 가능합니다!
+        </Text>
+      </Card>
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  content: {
+    paddingTop: 60,
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#999',
+    marginBottom: 20,
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+    paddingBottom: 12,
+    marginBottom: 12,
+  },
+  cardContent: {
+    gap: 8,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 4,
+  },
+  infoLabel: {
+    fontSize: 15,
+    color: '#666',
+  },
+  infoValue: {
+    fontSize: 15,
+    color: '#333',
+    fontWeight: '600',
+  },
+  statusBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    marginTop: 8,
+  },
+  online: {
+    backgroundColor: '#e8f5e9',
+  },
+  offline: {
+    backgroundColor: '#fce4ec',
+  },
+  statusText: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  emptyText: {
+    fontSize: 15,
+    color: '#666',
+    fontStyle: 'italic',
+    textAlign: 'center',
+    paddingVertical: 12,
+  },
+});
+
+export default App;
 ```
 
 ### 예제 23: Render Props / Slot 패턴
@@ -1339,6 +2024,238 @@ function TodoScreen() {
     </div>
   );
 }
+
+export default TodoScreen;
+```
+
+> **React Native로 직접 실행해보기:** 위의 TodoScreen을 React Native로 완전히 구현한 예제입니다. 할 일 추가, 완료 토글, 삭제 기능이 모두 동작합니다.
+
+```jsx [snack]
+import React, { useState, useCallback } from 'react';
+import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+
+// TodoItem 컴포넌트 — 개별 할 일 항목
+function TodoItem({ id, text, completed, onToggle, onDelete }) {
+  return (
+    <View style={styles.todoItem}>
+      <TouchableOpacity
+        style={styles.todoContent}
+        onPress={() => onToggle(id)}
+      >
+        <View style={[styles.checkbox, completed && styles.checkedBox]}>
+          {completed && <Text style={styles.checkmark}>✓</Text>}
+        </View>
+        <Text style={[styles.todoText, completed && styles.completedText]}>
+          {text}
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.deleteButton}
+        onPress={() => onDelete(id)}
+      >
+        <Text style={styles.deleteButtonText}>삭제</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+// TodoScreen — 전체 화면 컴포넌트
+function TodoScreen() {
+  const [todos, setTodos] = useState([]);
+  const [inputText, setInputText] = useState('');
+
+  const addTodo = useCallback(() => {
+    if (inputText.trim() === '') return;
+    setTodos(prev => [
+      ...prev,
+      { id: String(Date.now()), text: inputText.trim(), completed: false },
+    ]);
+    setInputText('');
+  }, [inputText]);
+
+  const toggleTodo = useCallback((id) => {
+    setTodos(prev =>
+      prev.map(todo =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      )
+    );
+  }, []);
+
+  const deleteTodo = useCallback((id) => {
+    setTodos(prev => prev.filter(todo => todo.id !== id));
+  }, []);
+
+  const completedCount = todos.filter(t => t.completed).length;
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>할 일 목록</Text>
+
+      {/* 입력 영역 */}
+      <View style={styles.inputRow}>
+        <TextInput
+          style={styles.input}
+          value={inputText}
+          onChangeText={setInputText}
+          onSubmitEditing={addTodo}
+          placeholder="할 일을 입력하세요"
+          placeholderTextColor="#999"
+          returnKeyType="done"
+        />
+        <TouchableOpacity style={styles.addButton} onPress={addTodo}>
+          <Text style={styles.addButtonText}>추가</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* 요약 */}
+      {todos.length > 0 && (
+        <Text style={styles.summary}>
+          {completedCount}/{todos.length} 완료
+        </Text>
+      )}
+
+      {/* 리스트 */}
+      {todos.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyIcon}>📝</Text>
+          <Text style={styles.emptyText}>
+            할 일이 없습니다. 위에서 추가해보세요!
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          data={todos}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <TodoItem
+              id={item.id}
+              text={item.text}
+              completed={item.completed}
+              onToggle={toggleTodo}
+              onDelete={deleteTodo}
+            />
+          )}
+        />
+      )}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+    paddingTop: 60,
+    paddingHorizontal: 20,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 20,
+  },
+  inputRow: {
+    flexDirection: 'row',
+    marginBottom: 16,
+    gap: 8,
+  },
+  input: {
+    flex: 1,
+    backgroundColor: '#fff',
+    padding: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    fontSize: 16,
+  },
+  addButton: {
+    backgroundColor: '#6200ee',
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    justifyContent: 'center',
+  },
+  addButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  summary: {
+    color: '#666',
+    fontSize: 14,
+    marginBottom: 12,
+  },
+  todoItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    padding: 14,
+    borderRadius: 12,
+    marginBottom: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  todoContent: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#ddd',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  checkedBox: {
+    backgroundColor: '#4caf50',
+    borderColor: '#4caf50',
+  },
+  checkmark: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  todoText: {
+    fontSize: 16,
+    color: '#333',
+    flex: 1,
+  },
+  completedText: {
+    textDecorationLine: 'line-through',
+    color: '#999',
+  },
+  deleteButton: {
+    backgroundColor: '#ff4444',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  deleteButtonText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyIcon: {
+    fontSize: 48,
+    marginBottom: 12,
+  },
+  emptyText: {
+    color: '#999',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+});
 
 export default TodoScreen;
 ```

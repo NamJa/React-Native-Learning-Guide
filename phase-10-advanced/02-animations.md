@@ -70,6 +70,54 @@ function FadeInView() {
 }
 ```
 
+```jsx [snack]
+import React, { useRef, useEffect, useState } from 'react';
+import { View, Text, Animated, Button, StyleSheet } from 'react-native';
+
+function FadeInView({ children, style }) {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 1000,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
+  return (
+    <Animated.View style={[style, { opacity: fadeAnim }]}>
+      {children}
+    </Animated.View>
+  );
+}
+
+export default function App() {
+  const [show, setShow] = useState(true);
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Animated.Value 페이드 인 데모</Text>
+      <Button title={show ? '리셋' : '다시 보기'} onPress={() => setShow(!show)} />
+      {show && (
+        <FadeInView style={styles.box}>
+          <Text style={styles.boxText}>서서히 나타나는 텍스트</Text>
+          <Text style={styles.boxSub}>Animated.timing + opacity</Text>
+        </FadeInView>
+      )}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f0f4f8' },
+  title: { fontSize: 20, fontWeight: 'bold', marginBottom: 20 },
+  box: { marginTop: 30, padding: 30, backgroundColor: '#4A90D9', borderRadius: 16, alignItems: 'center' },
+  boxText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
+  boxSub: { color: '#ddd', fontSize: 13, marginTop: 6 },
+});
+```
+
 ### 2.2 애니메이션 드라이버
 
 ```typescript
@@ -100,6 +148,84 @@ Animated.decay(value, {
 }).start();
 ```
 
+```jsx [snack]
+import React, { useRef, useState } from 'react';
+import { View, Text, Animated, Button, Easing, StyleSheet } from 'react-native';
+
+export default function App() {
+  const position = useRef(new Animated.Value(0)).current;
+  const [driver, setDriver] = useState('timing');
+
+  const reset = () => position.setValue(0);
+
+  const runTiming = () => {
+    reset();
+    Animated.timing(position, {
+      toValue: 200,
+      duration: 800,
+      easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+      useNativeDriver: true,
+    }).start();
+    setDriver('timing');
+  };
+
+  const runSpring = () => {
+    reset();
+    Animated.spring(position, {
+      toValue: 200,
+      tension: 40,
+      friction: 5,
+      useNativeDriver: true,
+    }).start();
+    setDriver('spring');
+  };
+
+  const runDecay = () => {
+    reset();
+    Animated.decay(position, {
+      velocity: 1,
+      deceleration: 0.99,
+      useNativeDriver: true,
+    }).start();
+    setDriver('decay');
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>애니메이션 드라이버 비교</Text>
+      <Text style={styles.subtitle}>현재: {driver}</Text>
+      <View style={styles.track}>
+        <Animated.View style={[styles.ball, { transform: [{ translateX: position }] }]}>
+          <Text style={styles.ballText}>{driver[0].toUpperCase()}</Text>
+        </Animated.View>
+      </View>
+      <View style={styles.buttons}>
+        <Button title="Timing" onPress={runTiming} />
+        <Button title="Spring" onPress={runSpring} />
+        <Button title="Decay" onPress={runDecay} />
+      </View>
+      <View style={styles.info}>
+        <Text style={styles.infoText}>timing: 일정 시간 동안 이동 (Easing 곡선)</Text>
+        <Text style={styles.infoText}>spring: 스프링 물리 (통통 튀는 효과)</Text>
+        <Text style={styles.infoText}>decay: 관성 감속 (플링 제스처)</Text>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f0f4f8', padding: 24 },
+  title: { fontSize: 20, fontWeight: 'bold', marginBottom: 4 },
+  subtitle: { fontSize: 14, color: '#666', marginBottom: 24 },
+  track: { width: 260, height: 60, backgroundColor: '#e0e0e0', borderRadius: 30, justifyContent: 'center', paddingLeft: 4, marginBottom: 24 },
+  ball: { width: 52, height: 52, borderRadius: 26, backgroundColor: '#6C63FF', justifyContent: 'center', alignItems: 'center' },
+  ballText: { color: '#fff', fontWeight: 'bold', fontSize: 18 },
+  buttons: { flexDirection: 'row', gap: 10, marginBottom: 24 },
+  info: { backgroundColor: '#fff', padding: 16, borderRadius: 12, width: '100%' },
+  infoText: { fontSize: 13, color: '#555', lineHeight: 22 },
+});
+```
+
 ### 2.3 조합 애니메이션
 
 ```typescript
@@ -126,6 +252,106 @@ Animated.stagger(100, // 100ms 간격
     })
   )
 ).start();
+```
+
+```jsx [snack]
+import React, { useRef, useState } from 'react';
+import { View, Text, Animated, Button, StyleSheet, Easing } from 'react-native';
+
+const ITEMS = ['parallel', 'sequence', 'stagger', 'spring', 'bounce'];
+
+export default function App() {
+  const opacity = useRef(new Animated.Value(0)).current;
+  const scale = useRef(new Animated.Value(0.5)).current;
+  const translateY = useRef(new Animated.Value(50)).current;
+  const itemAnims = useRef(ITEMS.map(() => new Animated.Value(0))).current;
+  const [mode, setMode] = useState('parallel');
+
+  const reset = () => {
+    opacity.setValue(0);
+    scale.setValue(0.5);
+    translateY.setValue(50);
+    itemAnims.forEach(a => a.setValue(0));
+  };
+
+  const runParallel = () => {
+    reset();
+    Animated.parallel([
+      Animated.timing(opacity, { toValue: 1, duration: 500, useNativeDriver: true }),
+      Animated.spring(scale, { toValue: 1, useNativeDriver: true }),
+    ]).start();
+    setMode('parallel');
+  };
+
+  const runSequence = () => {
+    reset();
+    Animated.sequence([
+      Animated.timing(opacity, { toValue: 1, duration: 300, useNativeDriver: true }),
+      Animated.timing(translateY, { toValue: 0, duration: 400, useNativeDriver: true }),
+      Animated.spring(scale, { toValue: 1, useNativeDriver: true }),
+    ]).start();
+    setMode('sequence');
+  };
+
+  const runStagger = () => {
+    reset();
+    opacity.setValue(1);
+    scale.setValue(1);
+    Animated.stagger(120,
+      itemAnims.map(anim =>
+        Animated.spring(anim, { toValue: 1, useNativeDriver: true })
+      )
+    ).start();
+    setMode('stagger');
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>조합 애니메이션 데모</Text>
+      <View style={styles.buttons}>
+        <Button title="Parallel" onPress={runParallel} />
+        <Button title="Sequence" onPress={runSequence} />
+        <Button title="Stagger" onPress={runStagger} />
+      </View>
+
+      {mode !== 'stagger' ? (
+        <Animated.View style={[styles.box, {
+          opacity,
+          transform: [{ scale }, { translateY }],
+        }]}>
+          <Text style={styles.boxText}>{mode.toUpperCase()}</Text>
+        </Animated.View>
+      ) : (
+        <View style={styles.staggerRow}>
+          {ITEMS.map((item, i) => (
+            <Animated.View key={item} style={[styles.staggerItem, {
+              opacity: itemAnims[i],
+              transform: [{
+                translateY: itemAnims[i].interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [40, 0],
+                }),
+              }],
+            }]}>
+              <Text style={styles.staggerText}>{item}</Text>
+            </Animated.View>
+          ))}
+        </View>
+      )}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f0f4f8' },
+  title: { fontSize: 20, fontWeight: 'bold', marginBottom: 16 },
+  buttons: { flexDirection: 'row', gap: 8, marginBottom: 30 },
+  box: { width: 120, height: 120, backgroundColor: '#6C63FF', borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
+  boxText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+  staggerRow: { alignItems: 'center', gap: 10 },
+  staggerItem: { backgroundColor: '#4CAF50', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 },
+  staggerText: { color: '#fff', fontWeight: 'bold', fontSize: 14 },
+});
 ```
 
 ### 2.4 Interpolation (보간)
@@ -170,6 +396,89 @@ return (
     }}
   />
 );
+```
+
+```jsx [snack]
+import React, { useRef } from 'react';
+import { View, Text, Animated, ScrollView, StyleSheet, Dimensions } from 'react-native';
+
+const { width } = Dimensions.get('window');
+
+export default function App() {
+  const scrollY = useRef(new Animated.Value(0)).current;
+
+  // 스크롤에 따라 헤더 높이 변경
+  const headerHeight = scrollY.interpolate({
+    inputRange: [0, 200],
+    outputRange: [220, 70],
+    extrapolate: 'clamp',
+  });
+
+  // 스크롤에 따라 투명도 변경
+  const headerOpacity = scrollY.interpolate({
+    inputRange: [0, 100, 200],
+    outputRange: [1, 0.6, 0.2],
+    extrapolate: 'clamp',
+  });
+
+  // 색상 보간
+  const headerBg = scrollY.interpolate({
+    inputRange: [0, 200],
+    outputRange: ['rgb(74, 144, 226)', 'rgb(30, 60, 120)'],
+    extrapolate: 'clamp',
+  });
+
+  // 제목 크기 보간
+  const titleScale = scrollY.interpolate({
+    inputRange: [0, 200],
+    outputRange: [1, 0.7],
+    extrapolate: 'clamp',
+  });
+
+  return (
+    <View style={styles.container}>
+      <Animated.View style={[styles.header, {
+        height: headerHeight,
+        backgroundColor: headerBg,
+      }]}>
+        <Animated.Text style={[styles.headerTitle, {
+          opacity: headerOpacity,
+          transform: [{ scale: titleScale }],
+        }]}>
+          Interpolation 데모
+        </Animated.Text>
+        <Text style={styles.headerSub}>아래로 스크롤해보세요</Text>
+      </Animated.View>
+      <Animated.ScrollView
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: false }
+        )}
+        scrollEventThrottle={16}
+      >
+        <View style={{ height: 220 }} />
+        {Array.from({ length: 20 }, (_, i) => (
+          <View key={i} style={styles.card}>
+            <Text style={styles.cardTitle}>카드 #{i + 1}</Text>
+            <Text style={styles.cardBody}>
+              스크롤하면 헤더의 높이, 투명도, 색상, 크기가 보간됩니다.
+            </Text>
+          </View>
+        ))}
+      </Animated.ScrollView>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#f0f4f8' },
+  header: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, justifyContent: 'center', alignItems: 'center', paddingTop: 40 },
+  headerTitle: { color: '#fff', fontSize: 24, fontWeight: 'bold' },
+  headerSub: { color: 'rgba(255,255,255,0.7)', fontSize: 13, marginTop: 4 },
+  card: { marginHorizontal: 16, marginBottom: 12, padding: 20, backgroundColor: '#fff', borderRadius: 12, elevation: 2 },
+  cardTitle: { fontSize: 16, fontWeight: 'bold', marginBottom: 6 },
+  cardBody: { fontSize: 14, color: '#666', lineHeight: 20 },
+});
 ```
 
 ---
@@ -677,6 +986,84 @@ function AnimatedList() {
 }
 ```
 
+```jsx [snack]
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, Animated, Button, TouchableOpacity, StyleSheet, LayoutAnimation, Platform, UIManager } from 'react-native';
+
+// Android에서 LayoutAnimation 사용을 위한 설정
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
+function AnimatedItem({ item, onRemove }) {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(30)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }),
+      Animated.spring(slideAnim, { toValue: 0, useNativeDriver: true }),
+    ]).start();
+  }, []);
+
+  return (
+    <Animated.View style={[styles.item, {
+      opacity: fadeAnim,
+      transform: [{ translateY: slideAnim }],
+    }]}>
+      <Text style={styles.itemText}>{item}</Text>
+      <TouchableOpacity onPress={onRemove} style={styles.removeBtn}>
+        <Text style={styles.removeTxt}>X</Text>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+}
+
+let counter = 4;
+
+export default function App() {
+  const [items, setItems] = useState(['아이템 1', '아이템 2', '아이템 3']);
+
+  const addItem = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
+    setItems([...items, `아이템 ${counter++}`]);
+  };
+
+  const removeItem = (index) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setItems(items.filter((_, i) => i !== index));
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>레이아웃 애니메이션 데모</Text>
+      <Text style={styles.sub}>아이템 추가/삭제 시 자연스러운 전환</Text>
+      <Button title="아이템 추가" onPress={addItem} />
+      <View style={styles.list}>
+        {items.map((item, index) => (
+          <AnimatedItem
+            key={item}
+            item={item}
+            onRemove={() => removeItem(index)}
+          />
+        ))}
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 24, paddingTop: 60, backgroundColor: '#f0f4f8' },
+  title: { fontSize: 20, fontWeight: 'bold', textAlign: 'center' },
+  sub: { fontSize: 13, color: '#888', textAlign: 'center', marginBottom: 16 },
+  list: { marginTop: 16 },
+  item: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', padding: 16, borderRadius: 12, marginBottom: 10, elevation: 2 },
+  itemText: { flex: 1, fontSize: 16, fontWeight: '500' },
+  removeBtn: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#ffebee', justifyContent: 'center', alignItems: 'center' },
+  removeTxt: { color: '#c62828', fontWeight: 'bold' },
+});
+```
+
 ### 사용 가능한 entering/exiting 애니메이션
 
 ```typescript
@@ -1057,6 +1444,117 @@ function ArticleCardSkeleton() {
     </View>
   );
 }
+```
+
+```jsx [snack]
+import React, { useRef, useEffect, useState } from 'react';
+import { View, Text, Animated, StyleSheet, Dimensions, Button } from 'react-native';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+function SkeletonBar({ width, height, style }) {
+  const shimmer = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.timing(shimmer, {
+        toValue: 1,
+        duration: 1200,
+        useNativeDriver: true,
+      })
+    ).start();
+  }, []);
+
+  const translateX = shimmer.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-width, width],
+  });
+
+  return (
+    <View style={[{ width, height, backgroundColor: '#E0E0E0', borderRadius: 6, overflow: 'hidden' }, style]}>
+      <Animated.View style={{
+        width: '100%', height: '100%',
+        transform: [{ translateX }],
+      }}>
+        <View style={{
+          width: '100%', height: '100%',
+          backgroundColor: 'rgba(255,255,255,0.4)',
+          borderRadius: 6,
+        }} />
+      </Animated.View>
+    </View>
+  );
+}
+
+function CardSkeleton() {
+  return (
+    <View style={styles.card}>
+      <SkeletonBar width={SCREEN_WIDTH - 64} height={160} />
+      <SkeletonBar width={SCREEN_WIDTH - 100} height={18} style={{ marginTop: 14 }} />
+      <SkeletonBar width={SCREEN_WIDTH - 160} height={14} style={{ marginTop: 10 }} />
+      <View style={{ flexDirection: 'row', marginTop: 14 }}>
+        <SkeletonBar width={32} height={32} style={{ borderRadius: 16 }} />
+        <View style={{ marginLeft: 10 }}>
+          <SkeletonBar width={100} height={12} />
+          <SkeletonBar width={70} height={10} style={{ marginTop: 6 }} />
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function LoadedCard() {
+  return (
+    <View style={styles.card}>
+      <View style={[styles.imagePlaceholder]}>
+        <Text style={{ color: '#fff', fontWeight: 'bold' }}>이미지 영역</Text>
+      </View>
+      <Text style={styles.cardTitle}>로딩 완료된 기사 제목</Text>
+      <Text style={styles.cardSub}>기사 본문 미리보기...</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 14 }}>
+        <View style={styles.avatar}><Text style={{ color: '#fff', fontSize: 12 }}>JW</Text></View>
+        <View style={{ marginLeft: 10 }}>
+          <Text style={{ fontSize: 13, fontWeight: '600' }}>작성자</Text>
+          <Text style={{ fontSize: 11, color: '#999' }}>3분 전</Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+export default function App() {
+  const [loading, setLoading] = useState(true);
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>스켈레톤 로더 (Shimmer)</Text>
+      <Button title={loading ? '로딩 완료 시뮬레이션' : '다시 로딩'} onPress={() => setLoading(!loading)} />
+      <View style={{ marginTop: 16 }}>
+        {loading ? (
+          <>
+            <CardSkeleton />
+            <CardSkeleton />
+          </>
+        ) : (
+          <>
+            <LoadedCard />
+            <LoadedCard />
+          </>
+        )}
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 16, paddingTop: 60, backgroundColor: '#f5f5f5' },
+  title: { fontSize: 20, fontWeight: 'bold', textAlign: 'center', marginBottom: 12 },
+  card: { backgroundColor: '#fff', padding: 16, borderRadius: 14, marginBottom: 16, elevation: 2 },
+  imagePlaceholder: { height: 160, backgroundColor: '#4A90D9', borderRadius: 10, justifyContent: 'center', alignItems: 'center' },
+  cardTitle: { fontSize: 17, fontWeight: 'bold', marginTop: 14 },
+  cardSub: { fontSize: 14, color: '#666', marginTop: 6 },
+  avatar: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#6C63FF', justifyContent: 'center', alignItems: 'center' },
+});
 ```
 
 ### 6.5 Lottie 애니메이션 통합

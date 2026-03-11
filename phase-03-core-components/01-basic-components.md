@@ -72,6 +72,45 @@ const styles = StyleSheet.create({
 export default BasicViewExample;
 ```
 
+> **직접 실행해보기**: 아래 Expo Snack에서 View 컨테이너의 스타일을 수정해보세요.
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+
+const BasicViewExample = () => {
+  return (
+    <View style={styles.container}>
+      <View style={styles.box}>
+        <Text>상자 1</Text>
+      </View>
+      <View style={styles.box}>
+        <Text>상자 2</Text>
+      </View>
+      <View style={[styles.box, { backgroundColor: '#bbdefb' }]}>
+        <Text>상자 3 (다른 색상)</Text>
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#ffffff',
+  },
+  box: {
+    padding: 20,
+    marginBottom: 10,
+    backgroundColor: '#e0e0e0',
+    borderRadius: 8,
+  },
+});
+
+export default BasicViewExample;
+```
+
 Android 대응 코드:
 ```xml
 <!-- Android XML -->
@@ -132,6 +171,46 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
+```
+
+> **직접 실행해보기**: View의 크기가 실시간으로 측정되는 것을 확인하세요.
+
+```jsx [snack]
+import React, { useState } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+
+const LayoutExample = () => {
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+  const handleLayout = (event) => {
+    const { width, height } = event.nativeEvent.layout;
+    setDimensions({ width, height });
+  };
+
+  return (
+    <View style={styles.container} onLayout={handleLayout}>
+      <Text style={styles.text}>
+        이 View의 크기: {dimensions.width.toFixed(0)} x {dimensions.height.toFixed(0)}
+      </Text>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+  },
+  text: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+});
+
+export default LayoutExample;
 ```
 
 ### 예제 3: 접근성 설정
@@ -266,6 +345,62 @@ const styles = StyleSheet.create({
 });
 ```
 
+> **직접 실행해보기**: 다양한 텍스트 스타일을 수정하며 결과를 확인하세요.
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+
+const TextStyleExample = () => {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>제목 텍스트</Text>
+      <Text style={styles.subtitle}>부제목 텍스트</Text>
+      <Text style={styles.body}>
+        본문 텍스트입니다. 일반적인 읽기용 텍스트에 적합한 크기와 색상입니다.
+      </Text>
+      <Text style={styles.caption}>캡션 텍스트 (작은 설명)</Text>
+      <Text style={styles.link}>링크 텍스트</Text>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 16, backgroundColor: '#fff' },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#1a1a1a',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#333333',
+    marginBottom: 8,
+  },
+  body: {
+    fontSize: 16,
+    fontWeight: '400',
+    color: '#555555',
+    lineHeight: 24,
+    marginBottom: 8,
+  },
+  caption: {
+    fontSize: 12,
+    color: '#999999',
+    marginBottom: 8,
+  },
+  link: {
+    fontSize: 16,
+    color: '#2196F3',
+    textDecorationLine: 'underline',
+  },
+});
+
+export default TextStyleExample;
+```
+
 ### 예제 2: 중첩 Text (SpannableString 대응)
 
 Android에서 하나의 TextView에 여러 스타일을 적용하려면 `SpannableString`을 사용해야 합니다. React Native에서는 `<Text>`를 중첩하면 됩니다.
@@ -304,6 +439,46 @@ const styles = StyleSheet.create({
   italic: { fontStyle: 'italic' },
   colored: { color: '#e91e63' },
 });
+```
+
+> **직접 실행해보기**: Android의 SpannableString 대신 중첩 Text로 다양한 스타일을 적용해보세요.
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+
+const NestedTextExample = () => {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.base}>
+        일반 텍스트와{' '}
+        <Text style={styles.bold}>굵은 텍스트</Text>
+        , 그리고{' '}
+        <Text style={styles.italic}>기울임 텍스트</Text>
+        를 한 줄에 표시합니다.{' '}
+        <Text style={styles.colored}>색상도 변경</Text>
+        할 수 있습니다.
+      </Text>
+
+      <Text style={[styles.base, { marginTop: 20 }]}>
+        <Text style={{ fontSize: 24, fontWeight: 'bold' }}>큰 제목</Text>
+        {' 옆에 '}
+        <Text style={{ fontSize: 12, color: '#999' }}>작은 텍스트</Text>
+        {'도 가능합니다.'}
+      </Text>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 16, backgroundColor: '#fff' },
+  base: { fontSize: 16, lineHeight: 24, color: '#333' },
+  bold: { fontWeight: 'bold' },
+  italic: { fontStyle: 'italic' },
+  colored: { color: '#e91e63' },
+});
+
+export default NestedTextExample;
 ```
 
 ### 예제 3: numberOfLines와 ellipsizeMode
@@ -356,6 +531,53 @@ const styles = StyleSheet.create({
 });
 ```
 
+> **직접 실행해보기**: numberOfLines 값을 변경하며 말줄임 처리가 어떻게 바뀌는지 확인하세요.
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+
+const EllipsisExample = () => {
+  const longText = '이것은 매우 긴 텍스트입니다. 화면에 다 표시할 수 없을 만큼 긴 내용을 가지고 있으며, 말줄임 처리를 보여주기 위한 예제입니다. React Native에서는 numberOfLines와 ellipsizeMode를 사용합니다.';
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.label}>말줄임 없음:</Text>
+      <Text style={styles.text}>{longText}</Text>
+
+      <Text style={styles.label}>2줄 제한 (tail):</Text>
+      <Text style={styles.text} numberOfLines={2} ellipsizeMode="tail">
+        {longText}
+      </Text>
+
+      <Text style={styles.label}>1줄 제한 (middle):</Text>
+      <Text style={styles.text} numberOfLines={1} ellipsizeMode="middle">
+        {longText}
+      </Text>
+
+      <Text style={styles.label}>1줄 제한 (head):</Text>
+      <Text style={styles.text} numberOfLines={1} ellipsizeMode="head">
+        {longText}
+      </Text>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 16, backgroundColor: '#fff' },
+  label: { fontSize: 14, fontWeight: 'bold', marginBottom: 4, color: '#333' },
+  text: {
+    fontSize: 14,
+    marginBottom: 16,
+    backgroundColor: '#f0f0f0',
+    padding: 8,
+    borderRadius: 4,
+  },
+});
+
+export default EllipsisExample;
+```
+
 ### 예제 4: 탭 가능한 Text
 
 ```tsx
@@ -387,6 +609,44 @@ const styles = StyleSheet.create({
   paragraph: { fontSize: 14, color: '#333', padding: 16 },
   link: { color: '#2196F3', textDecorationLine: 'underline' },
 });
+```
+
+> **직접 실행해보기**: 텍스트 내 링크를 탭하면 Alert가 표시됩니다.
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, Alert, StyleSheet } from 'react-native';
+
+const TappableTextExample = () => {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.paragraph}>
+        이용약관에 동의합니다.{' '}
+        <Text
+          style={styles.link}
+          onPress={() => Alert.alert('이용약관', '이용약관 내용...')}
+        >
+          이용약관 보기
+        </Text>
+        {' '}및{' '}
+        <Text
+          style={styles.link}
+          onPress={() => Alert.alert('개인정보처리방침', '개인정보처리방침 내용...')}
+        >
+          개인정보처리방침
+        </Text>
+      </Text>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, justifyContent: 'center', backgroundColor: '#fff' },
+  paragraph: { fontSize: 14, color: '#333', padding: 16, lineHeight: 22 },
+  link: { color: '#2196F3', textDecorationLine: 'underline' },
+});
+
+export default TappableTextExample;
 ```
 
 ---
@@ -538,6 +798,71 @@ const styles = StyleSheet.create({
 });
 ```
 
+> **직접 실행해보기**: 네트워크 이미지 로드 시 로딩/에러 처리를 확인하세요.
+
+```jsx [snack]
+import React, { useState } from 'react';
+import { View, Image, Text, ActivityIndicator, StyleSheet } from 'react-native';
+
+const NetworkImageExample = () => {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>네트워크 이미지 로드</Text>
+
+      <View style={styles.imageWrapper}>
+        {loading && (
+          <ActivityIndicator
+            style={styles.loader}
+            size="large"
+            color="#2196F3"
+          />
+        )}
+
+        {error ? (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>이미지를 불러올 수 없습니다</Text>
+          </View>
+        ) : (
+          <Image
+            source={{ uri: 'https://picsum.photos/400/300' }}
+            style={styles.image}
+            resizeMode="cover"
+            onLoadStart={() => setLoading(true)}
+            onLoadEnd={() => setLoading(false)}
+            onError={() => {
+              setError(true);
+              setLoading(false);
+            }}
+          />
+        )}
+      </View>
+
+      <Text style={styles.caption}>picsum.photos에서 랜덤 이미지를 로드합니다</Text>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, alignItems: 'center', padding: 16, backgroundColor: '#fff' },
+  title: { fontSize: 18, fontWeight: 'bold', marginBottom: 16 },
+  imageWrapper: { width: 300, height: 200, justifyContent: 'center', alignItems: 'center' },
+  image: { width: 300, height: 200, borderRadius: 8 },
+  loader: { position: 'absolute' },
+  errorContainer: {
+    width: 300, height: 200, borderRadius: 8,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center', alignItems: 'center',
+  },
+  errorText: { color: '#999' },
+  caption: { marginTop: 12, fontSize: 13, color: '#888' },
+});
+
+export default NetworkImageExample;
+```
+
 ### 예제 3: 원형 프로필 이미지
 
 ```tsx
@@ -569,6 +894,72 @@ const styles = StyleSheet.create({
     borderColor: '#2196F3',
   },
 });
+```
+
+> **직접 실행해보기**: borderRadius를 조정하여 원형/사각형 프로필 이미지를 만들어보세요.
+
+```jsx [snack]
+import React from 'react';
+import { View, Image, Text, StyleSheet } from 'react-native';
+
+const CircleImageExample = () => {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>프로필 이미지 스타일</Text>
+
+      <View style={styles.row}>
+        <View style={styles.profileItem}>
+          <Image
+            source={{ uri: 'https://i.pravatar.cc/200?img=1' }}
+            style={styles.avatarCircle}
+          />
+          <Text style={styles.label}>원형</Text>
+        </View>
+
+        <View style={styles.profileItem}>
+          <Image
+            source={{ uri: 'https://i.pravatar.cc/200?img=2' }}
+            style={styles.avatarRounded}
+          />
+          <Text style={styles.label}>둥근 사각형</Text>
+        </View>
+
+        <View style={styles.profileItem}>
+          <Image
+            source={{ uri: 'https://i.pravatar.cc/200?img=3' }}
+            style={styles.avatarSquare}
+          />
+          <Text style={styles.label}>사각형</Text>
+        </View>
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, alignItems: 'center', padding: 24, backgroundColor: '#fff' },
+  title: { fontSize: 18, fontWeight: 'bold', marginBottom: 24 },
+  row: { flexDirection: 'row', gap: 20 },
+  profileItem: { alignItems: 'center' },
+  avatarCircle: {
+    width: 80, height: 80,
+    borderRadius: 40,
+    borderWidth: 2, borderColor: '#2196F3',
+  },
+  avatarRounded: {
+    width: 80, height: 80,
+    borderRadius: 16,
+    borderWidth: 2, borderColor: '#4CAF50',
+  },
+  avatarSquare: {
+    width: 80, height: 80,
+    borderRadius: 0,
+    borderWidth: 2, borderColor: '#FF9800',
+  },
+  label: { marginTop: 8, fontSize: 13, color: '#666' },
+});
+
+export default CircleImageExample;
 ```
 
 ---
@@ -673,6 +1064,49 @@ const styles = StyleSheet.create({
 });
 ```
 
+> **직접 실행해보기**: TextInput에 텍스트를 입력하면 아래에 실시간으로 반영됩니다.
+
+```jsx [snack]
+import React, { useState } from 'react';
+import { View, TextInput, Text, StyleSheet } from 'react-native';
+
+const BasicInputExample = () => {
+  const [text, setText] = useState('');
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.label}>이름</Text>
+      <TextInput
+        style={styles.input}
+        value={text}
+        onChangeText={setText}
+        placeholder="이름을 입력하세요"
+        placeholderTextColor="#999"
+        autoCapitalize="words"
+        returnKeyType="done"
+      />
+      <Text style={styles.preview}>입력한 이름: {text}</Text>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 16, backgroundColor: '#fff' },
+  label: { fontSize: 16, fontWeight: '600', marginBottom: 8 },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: '#fafafa',
+  },
+  preview: { marginTop: 16, fontSize: 14, color: '#666' },
+});
+
+export default BasicInputExample;
+```
+
 ### 예제 2: 로그인 폼 (다중 입력)
 
 ```tsx
@@ -749,6 +1183,82 @@ const styles = StyleSheet.create({
 });
 ```
 
+> **직접 실행해보기**: 이메일 입력 후 키보드의 "다음" 버튼으로 비밀번호 필드로 이동해보세요.
+
+```jsx [snack]
+import React, { useState, useRef } from 'react';
+import { View, TextInput, Text, Pressable, Alert, StyleSheet } from 'react-native';
+
+const LoginFormExample = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const passwordRef = useRef(null);
+
+  const handleLogin = () => {
+    Alert.alert('로그인 시도', `이메일: ${email}\n비밀번호: ${'*'.repeat(password.length)}`);
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>로그인</Text>
+
+      <TextInput
+        style={styles.input}
+        value={email}
+        onChangeText={setEmail}
+        placeholder="이메일"
+        placeholderTextColor="#999"
+        keyboardType="email-address"
+        autoCapitalize="none"
+        autoCorrect={false}
+        returnKeyType="next"
+        onSubmitEditing={() => passwordRef.current?.focus()}
+      />
+
+      <TextInput
+        ref={passwordRef}
+        style={styles.input}
+        value={password}
+        onChangeText={setPassword}
+        placeholder="비밀번호"
+        placeholderTextColor="#999"
+        secureTextEntry={true}
+        returnKeyType="done"
+        onSubmitEditing={handleLogin}
+      />
+
+      <Pressable style={styles.button} onPress={handleLogin}>
+        <Text style={styles.buttonText}>로그인</Text>
+      </Pressable>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 24, backgroundColor: '#fff' },
+  title: { fontSize: 28, fontWeight: 'bold', marginBottom: 24 },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 14,
+    fontSize: 16,
+    marginBottom: 12,
+    backgroundColor: '#fafafa',
+  },
+  button: {
+    backgroundColor: '#2196F3',
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+});
+
+export default LoginFormExample;
+```
+
 ### 예제 3: 여러 줄 입력 (메모)
 
 ```tsx
@@ -803,6 +1313,59 @@ const styles = StyleSheet.create({
     color: '#999',
   },
 });
+```
+
+> **직접 실행해보기**: 여러 줄 메모를 입력하면서 글자 수 카운터가 업데이트되는 것을 확인하세요.
+
+```jsx [snack]
+import React, { useState } from 'react';
+import { View, TextInput, Text, StyleSheet } from 'react-native';
+
+const MultilineExample = () => {
+  const [memo, setMemo] = useState('');
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.label}>메모</Text>
+      <TextInput
+        style={styles.textArea}
+        value={memo}
+        onChangeText={setMemo}
+        placeholder="메모를 입력하세요..."
+        placeholderTextColor="#999"
+        multiline={true}
+        numberOfLines={6}
+        maxLength={500}
+        textAlignVertical="top"
+      />
+      <Text style={[styles.counter, memo.length >= 450 && { color: '#f44336' }]}>
+        {memo.length}/500
+      </Text>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 16, backgroundColor: '#fff' },
+  label: { fontSize: 16, fontWeight: '600', marginBottom: 8 },
+  textArea: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    minHeight: 150,
+    backgroundColor: '#fafafa',
+  },
+  counter: {
+    textAlign: 'right',
+    marginTop: 4,
+    fontSize: 12,
+    color: '#999',
+  },
+});
+
+export default MultilineExample;
 ```
 
 ---
@@ -896,6 +1459,70 @@ const styles = StyleSheet.create({
 });
 ```
 
+> **직접 실행해보기**: 버튼을 눌러보면 pressed 상태에 따라 스타일이 동적으로 변합니다.
+
+```jsx [snack]
+import React, { useState } from 'react';
+import { View, Pressable, Text, StyleSheet } from 'react-native';
+
+const PressableButtonExample = () => {
+  const [count, setCount] = useState(0);
+
+  return (
+    <View style={styles.container}>
+      <Pressable
+        style={({ pressed }) => [
+          styles.button,
+          pressed && styles.buttonPressed,
+        ]}
+        android_ripple={{ color: 'rgba(255,255,255,0.3)' }}
+        onPress={() => setCount(c => c + 1)}
+      >
+        {({ pressed }) => (
+          <Text style={[styles.buttonText, pressed && styles.buttonTextPressed]}>
+            {pressed ? '누르는 중...' : '버튼을 눌러보세요'}
+          </Text>
+        )}
+      </Pressable>
+
+      <Text style={styles.countText}>클릭 횟수: {count}</Text>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 16, justifyContent: 'center', backgroundColor: '#fff' },
+  button: {
+    backgroundColor: '#2196F3',
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    alignItems: 'center',
+    elevation: 2,
+  },
+  buttonPressed: {
+    backgroundColor: '#1976D2',
+    elevation: 0,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  buttonTextPressed: {
+    opacity: 0.8,
+  },
+  countText: {
+    marginTop: 20,
+    fontSize: 16,
+    textAlign: 'center',
+    color: '#666',
+  },
+});
+
+export default PressableButtonExample;
+```
+
 ### 예제 2: 다양한 버튼 스타일
 
 ```tsx
@@ -979,6 +1606,89 @@ const styles = StyleSheet.create({
 });
 ```
 
+> **직접 실행해보기**: Primary, Secondary, Text, Disabled 버튼의 다양한 스타일을 확인하세요.
+
+```jsx [snack]
+import React from 'react';
+import { View, Pressable, Text, Alert, StyleSheet } from 'react-native';
+
+const ButtonVariantsExample = () => {
+  const handlePress = (type) => Alert.alert('버튼 클릭', `${type} 버튼이 클릭되었습니다`);
+
+  return (
+    <View style={styles.container}>
+      <Pressable
+        style={({ pressed }) => [
+          styles.buttonBase,
+          styles.primaryButton,
+          pressed && { opacity: 0.8 },
+        ]}
+        android_ripple={{ color: 'rgba(255,255,255,0.3)' }}
+        onPress={() => handlePress('Primary')}
+      >
+        <Text style={[styles.buttonText, styles.primaryText]}>Primary</Text>
+      </Pressable>
+
+      <Pressable
+        style={({ pressed }) => [
+          styles.buttonBase,
+          styles.secondaryButton,
+          pressed && { backgroundColor: '#e3f2fd' },
+        ]}
+        android_ripple={{ color: 'rgba(33,150,243,0.2)' }}
+        onPress={() => handlePress('Secondary')}
+      >
+        <Text style={[styles.buttonText, styles.secondaryText]}>Secondary</Text>
+      </Pressable>
+
+      <Pressable
+        style={({ pressed }) => [
+          styles.buttonBase,
+          styles.textButton,
+          pressed && { backgroundColor: '#f5f5f5' },
+        ]}
+        onPress={() => handlePress('Text')}
+      >
+        <Text style={[styles.buttonText, styles.textButtonText]}>Text Button</Text>
+      </Pressable>
+
+      <Pressable
+        style={[styles.buttonBase, styles.disabledButton]}
+        disabled={true}
+        onPress={() => {}}
+      >
+        <Text style={[styles.buttonText, styles.disabledText]}>Disabled</Text>
+      </Pressable>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 16, gap: 12, justifyContent: 'center', backgroundColor: '#fff' },
+  buttonBase: {
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  primaryButton: { backgroundColor: '#2196F3', elevation: 2 },
+  primaryText: { color: '#fff' },
+  secondaryButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
+    borderColor: '#2196F3',
+  },
+  secondaryText: { color: '#2196F3' },
+  textButton: { backgroundColor: 'transparent' },
+  textButtonText: { color: '#2196F3' },
+  disabledButton: { backgroundColor: '#e0e0e0' },
+  disabledText: { color: '#9e9e9e' },
+  buttonText: { fontSize: 16, fontWeight: '600' },
+});
+
+export default ButtonVariantsExample;
+```
+
 ### 예제 3: 카드 형태의 Pressable
 
 ```tsx
@@ -1033,6 +1743,65 @@ const styles = StyleSheet.create({
   cardTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 8 },
   cardDescription: { fontSize: 14, color: '#666', lineHeight: 20 },
 });
+```
+
+> **직접 실행해보기**: 카드를 누르면 scale 변환과 elevation 변화를 확인하세요.
+
+```jsx [snack]
+import React from 'react';
+import { View, Pressable, Text, Image, Alert, StyleSheet } from 'react-native';
+
+const PressableCardExample = () => {
+  return (
+    <View style={styles.container}>
+      <Pressable
+        style={({ pressed }) => [
+          styles.card,
+          pressed && styles.cardPressed,
+        ]}
+        android_ripple={{ color: 'rgba(0,0,0,0.1)' }}
+        onPress={() => Alert.alert('카드 클릭', '상세 화면으로 이동합니다')}
+        onLongPress={() => Alert.alert('롱프레스', '옵션 메뉴를 표시합니다')}
+      >
+        <Image
+          source={{ uri: 'https://picsum.photos/300/150' }}
+          style={styles.cardImage}
+        />
+        <View style={styles.cardContent}>
+          <Text style={styles.cardTitle}>카드 제목</Text>
+          <Text style={styles.cardDescription}>
+            카드 설명 텍스트입니다. 이 카드를 누르면 상세 화면으로 이동합니다.
+            길게 누르면 옵션 메뉴가 표시됩니다.
+          </Text>
+        </View>
+      </Pressable>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 16, backgroundColor: '#f5f5f5' },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    overflow: 'hidden',
+  },
+  cardPressed: {
+    elevation: 1,
+    transform: [{ scale: 0.98 }],
+  },
+  cardImage: { width: '100%', height: 150 },
+  cardContent: { padding: 16 },
+  cardTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 8 },
+  cardDescription: { fontSize: 14, color: '#666', lineHeight: 20 },
+});
+
+export default PressableCardExample;
 ```
 
 ---
@@ -1092,6 +1861,64 @@ const styles = StyleSheet.create({
   },
   text: { color: '#fff', fontSize: 16, fontWeight: '600' },
 });
+```
+
+> **직접 실행해보기**: TouchableOpacity와 Pressable의 터치 피드백 차이를 비교해보세요.
+
+```jsx [snack]
+import React from 'react';
+import { View, TouchableOpacity, Pressable, Text, Alert, StyleSheet } from 'react-native';
+
+const ComparisonExample = () => {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>터치 컴포넌트 비교</Text>
+
+      <TouchableOpacity
+        style={styles.button}
+        activeOpacity={0.7}
+        onPress={() => Alert.alert('TouchableOpacity', '자동 opacity 피드백')}
+      >
+        <Text style={styles.text}>TouchableOpacity (activeOpacity: 0.7)</Text>
+      </TouchableOpacity>
+
+      <Pressable
+        style={({ pressed }) => [
+          styles.button,
+          { opacity: pressed ? 0.7 : 1 },
+        ]}
+        onPress={() => Alert.alert('Pressable', '수동 opacity 제어')}
+      >
+        <Text style={styles.text}>Pressable (같은 효과)</Text>
+      </Pressable>
+
+      <Pressable
+        style={({ pressed }) => [
+          styles.button,
+          { backgroundColor: pressed ? '#388E3C' : '#4CAF50' },
+          { transform: [{ scale: pressed ? 0.95 : 1 }] },
+        ]}
+        onPress={() => Alert.alert('Pressable', 'scale + 색상 변경')}
+      >
+        <Text style={styles.text}>Pressable (고급 효과)</Text>
+      </Pressable>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 16, gap: 12, backgroundColor: '#fff' },
+  title: { fontSize: 20, fontWeight: 'bold', marginBottom: 8 },
+  button: {
+    backgroundColor: '#4CAF50',
+    padding: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  text: { color: '#fff', fontSize: 16, fontWeight: '600' },
+});
+
+export default ComparisonExample;
 ```
 
 ---
@@ -1428,6 +2255,55 @@ const styles = StyleSheet.create({
 });
 ```
 
+> **직접 실행해보기**: 3초 후 로딩이 완료되는 ActivityIndicator를 확인하세요.
+
+```jsx [snack]
+import React, { useState, useEffect } from 'react';
+import { View, ActivityIndicator, Text, Pressable, StyleSheet } from 'react-native';
+
+const LoadingExample = () => {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const reload = () => {
+    setLoading(true);
+    setTimeout(() => setLoading(false), 3000);
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#2196F3" />
+        <Text style={styles.loadingText}>데이터를 불러오는 중...</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.centered}>
+      <Text style={styles.doneText}>데이터 로드 완료!</Text>
+      <Pressable style={styles.button} onPress={reload}>
+        <Text style={styles.buttonText}>다시 로드</Text>
+      </Pressable>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  centered: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' },
+  loadingText: { marginTop: 16, fontSize: 16, color: '#666' },
+  doneText: { fontSize: 18, fontWeight: 'bold', color: '#4CAF50', marginBottom: 20 },
+  button: { backgroundColor: '#2196F3', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 8 },
+  buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+});
+
+export default LoadingExample;
+```
+
 ---
 
 ## 12. Alert — 알림 다이얼로그
@@ -1510,6 +2386,69 @@ const styles = StyleSheet.create({
 });
 ```
 
+> **직접 실행해보기**: 각 버튼을 눌러 다양한 스타일의 Alert 다이얼로그를 확인하세요.
+
+```jsx [snack]
+import React from 'react';
+import { View, Alert, Pressable, Text, StyleSheet } from 'react-native';
+
+const AlertExample = () => {
+  const showBasicAlert = () => {
+    Alert.alert('알림', '기본 알림 메시지입니다.');
+  };
+
+  const showConfirmAlert = () => {
+    Alert.alert(
+      '삭제 확인',
+      '정말 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.',
+      [
+        { text: '취소', style: 'cancel' },
+        { text: '삭제', style: 'destructive', onPress: () => Alert.alert('삭제됨') },
+      ]
+    );
+  };
+
+  const showThreeButtonAlert = () => {
+    Alert.alert(
+      '변경 사항 저장',
+      '변경 사항을 저장하시겠습니까?',
+      [
+        { text: '저장하지 않음', style: 'destructive' },
+        { text: '취소', style: 'cancel' },
+        { text: '저장', onPress: () => Alert.alert('저장 완료') },
+      ]
+    );
+  };
+
+  return (
+    <View style={styles.container}>
+      <Pressable style={styles.button} onPress={showBasicAlert}>
+        <Text style={styles.text}>기본 알림</Text>
+      </Pressable>
+      <Pressable style={[styles.button, { backgroundColor: '#f44336' }]} onPress={showConfirmAlert}>
+        <Text style={styles.text}>확인 다이얼로그</Text>
+      </Pressable>
+      <Pressable style={[styles.button, { backgroundColor: '#FF9800' }]} onPress={showThreeButtonAlert}>
+        <Text style={styles.text}>3버튼 다이얼로그</Text>
+      </Pressable>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 16, gap: 12, justifyContent: 'center', backgroundColor: '#fff' },
+  button: {
+    backgroundColor: '#2196F3',
+    padding: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  text: { color: '#fff', fontSize: 16, fontWeight: '600' },
+});
+
+export default AlertExample;
+```
+
 ---
 
 ## 13. Switch — 토글 스위치
@@ -1560,6 +2499,69 @@ const styles = StyleSheet.create({
   },
   label: { fontSize: 16 },
 });
+```
+
+> **직접 실행해보기**: 스위치를 토글하면서 트랙/썸 색상이 바뀌는 것을 확인하세요.
+
+```jsx [snack]
+import React, { useState } from 'react';
+import { View, Switch, Text, StyleSheet } from 'react-native';
+
+const SwitchExample = () => {
+  const [darkMode, setDarkMode] = useState(false);
+  const [notifications, setNotifications] = useState(true);
+  const [autoSave, setAutoSave] = useState(false);
+
+  return (
+    <View style={[styles.container, darkMode && { backgroundColor: '#1a1a1a' }]}>
+      <Text style={[styles.title, darkMode && { color: '#fff' }]}>설정</Text>
+
+      <View style={styles.row}>
+        <Text style={[styles.label, darkMode && { color: '#fff' }]}>다크 모드</Text>
+        <Switch
+          value={darkMode}
+          onValueChange={setDarkMode}
+          trackColor={{ false: '#e0e0e0', true: '#81b0ff' }}
+          thumbColor={darkMode ? '#2196F3' : '#f4f3f4'}
+        />
+      </View>
+      <View style={styles.row}>
+        <Text style={[styles.label, darkMode && { color: '#fff' }]}>알림</Text>
+        <Switch
+          value={notifications}
+          onValueChange={setNotifications}
+          trackColor={{ false: '#e0e0e0', true: '#81C784' }}
+          thumbColor={notifications ? '#4CAF50' : '#f4f3f4'}
+        />
+      </View>
+      <View style={styles.row}>
+        <Text style={[styles.label, darkMode && { color: '#fff' }]}>자동 저장</Text>
+        <Switch
+          value={autoSave}
+          onValueChange={setAutoSave}
+          trackColor={{ false: '#e0e0e0', true: '#FFB74D' }}
+          thumbColor={autoSave ? '#FF9800' : '#f4f3f4'}
+        />
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 16, backgroundColor: '#fff' },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 16 },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  label: { fontSize: 16 },
+});
+
+export default SwitchExample;
 ```
 
 ---
@@ -1651,6 +2653,94 @@ const styles = StyleSheet.create({
   },
   closeButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
 });
+```
+
+> **직접 실행해보기**: 모달 열기/닫기와 fade 애니메이션을 확인하세요.
+
+```jsx [snack]
+import React, { useState } from 'react';
+import { View, Modal, Text, Pressable, StyleSheet } from 'react-native';
+
+const ModalExample = () => {
+  const [visible, setVisible] = useState(false);
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Modal 예제</Text>
+      <Text style={styles.description}>
+        Android의 DialogFragment와 유사한 모달 다이얼로그입니다.
+      </Text>
+
+      <Pressable style={styles.openButton} onPress={() => setVisible(true)}>
+        <Text style={styles.buttonText}>모달 열기</Text>
+      </Pressable>
+
+      <Modal
+        visible={visible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setVisible(false)}
+      >
+        <View style={styles.overlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>모달 제목</Text>
+            <Text style={styles.modalBody}>
+              모달 내용입니다. Android의 DialogFragment와 유사합니다.
+              배경을 눌러도 닫히지 않으며, 닫기 버튼을 눌러야 합니다.
+            </Text>
+            <Pressable
+              style={styles.closeButton}
+              onPress={() => setVisible(false)}
+            >
+              <Text style={styles.closeButtonText}>닫기</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff', padding: 24 },
+  title: { fontSize: 22, fontWeight: 'bold', marginBottom: 8 },
+  description: { fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 24, lineHeight: 20 },
+  openButton: {
+    backgroundColor: '#2196F3',
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    borderRadius: 8,
+  },
+  buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 24,
+    width: '85%',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+  },
+  modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 12 },
+  modalBody: { fontSize: 16, color: '#666', lineHeight: 24, marginBottom: 20 },
+  closeButton: {
+    backgroundColor: '#2196F3',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  closeButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+});
+
+export default ModalExample;
 ```
 
 ---

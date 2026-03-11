@@ -1,6 +1,11 @@
 (function() {
   var playgroundCounter = 0;
 
+  // Strip Prism.js syntax highlighting HTML tags from code content
+  function stripHtmlTags(str) {
+    return str.replace(/<[^>]*>/g, '');
+  }
+
   // Escape HTML for display
   function escapeHtml(str) {
     return str
@@ -184,7 +189,7 @@
       // Docsify renders ```javascript [playground] as <code class="lang-javascript [playground]">
       // or it might be class="lang-javascript" with [playground] in various positions
       html = html.replace(/<pre[^>]*><code[^>]*class="lang-([^"]*?\[playground\][^"]*?)"[^>]*>([\s\S]*?)<\/code><\/pre>/gi, function(match, lang, content) {
-        var decoded = content
+        var decoded = stripHtmlTags(content)
           .replace(/&lt;/g, '<')
           .replace(/&gt;/g, '>')
           .replace(/&amp;/g, '&')
@@ -200,7 +205,7 @@
 
       // Match code blocks with [snack] in the language tag
       html = html.replace(/<pre[^>]*><code[^>]*class="lang-([^"]*?\[snack\][^"]*?)"[^>]*>([\s\S]*?)<\/code><\/pre>/gi, function(match, lang, content) {
-        var decoded = content
+        var decoded = stripHtmlTags(content)
           .replace(/&lt;/g, '<')
           .replace(/&gt;/g, '>')
           .replace(/&amp;/g, '&')

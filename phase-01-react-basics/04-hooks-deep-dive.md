@@ -301,6 +301,122 @@ function ToggleExamples() {
 }
 ```
 
+```jsx [snack]
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+
+function ToggleCycleDemo() {
+  // 불리언 토글
+  const [isOpen, setIsOpen] = useState(false);
+  const toggle = () => setIsOpen(prev => !prev);
+
+  // 값 사이클 (다음 값으로 순환)
+  const themes = ['light', 'dark', 'auto'];
+  const [themeIndex, setThemeIndex] = useState(0);
+  const currentTheme = themes[themeIndex];
+  const nextTheme = () => setThemeIndex(prev => (prev + 1) % themes.length);
+
+  // 카운터 (updater 함수 패턴)
+  const [count, setCount] = useState(0);
+
+  const themeColors = {
+    light: { bg: '#ffffff', text: '#333333' },
+    dark: { bg: '#1a1a2e', text: '#eaeaea' },
+    auto: { bg: '#f0e6d3', text: '#5c4033' },
+  };
+
+  const colors = themeColors[currentTheme];
+
+  return (
+    <View style={[styles.container, { backgroundColor: colors.bg }]}>
+      <Text style={[styles.title, { color: colors.text }]}>
+        useState 패턴 모음
+      </Text>
+
+      {/* 불리언 토글 */}
+      <View style={styles.section}>
+        <Text style={[styles.label, { color: colors.text }]}>
+          불리언 토글: {isOpen ? '열림' : '닫힘'}
+        </Text>
+        <TouchableOpacity style={styles.button} onPress={toggle}>
+          <Text style={styles.buttonText}>{isOpen ? '닫기' : '열기'}</Text>
+        </TouchableOpacity>
+        {isOpen && (
+          <View style={styles.content}>
+            <Text style={{ color: colors.text }}>
+              토글로 열린 콘텐츠입니다!
+            </Text>
+          </View>
+        )}
+      </View>
+
+      {/* 값 사이클 */}
+      <View style={styles.section}>
+        <Text style={[styles.label, { color: colors.text }]}>
+          테마 사이클: {currentTheme}
+        </Text>
+        <TouchableOpacity style={styles.button} onPress={nextTheme}>
+          <Text style={styles.buttonText}>다음 테마</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* 카운터 (updater 함수) */}
+      <View style={styles.section}>
+        <Text style={[styles.label, { color: colors.text }]}>
+          카운트: {count}
+        </Text>
+        <View style={styles.row}>
+          <TouchableOpacity
+            style={[styles.button, styles.danger]}
+            onPress={() => setCount(c => c - 1)}
+          >
+            <Text style={styles.buttonText}>-1</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, styles.secondary]}
+            onPress={() => setCount(0)}
+          >
+            <Text style={styles.buttonText}>리셋</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, styles.primary]}
+            onPress={() => setCount(c => c + 1)}
+          >
+            <Text style={styles.buttonText}>+1</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 24, justifyContent: 'center' },
+  title: { fontSize: 22, fontWeight: 'bold', textAlign: 'center', marginBottom: 24 },
+  section: { marginBottom: 20, alignItems: 'center' },
+  label: { fontSize: 16, marginBottom: 8 },
+  content: {
+    marginTop: 8,
+    padding: 12,
+    backgroundColor: 'rgba(100,100,255,0.1)',
+    borderRadius: 8,
+  },
+  row: { flexDirection: 'row', gap: 12 },
+  button: {
+    backgroundColor: '#6c5ce7',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  primary: { backgroundColor: '#00b894' },
+  secondary: { backgroundColor: '#636e72' },
+  danger: { backgroundColor: '#d63031' },
+  buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+});
+
+export default ToggleCycleDemo;
+```
+
 ---
 
 ## 4. useEffect
@@ -529,6 +645,115 @@ function ChatRoom({ roomId }: { roomId: string }) {
     </div>
   );
 }
+```
+
+```jsx [snack]
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
+
+// useEffect 타이머 + cleanup 데모
+function TimerDemo() {
+  const [seconds, setSeconds] = useState(0);
+  const [isRunning, setIsRunning] = useState(false);
+  const [logs, setLogs] = useState([]);
+  const logId = useRef(0);
+
+  // useEffect + cleanup 패턴: 타이머
+  useEffect(() => {
+    if (!isRunning) return;
+
+    const id = setInterval(() => {
+      setSeconds(prev => prev + 1);
+    }, 1000);
+
+    // cleanup: 컴포넌트 언마운트 또는 isRunning 변경 시 타이머 해제
+    return () => clearInterval(id);
+  }, [isRunning]);
+
+  // 마운트 시 1회 실행 (빈 배열 [])
+  useEffect(() => {
+    addLog('컴포넌트 마운트됨 (빈 배열 [])');
+    return () => addLog('컴포넌트 언마운트 cleanup');
+  }, []);
+
+  // seconds 변경 감지 (의존성 배열 [seconds])
+  useEffect(() => {
+    if (seconds > 0 && seconds % 5 === 0) {
+      addLog(`${seconds}초 도달! (5초마다 감지)`);
+    }
+  }, [seconds]);
+
+  const addLog = (message) => {
+    logId.current += 1;
+    setLogs(prev => [
+      { id: logId.current, text: `[${new Date().toLocaleTimeString()}] ${message}` },
+      ...prev.slice(0, 9),
+    ]);
+  };
+
+  const formatTime = (s) => {
+    const mins = Math.floor(s / 60).toString().padStart(2, '0');
+    const secs = (s % 60).toString().padStart(2, '0');
+    return `${mins}:${secs}`;
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>useEffect + Cleanup 데모</Text>
+
+      <Text style={styles.timer}>{formatTime(seconds)}</Text>
+
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={[styles.button, isRunning ? styles.danger : styles.primary]}
+          onPress={() => {
+            setIsRunning(prev => !prev);
+            addLog(isRunning ? '타이머 중지' : '타이머 시작');
+          }}
+        >
+          <Text style={styles.buttonText}>{isRunning ? '중지' : '시작'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.button, styles.secondary]}
+          onPress={() => {
+            setIsRunning(false);
+            setSeconds(0);
+            addLog('타이머 리셋');
+          }}
+        >
+          <Text style={styles.buttonText}>리셋</Text>
+        </TouchableOpacity>
+      </View>
+
+      <Text style={styles.logTitle}>Effect 로그:</Text>
+      <FlatList
+        data={logs}
+        keyExtractor={(item) => String(item.id)}
+        renderItem={({ item }) => (
+          <Text style={styles.logItem}>{item.text}</Text>
+        )}
+        style={styles.logList}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 24, backgroundColor: '#f8f9fa' },
+  title: { fontSize: 20, fontWeight: 'bold', textAlign: 'center', marginBottom: 16, color: '#2d3436' },
+  timer: { fontSize: 48, fontWeight: 'bold', textAlign: 'center', color: '#6c5ce7', marginBottom: 20 },
+  row: { flexDirection: 'row', justifyContent: 'center', gap: 12, marginBottom: 24 },
+  button: { paddingHorizontal: 24, paddingVertical: 12, borderRadius: 8 },
+  primary: { backgroundColor: '#00b894' },
+  secondary: { backgroundColor: '#636e72' },
+  danger: { backgroundColor: '#d63031' },
+  buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  logTitle: { fontSize: 14, fontWeight: '600', color: '#636e72', marginBottom: 8 },
+  logList: { flex: 1 },
+  logItem: { fontSize: 12, color: '#2d3436', paddingVertical: 4, borderBottomWidth: 1, borderBottomColor: '#dfe6e9' },
+});
+
+export default TimerDemo;
 ```
 
 ### useEffect 함정과 해결책
@@ -1049,6 +1274,126 @@ function StopWatch() {
 └──────────────────────────────┴──────────────────────────────────┘
 ```
 
+```jsx [snack]
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+
+// useRef 실전 예제: 스톱워치
+function StopWatch() {
+  const [time, setTime] = useState(0);
+  const [isRunning, setIsRunning] = useState(false);
+  const [laps, setLaps] = useState([]);
+  const intervalRef = useRef(null);
+  const startTimeRef = useRef(0);
+
+  useEffect(() => {
+    // cleanup on unmount
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, []);
+
+  const start = () => {
+    if (isRunning) return;
+    setIsRunning(true);
+    startTimeRef.current = Date.now() - time;
+    intervalRef.current = setInterval(() => {
+      setTime(Date.now() - startTimeRef.current);
+    }, 10);
+  };
+
+  const stop = () => {
+    if (!isRunning) return;
+    setIsRunning(false);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  };
+
+  const reset = () => {
+    stop();
+    setTime(0);
+    setLaps([]);
+  };
+
+  const lap = () => {
+    if (!isRunning) return;
+    setLaps(prev => [time, ...prev]);
+  };
+
+  const formatTime = (ms) => {
+    const minutes = Math.floor(ms / 60000).toString().padStart(2, '0');
+    const seconds = Math.floor((ms % 60000) / 1000).toString().padStart(2, '0');
+    const centis = Math.floor((ms % 1000) / 10).toString().padStart(2, '0');
+    return `${minutes}:${seconds}.${centis}`;
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>useRef 스톱워치</Text>
+      <Text style={styles.subtitle}>intervalRef로 타이머 ID 저장 (리렌더 없음)</Text>
+
+      <Text style={styles.timer}>{formatTime(time)}</Text>
+
+      <View style={styles.row}>
+        {!isRunning ? (
+          <TouchableOpacity style={[styles.btn, styles.startBtn]} onPress={start}>
+            <Text style={styles.btnText}>시작</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity style={[styles.btn, styles.stopBtn]} onPress={stop}>
+            <Text style={styles.btnText}>정지</Text>
+          </TouchableOpacity>
+        )}
+        {isRunning ? (
+          <TouchableOpacity style={[styles.btn, styles.lapBtn]} onPress={lap}>
+            <Text style={styles.btnText}>랩</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity style={[styles.btn, styles.resetBtn]} onPress={reset}>
+            <Text style={styles.btnText}>리셋</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
+      {laps.length > 0 && (
+        <View style={styles.lapsContainer}>
+          <Text style={styles.lapsTitle}>랩 기록</Text>
+          {laps.map((lapTime, index) => (
+            <View key={index} style={styles.lapRow}>
+              <Text style={styles.lapLabel}>랩 {laps.length - index}</Text>
+              <Text style={styles.lapTime}>{formatTime(lapTime)}</Text>
+            </View>
+          ))}
+        </View>
+      )}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 24, backgroundColor: '#0d1117', justifyContent: 'center' },
+  title: { fontSize: 22, fontWeight: 'bold', color: '#e6edf3', textAlign: 'center' },
+  subtitle: { fontSize: 12, color: '#8b949e', textAlign: 'center', marginBottom: 24 },
+  timer: { fontSize: 56, fontWeight: '200', color: '#58a6ff', textAlign: 'center', fontVariant: ['tabular-nums'], marginBottom: 32 },
+  row: { flexDirection: 'row', justifyContent: 'center', gap: 16, marginBottom: 24 },
+  btn: { width: 80, height: 80, borderRadius: 40, justifyContent: 'center', alignItems: 'center' },
+  startBtn: { backgroundColor: '#238636' },
+  stopBtn: { backgroundColor: '#da3633' },
+  lapBtn: { backgroundColor: '#1f6feb' },
+  resetBtn: { backgroundColor: '#30363d' },
+  btnText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  lapsContainer: { maxHeight: 200 },
+  lapsTitle: { fontSize: 14, color: '#8b949e', marginBottom: 8 },
+  lapRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#21262d' },
+  lapLabel: { color: '#e6edf3', fontSize: 14 },
+  lapTime: { color: '#58a6ff', fontSize: 14, fontVariant: ['tabular-nums'] },
+});
+
+export default StopWatch;
+```
+
 ---
 
 ## 8. useContext
@@ -1146,6 +1491,121 @@ function App() {
     </ThemeProvider>
   );
 }
+```
+
+```jsx [snack]
+import React, { createContext, useContext, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+
+// 1. Context 생성
+const ThemeContext = createContext(undefined);
+
+// 2. Provider 컴포넌트
+function ThemeProvider({ children }) {
+  const [theme, setTheme] = useState('light');
+  const toggleTheme = () => setTheme(t => (t === 'light' ? 'dark' : 'light'));
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+
+// 3. Custom Hook으로 안전하게 접근
+function useTheme() {
+  const context = useContext(ThemeContext);
+  if (!context) throw new Error('useTheme must be inside ThemeProvider');
+  return context;
+}
+
+// 4. 깊이 중첩된 자식 컴포넌트 — props 전달 없이 직접 접근!
+function Header() {
+  const { theme, toggleTheme } = useTheme();
+  const isDark = theme === 'dark';
+  return (
+    <View style={[styles.header, { backgroundColor: isDark ? '#2d3436' : '#dfe6e9' }]}>
+      <Text style={[styles.headerText, { color: isDark ? '#fff' : '#2d3436' }]}>
+        내 앱 헤더
+      </Text>
+      <TouchableOpacity style={styles.themeBtn} onPress={toggleTheme}>
+        <Text style={styles.themeBtnText}>{isDark ? '☀️ 라이트' : '🌙 다크'}</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+function Card({ title, description }) {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+  return (
+    <View style={[styles.card, { backgroundColor: isDark ? '#2d3436' : '#fff' }]}>
+      <Text style={[styles.cardTitle, { color: isDark ? '#74b9ff' : '#0984e3' }]}>{title}</Text>
+      <Text style={[styles.cardDesc, { color: isDark ? '#b2bec3' : '#636e72' }]}>{description}</Text>
+    </View>
+  );
+}
+
+function DeepChild() {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+  return (
+    <View style={[styles.deepChild, { borderColor: isDark ? '#636e72' : '#dfe6e9' }]}>
+      <Text style={{ color: isDark ? '#dfe6e9' : '#2d3436', fontSize: 12 }}>
+        깊이 중첩된 컴포넌트 — props drilling 없이 테마 사용!
+      </Text>
+      <Text style={{ color: isDark ? '#74b9ff' : '#0984e3', fontSize: 12, marginTop: 4 }}>
+        현재 테마: {theme}
+      </Text>
+    </View>
+  );
+}
+
+function Content() {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+  return (
+    <View style={styles.content}>
+      <Card title="useContext" description="Props Drilling 없이 데이터를 전달합니다" />
+      <Card title="Provider 패턴" description="앱 루트에서 Provider로 감싸면 어디서든 접근 가능" />
+      <DeepChild />
+    </View>
+  );
+}
+
+// 5. 앱 루트: Provider로 감싸기
+function App() {
+  return (
+    <ThemeProvider>
+      <AppInner />
+    </ThemeProvider>
+  );
+}
+
+function AppInner() {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+  return (
+    <View style={[styles.container, { backgroundColor: isDark ? '#1a1a2e' : '#f5f6fa' }]}>
+      <Header />
+      <Content />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16 },
+  headerText: { fontSize: 18, fontWeight: 'bold' },
+  themeBtn: { backgroundColor: '#6c5ce7', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20 },
+  themeBtnText: { color: '#fff', fontSize: 13 },
+  content: { padding: 16, gap: 12 },
+  card: { padding: 16, borderRadius: 12, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
+  cardTitle: { fontSize: 16, fontWeight: '700', marginBottom: 4 },
+  cardDesc: { fontSize: 13 },
+  deepChild: { padding: 12, borderWidth: 1, borderRadius: 8, borderStyle: 'dashed' },
+});
+
+export default App;
 ```
 
 ### 예제 16: 인증 Context — 실전 패턴
@@ -1381,6 +1841,121 @@ function Counter() {
     </div>
   );
 }
+```
+
+```jsx [snack]
+import React, { useReducer } from 'react';
+import { View, Text, TouchableOpacity, TextInput, FlatList, StyleSheet } from 'react-native';
+
+// useReducer로 복잡한 상태 관리: 카운터 + 히스토리
+function counterReducer(state, action) {
+  switch (action.type) {
+    case 'INCREMENT':
+      return {
+        ...state,
+        count: state.count + state.step,
+        history: [...state.history, state.count + state.step],
+      };
+    case 'DECREMENT':
+      return {
+        ...state,
+        count: state.count - state.step,
+        history: [...state.history, state.count - state.step],
+      };
+    case 'RESET':
+      return { count: 0, step: 1, history: [] };
+    case 'SET_STEP':
+      return { ...state, step: action.payload };
+    default:
+      return state;
+  }
+}
+
+function ReducerCounterDemo() {
+  const [state, dispatch] = useReducer(counterReducer, {
+    count: 0,
+    step: 1,
+    history: [],
+  });
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>useReducer 카운터</Text>
+      <Text style={styles.subtitle}>MVI 패턴: dispatch(action) → reducer → 새 상태</Text>
+
+      <Text style={styles.count}>{state.count}</Text>
+
+      <View style={styles.stepRow}>
+        <Text style={styles.label}>단계:</Text>
+        {[1, 5, 10].map(step => (
+          <TouchableOpacity
+            key={step}
+            style={[styles.stepBtn, state.step === step && styles.stepBtnActive]}
+            onPress={() => dispatch({ type: 'SET_STEP', payload: step })}
+          >
+            <Text style={[styles.stepText, state.step === step && styles.stepTextActive]}>
+              {step}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={[styles.btn, styles.danger]}
+          onPress={() => dispatch({ type: 'DECREMENT' })}
+        >
+          <Text style={styles.btnText}>-{state.step}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.btn, styles.secondary]}
+          onPress={() => dispatch({ type: 'RESET' })}
+        >
+          <Text style={styles.btnText}>리셋</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.btn, styles.primary]}
+          onPress={() => dispatch({ type: 'INCREMENT' })}
+        >
+          <Text style={styles.btnText}>+{state.step}</Text>
+        </TouchableOpacity>
+      </View>
+
+      {state.history.length > 0 && (
+        <View style={styles.historyBox}>
+          <Text style={styles.historyTitle}>히스토리 ({state.history.length})</Text>
+          <Text style={styles.historyValues}>
+            {state.history.slice(-10).join(' → ')}
+          </Text>
+        </View>
+      )}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 24, backgroundColor: '#fdf6e3', justifyContent: 'center' },
+  title: { fontSize: 22, fontWeight: 'bold', textAlign: 'center', color: '#073642' },
+  subtitle: { fontSize: 12, color: '#93a1a1', textAlign: 'center', marginBottom: 20 },
+  count: { fontSize: 64, fontWeight: 'bold', textAlign: 'center', color: '#268bd2', marginBottom: 20 },
+  stepRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 20 },
+  label: { fontSize: 14, color: '#586e75' },
+  stepBtn: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, backgroundColor: '#eee8d5', borderWidth: 1, borderColor: '#93a1a1' },
+  stepBtnActive: { backgroundColor: '#268bd2', borderColor: '#268bd2' },
+  stepText: { color: '#586e75', fontWeight: '600' },
+  stepTextActive: { color: '#fff' },
+  row: { flexDirection: 'row', justifyContent: 'center', gap: 12, marginBottom: 24 },
+  btn: { paddingHorizontal: 24, paddingVertical: 14, borderRadius: 12 },
+  primary: { backgroundColor: '#859900' },
+  secondary: { backgroundColor: '#657b83' },
+  danger: { backgroundColor: '#dc322f' },
+  btnText: { color: '#fff', fontSize: 18, fontWeight: '700' },
+  historyBox: { backgroundColor: '#eee8d5', padding: 16, borderRadius: 12 },
+  historyTitle: { fontSize: 14, fontWeight: '600', color: '#586e75', marginBottom: 8 },
+  historyValues: { fontSize: 14, color: '#073642' },
+});
+
+export default ReducerCounterDemo;
 ```
 
 ### 예제 18: 실전 — 비동기 데이터 로딩 Reducer
@@ -1920,6 +2495,142 @@ function Modal() {
     </div>
   );
 }
+```
+
+```jsx [snack]
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { View, Text, TouchableOpacity, TextInput, FlatList, StyleSheet } from 'react-native';
+
+// Custom Hook: useToggle
+function useToggle(initialValue = false) {
+  const [value, setValue] = useState(initialValue);
+  const toggle = useCallback(() => setValue(v => !v), []);
+  const setTrue = useCallback(() => setValue(true), []);
+  const setFalse = useCallback(() => setValue(false), []);
+  return { value, toggle, setTrue, setFalse };
+}
+
+// Custom Hook: useCounter
+function useCounter(initialValue = 0, step = 1) {
+  const [count, setCount] = useState(initialValue);
+  const increment = useCallback(() => setCount(c => c + step), [step]);
+  const decrement = useCallback(() => setCount(c => c - step), [step]);
+  const reset = useCallback(() => setCount(initialValue), [initialValue]);
+  return { count, increment, decrement, reset };
+}
+
+// Custom Hook: useDebounce
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+  return debouncedValue;
+}
+
+function CustomHooksDemo() {
+  // useToggle 사용
+  const darkMode = useToggle(false);
+  const showDetails = useToggle(false);
+
+  // useCounter 사용
+  const counter = useCounter(0, 1);
+
+  // useDebounce 사용
+  const [searchText, setSearchText] = useState('');
+  const debouncedSearch = useDebounce(searchText, 500);
+  const fruits = ['사과', '바나나', '딸기', '포도', '수박', '키위', '망고', '블루베리', '체리', '복숭아'];
+  const filtered = fruits.filter(f =>
+    f.includes(debouncedSearch)
+  );
+
+  const bg = darkMode.value ? '#1a1a2e' : '#ffffff';
+  const textColor = darkMode.value ? '#e6e6e6' : '#2d3436';
+  const cardBg = darkMode.value ? '#16213e' : '#f1f2f6';
+
+  return (
+    <View style={[styles.container, { backgroundColor: bg }]}>
+      <Text style={[styles.title, { color: textColor }]}>Custom Hooks 데모</Text>
+
+      {/* useToggle: 다크 모드 */}
+      <View style={[styles.card, { backgroundColor: cardBg }]}>
+        <Text style={[styles.cardTitle, { color: textColor }]}>useToggle</Text>
+        <View style={styles.row}>
+          <TouchableOpacity style={styles.toggleBtn} onPress={darkMode.toggle}>
+            <Text style={styles.toggleText}>
+              {darkMode.value ? '🌙 다크' : '☀️ 라이트'}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.smallBtn, { backgroundColor: '#6c5ce7' }]}
+            onPress={showDetails.toggle}
+          >
+            <Text style={styles.smallBtnText}>
+              {showDetails.value ? '상세 숨기기' : '상세 보기'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+        {showDetails.value && (
+          <Text style={{ color: textColor, marginTop: 8, fontSize: 12 }}>
+            useToggle은 불리언 상태 + toggle/setTrue/setFalse를 반환합니다.
+          </Text>
+        )}
+      </View>
+
+      {/* useCounter */}
+      <View style={[styles.card, { backgroundColor: cardBg }]}>
+        <Text style={[styles.cardTitle, { color: textColor }]}>useCounter</Text>
+        <Text style={[styles.countText, { color: textColor }]}>{counter.count}</Text>
+        <View style={styles.row}>
+          <TouchableOpacity style={[styles.smallBtn, { backgroundColor: '#d63031' }]} onPress={counter.decrement}>
+            <Text style={styles.smallBtnText}>-1</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.smallBtn, { backgroundColor: '#636e72' }]} onPress={counter.reset}>
+            <Text style={styles.smallBtnText}>리셋</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.smallBtn, { backgroundColor: '#00b894' }]} onPress={counter.increment}>
+            <Text style={styles.smallBtnText}>+1</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* useDebounce */}
+      <View style={[styles.card, { backgroundColor: cardBg }]}>
+        <Text style={[styles.cardTitle, { color: textColor }]}>useDebounce (500ms)</Text>
+        <TextInput
+          style={[styles.input, { color: textColor, borderColor: darkMode.value ? '#444' : '#ddd' }]}
+          value={searchText}
+          onChangeText={setSearchText}
+          placeholder="과일 검색..."
+          placeholderTextColor="#999"
+        />
+        <Text style={{ color: '#999', fontSize: 12, marginBottom: 4 }}>
+          디바운스 값: "{debouncedSearch}"
+        </Text>
+        <Text style={{ color: textColor, fontSize: 14 }}>
+          결과: {filtered.join(', ') || '없음'}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 16 },
+  title: { fontSize: 20, fontWeight: 'bold', textAlign: 'center', marginBottom: 16 },
+  card: { padding: 16, borderRadius: 12, marginBottom: 12 },
+  cardTitle: { fontSize: 16, fontWeight: '700', marginBottom: 8 },
+  row: { flexDirection: 'row', gap: 8, alignItems: 'center' },
+  toggleBtn: { backgroundColor: '#2d3436', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20 },
+  toggleText: { color: '#fff', fontSize: 14 },
+  smallBtn: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8 },
+  smallBtnText: { color: '#fff', fontSize: 14, fontWeight: '600' },
+  countText: { fontSize: 36, fontWeight: 'bold', textAlign: 'center', marginBottom: 8 },
+  input: { borderWidth: 1, borderRadius: 8, padding: 10, fontSize: 14, marginBottom: 8 },
+});
+
+export default CustomHooksDemo;
 ```
 
 ### 예제 26: usePrevious — 이전 값 추적

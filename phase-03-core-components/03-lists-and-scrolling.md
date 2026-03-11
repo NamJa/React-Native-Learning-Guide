@@ -74,6 +74,41 @@ const styles = StyleSheet.create({
 });
 ```
 
+```jsx [snack]
+import React from 'react';
+import { ScrollView, View, Text, StyleSheet } from 'react-native';
+
+const BasicScrollExample = () => {
+  return (
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      showsVerticalScrollIndicator={true}
+    >
+      {Array.from({ length: 20 }, (_, i) => (
+        <View key={i} style={styles.item}>
+          <Text style={styles.itemText}>항목 {i + 1}</Text>
+        </View>
+      ))}
+    </ScrollView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  contentContainer: { padding: 16 },
+  item: {
+    padding: 16,
+    marginBottom: 8,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 8,
+  },
+  itemText: { fontSize: 16 },
+});
+
+export default BasicScrollExample;
+```
+
 ### 예제 2: 수평 스크롤 (카러셀)
 
 ```tsx
@@ -288,6 +323,64 @@ const styles = StyleSheet.create({
 });
 ```
 
+```jsx [snack]
+import React from 'react';
+import { FlatList, View, Text, StyleSheet } from 'react-native';
+
+const users = Array.from({ length: 50 }, (_, i) => ({
+  id: String(i + 1),
+  name: '사용자 ' + (i + 1),
+  email: 'user' + (i + 1) + '@example.com',
+}));
+
+const BasicFlatListExample = () => {
+  const renderItem = ({ item }) => (
+    <View style={styles.userItem}>
+      <View style={styles.avatar}>
+        <Text style={styles.avatarText}>{item.name[0]}</Text>
+      </View>
+      <View style={styles.userInfo}>
+        <Text style={styles.userName}>{item.name}</Text>
+        <Text style={styles.userEmail}>{item.email}</Text>
+      </View>
+    </View>
+  );
+
+  return (
+    <FlatList
+      data={users}
+      renderItem={renderItem}
+      keyExtractor={(item) => item.id}
+      ItemSeparatorComponent={() => <View style={styles.separator} />}
+    />
+  );
+};
+
+const styles = StyleSheet.create({
+  userItem: {
+    flexDirection: 'row',
+    padding: 16,
+    alignItems: 'center',
+  },
+  avatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#E3F2FD',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  avatarText: { fontSize: 18, fontWeight: 'bold', color: '#1565C0' },
+  userInfo: { flex: 1 },
+  userName: { fontSize: 16, fontWeight: '600' },
+  userEmail: { fontSize: 14, color: '#666', marginTop: 2 },
+  separator: { height: 1, backgroundColor: '#f0f0f0', marginLeft: 76 },
+});
+
+export default BasicFlatListExample;
+```
+
 ### 예제 2: 당겨서 새로고침 (Pull to Refresh)
 
 ```tsx
@@ -368,6 +461,61 @@ const styles = StyleSheet.create({
   postTitle: { fontSize: 16, fontWeight: '600', marginBottom: 4 },
   postBody: { fontSize: 14, color: '#666' },
 });
+```
+
+```jsx [snack]
+import React, { useState, useCallback } from 'react';
+import { FlatList, View, Text, StyleSheet } from 'react-native';
+
+const PullToRefreshExample = () => {
+  const [posts, setPosts] = useState(
+    Array.from({ length: 10 }, (_, i) => ({
+      id: String(i + 1),
+      title: '게시글 ' + (i + 1),
+      body: '게시글 ' + (i + 1) + '의 내용입니다.',
+    }))
+  );
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    const newPosts = Array.from({ length: 10 }, (_, i) => ({
+      id: String(Date.now() + i),
+      title: '새 게시글 ' + (i + 1),
+      body: '새로고침된 게시글 ' + (i + 1) + '의 내용입니다.',
+    }));
+    setPosts(newPosts);
+    setRefreshing(false);
+  }, []);
+
+  return (
+    <FlatList
+      data={posts}
+      renderItem={({ item }) => (
+        <View style={styles.postItem}>
+          <Text style={styles.postTitle}>{item.title}</Text>
+          <Text style={styles.postBody}>{item.body}</Text>
+        </View>
+      )}
+      keyExtractor={(item) => item.id}
+      refreshing={refreshing}
+      onRefresh={onRefresh}
+    />
+  );
+};
+
+const styles = StyleSheet.create({
+  postItem: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  postTitle: { fontSize: 16, fontWeight: '600', marginBottom: 4 },
+  postBody: { fontSize: 14, color: '#666' },
+});
+
+export default PullToRefreshExample;
 ```
 
 ### 예제 3: 무한 스크롤 (Infinite Scroll / Pagination)
@@ -471,6 +619,84 @@ const styles = StyleSheet.create({
 });
 ```
 
+```jsx [snack]
+import React, { useState, useCallback } from 'react';
+import { FlatList, View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+
+const InfiniteScrollExample = () => {
+  const [data, setData] = useState(
+    Array.from({ length: 20 }, (_, i) => ({
+      id: String(i + 1),
+      title: '항목 ' + (i + 1),
+    }))
+  );
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
+
+  const loadMore = useCallback(async () => {
+    if (loading || !hasMore) return;
+    setLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    const nextPage = page + 1;
+    const newItems = Array.from({ length: 20 }, (_, i) => ({
+      id: String(page * 20 + i + 1),
+      title: '항목 ' + (page * 20 + i + 1),
+    }));
+    if (nextPage > 5) {
+      setHasMore(false);
+    }
+    setData((prev) => [...prev, ...newItems]);
+    setPage(nextPage);
+    setLoading(false);
+  }, [loading, hasMore, page]);
+
+  const renderFooter = () => {
+    if (!loading) return null;
+    return (
+      <View style={styles.footer}>
+        <ActivityIndicator size="small" color="#2196F3" />
+        <Text style={styles.footerText}>더 불러오는 중...</Text>
+      </View>
+    );
+  };
+
+  return (
+    <FlatList
+      data={data}
+      renderItem={({ item }) => (
+        <View style={styles.item}>
+          <Text style={styles.itemText}>{item.title}</Text>
+        </View>
+      )}
+      keyExtractor={(item) => item.id}
+      onEndReached={loadMore}
+      onEndReachedThreshold={0.5}
+      ListFooterComponent={renderFooter}
+    />
+  );
+};
+
+const styles = StyleSheet.create({
+  item: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  itemText: { fontSize: 16 },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+    gap: 8,
+  },
+  footerText: { fontSize: 14, color: '#666' },
+});
+
+export default InfiniteScrollExample;
+```
+
 ### 예제 4: 수평 리스트
 
 ```tsx
@@ -529,6 +755,62 @@ const styles = StyleSheet.create({
 });
 ```
 
+```jsx [snack]
+import React from 'react';
+import { FlatList, View, Text, StyleSheet } from 'react-native';
+
+const categories = [
+  { id: '1', name: '전체', color: '#FF6B6B' },
+  { id: '2', name: '음식', color: '#4ECDC4' },
+  { id: '3', name: '여행', color: '#45B7D1' },
+  { id: '4', name: '기술', color: '#96CEB4' },
+  { id: '5', name: '스포츠', color: '#FFEAA7' },
+  { id: '6', name: '음악', color: '#DDA0DD' },
+  { id: '7', name: '영화', color: '#98D8C8' },
+];
+
+const HorizontalListExample = () => {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>카테고리</Text>
+      <FlatList
+        data={categories}
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.listContent}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={[styles.categoryChip, { backgroundColor: item.color }]}>
+            <Text style={styles.categoryText}>{item.name}</Text>
+          </View>
+        )}
+      />
+      <View style={styles.contentArea}>
+        <Text style={styles.contentText}>
+          카테고리 칩을 수평으로 스크롤할 수 있습니다
+        </Text>
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, paddingVertical: 16 },
+  title: { fontSize: 18, fontWeight: 'bold', paddingHorizontal: 16, marginBottom: 12 },
+  listContent: { paddingHorizontal: 16, gap: 8 },
+  categoryChip: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+  },
+  categoryText: { color: '#fff', fontWeight: '600' },
+  contentArea: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
+  contentText: { fontSize: 14, color: '#999', textAlign: 'center' },
+});
+
+export default HorizontalListExample;
+```
+
 ### 예제 5: 그리드 레이아웃 (numColumns)
 
 ```tsx
@@ -581,6 +863,52 @@ const styles = StyleSheet.create({
   },
   gridItemText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
 });
+```
+
+```jsx [snack]
+import React from 'react';
+import { FlatList, View, Text, Dimensions, StyleSheet } from 'react-native';
+
+const { width: screenWidth } = Dimensions.get('window');
+const numColumns = 3;
+const itemSize = (screenWidth - 32 - (numColumns - 1) * 8) / numColumns;
+
+const photos = Array.from({ length: 30 }, (_, i) => ({
+  id: String(i + 1),
+  color: 'hsl(' + ((i * 37) % 360) + ', 70%, 60%)',
+}));
+
+const GridExample = () => {
+  return (
+    <FlatList
+      data={photos}
+      numColumns={numColumns}
+      keyExtractor={(item) => item.id}
+      contentContainerStyle={styles.gridContainer}
+      columnWrapperStyle={styles.row}
+      renderItem={({ item }) => (
+        <View style={[styles.gridItem, { backgroundColor: item.color }]}>
+          <Text style={styles.gridItemText}>{item.id}</Text>
+        </View>
+      )}
+    />
+  );
+};
+
+const styles = StyleSheet.create({
+  gridContainer: { padding: 16 },
+  row: { gap: 8, marginBottom: 8 },
+  gridItem: {
+    width: itemSize,
+    height: itemSize,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  gridItemText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
+});
+
+export default GridExample;
 ```
 
 ### 예제 6: 헤더, 푸터, 빈 상태
@@ -676,6 +1004,95 @@ const styles = StyleSheet.create({
   emptyTitle: { fontSize: 18, fontWeight: '600', color: '#333', marginBottom: 8 },
   emptySubtitle: { fontSize: 14, color: '#999', textAlign: 'center' },
 });
+```
+
+```jsx [snack]
+import React, { useState } from 'react';
+import { FlatList, View, Text, Pressable, StyleSheet } from 'react-native';
+
+const HeaderFooterEmptyExample = () => {
+  const [data, setData] = useState([]);
+
+  return (
+    <FlatList
+      data={data}
+      keyExtractor={(item, index) => String(index)}
+      renderItem={({ item }) => (
+        <View style={styles.item}>
+          <Text>{item}</Text>
+        </View>
+      )}
+      ListHeaderComponent={
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>나의 할 일</Text>
+          <Pressable
+            style={styles.addButton}
+            onPress={() => setData((prev) => [...prev, '할 일 ' + (prev.length + 1)])}
+          >
+            <Text style={styles.addButtonText}>+ 추가</Text>
+          </Pressable>
+        </View>
+      }
+      ListFooterComponent={
+        data.length > 0 ? (
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>총 {data.length}개의 할 일</Text>
+          </View>
+        ) : null
+      }
+      ListEmptyComponent={
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyIcon}>📋</Text>
+          <Text style={styles.emptyTitle}>할 일이 없습니다</Text>
+          <Text style={styles.emptySubtitle}>
+            상단의 + 추가 버튼을 눌러 할 일을 추가하세요
+          </Text>
+        </View>
+      }
+    />
+  );
+};
+
+const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  headerTitle: { fontSize: 24, fontWeight: 'bold' },
+  addButton: {
+    backgroundColor: '#2196F3',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  addButtonText: { color: '#fff', fontWeight: '600' },
+  item: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  footer: {
+    padding: 16,
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: '#f0f0f0',
+  },
+  footerText: { color: '#999' },
+  emptyContainer: {
+    alignItems: 'center',
+    paddingVertical: 60,
+    paddingHorizontal: 32,
+  },
+  emptyIcon: { fontSize: 48, marginBottom: 16 },
+  emptyTitle: { fontSize: 18, fontWeight: '600', color: '#333', marginBottom: 8 },
+  emptySubtitle: { fontSize: 14, color: '#999', textAlign: 'center' },
+});
+
+export default HeaderFooterEmptyExample;
 ```
 
 ### 예제 7: getItemLayout으로 성능 최적화
@@ -892,6 +1309,105 @@ const styles = StyleSheet.create({
   separator: { height: 1, backgroundColor: '#f0f0f0', marginLeft: 72 },
   empty: { padding: 32, alignItems: 'center' },
 });
+```
+
+```jsx [snack]
+import React from 'react';
+import { SectionList, View, Text, StyleSheet } from 'react-native';
+
+const sections = [
+  {
+    title: 'ㄱ',
+    data: [
+      { id: '1', name: '김민수', phone: '010-1234-5678' },
+      { id: '2', name: '김영희', phone: '010-2345-6789' },
+    ],
+  },
+  {
+    title: 'ㄴ',
+    data: [
+      { id: '3', name: '나철수', phone: '010-3456-7890' },
+    ],
+  },
+  {
+    title: 'ㅂ',
+    data: [
+      { id: '4', name: '박지영', phone: '010-4567-8901' },
+      { id: '5', name: '박서준', phone: '010-5678-9012' },
+      { id: '6', name: '배수지', phone: '010-6789-0123' },
+    ],
+  },
+  {
+    title: 'ㅇ',
+    data: [
+      { id: '7', name: '이지은', phone: '010-7890-1234' },
+      { id: '8', name: '이민호', phone: '010-8901-2345' },
+    ],
+  },
+];
+
+const ContactListExample = () => {
+  return (
+    <SectionList
+      sections={sections}
+      keyExtractor={(item) => item.id}
+      stickySectionHeadersEnabled={true}
+      renderSectionHeader={({ section }) => (
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>{section.title}</Text>
+        </View>
+      )}
+      renderItem={({ item }) => (
+        <View style={styles.contactItem}>
+          <View style={styles.contactAvatar}>
+            <Text style={styles.contactAvatarText}>{item.name[0]}</Text>
+          </View>
+          <View style={styles.contactInfo}>
+            <Text style={styles.contactName}>{item.name}</Text>
+            <Text style={styles.contactPhone}>{item.phone}</Text>
+          </View>
+        </View>
+      )}
+      ItemSeparatorComponent={() => <View style={styles.separator} />}
+    />
+  );
+};
+
+const styles = StyleSheet.create({
+  sectionHeader: {
+    backgroundColor: '#f0f0f0',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#666',
+  },
+  contactItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    paddingHorizontal: 16,
+    backgroundColor: '#fff',
+  },
+  contactAvatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#E3F2FD',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  contactAvatarText: { fontSize: 16, fontWeight: 'bold', color: '#1565C0' },
+  contactInfo: { flex: 1 },
+  contactName: { fontSize: 16, fontWeight: '500' },
+  contactPhone: { fontSize: 14, color: '#666', marginTop: 2 },
+  separator: { height: 1, backgroundColor: '#f0f0f0', marginLeft: 72 },
+});
+
+export default ContactListExample;
 ```
 
 ---

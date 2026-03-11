@@ -81,6 +81,72 @@ const styles = StyleSheet.create({
 });
 ```
 
+**직접 실행해보기:**
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+
+const StyleSheetDemo = () => {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>StyleSheet 스타일</Text>
+      <Text style={styles.subtitle}>인라인 스타일 대신 StyleSheet.create를 사용합니다</Text>
+
+      {/* 인라인 스타일 (비교용) */}
+      <View style={{ marginTop: 20, padding: 16, backgroundColor: '#FFF3E0', borderRadius: 8 }}>
+        <Text style={{ fontSize: 16, color: '#E65100' }}>이것은 인라인 스타일입니다</Text>
+      </View>
+
+      {/* StyleSheet 스타일 */}
+      <View style={styles.card}>
+        <Text style={styles.cardText}>이것은 StyleSheet 스타일입니다</Text>
+      </View>
+
+      {/* 스타일 조합 (배열) */}
+      <View style={[styles.card, styles.highlighted]}>
+        <Text style={[styles.cardText, { fontWeight: 'bold' }]}>스타일 조합 (배열 방식)</Text>
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#fff',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 4,
+  },
+  card: {
+    marginTop: 12,
+    padding: 16,
+    backgroundColor: '#E3F2FD',
+    borderRadius: 8,
+  },
+  highlighted: {
+    backgroundColor: '#C8E6C9',
+    borderWidth: 1,
+    borderColor: '#4CAF50',
+  },
+  cardText: {
+    fontSize: 16,
+    color: '#1565C0',
+  },
+});
+
+export default StyleSheetDemo;
+```
+
 ### 비교
 
 | 특성 | 인라인 스타일 | StyleSheet.create |
@@ -222,6 +288,76 @@ const styles = StyleSheet.create({
 });
 ```
 
+**직접 실행해보기:**
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+
+const LayoutExample = () => {
+  return (
+    <View style={styles.container}>
+      {/* 퍼센트 크기 */}
+      <View style={styles.percentBox}>
+        <Text style={styles.text}>width: '80%'</Text>
+      </View>
+
+      {/* aspectRatio */}
+      <View style={styles.ratioBox}>
+        <Text style={styles.text}>16:9 비율</Text>
+      </View>
+
+      {/* 고정 + 최대 크기 */}
+      <View style={styles.constrainedBox}>
+        <Text style={styles.text}>maxWidth: 300</Text>
+      </View>
+
+      {/* minHeight 예시 */}
+      <View style={styles.minHeightBox}>
+        <Text style={styles.text}>minHeight: 60</Text>
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 16, gap: 12, backgroundColor: '#f9f9f9' },
+  percentBox: {
+    width: '80%',
+    padding: 16,
+    backgroundColor: '#E3F2FD',
+    borderRadius: 8,
+  },
+  ratioBox: {
+    width: '100%',
+    aspectRatio: 16 / 9,
+    backgroundColor: '#FFF3E0',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  constrainedBox: {
+    width: '100%',
+    maxWidth: 300,
+    padding: 16,
+    backgroundColor: '#E8F5E9',
+    borderRadius: 8,
+    alignSelf: 'center',
+  },
+  minHeightBox: {
+    width: '60%',
+    minHeight: 60,
+    padding: 16,
+    backgroundColor: '#F3E5F5',
+    borderRadius: 8,
+    justifyContent: 'center',
+  },
+  text: { fontSize: 14, textAlign: 'center' },
+});
+
+export default LayoutExample;
+```
+
 ### 3-2. 텍스트 (Typography) 속성
 
 | 속성 | 타입 | 설명 | Android 대응 |
@@ -332,6 +468,76 @@ const styles = StyleSheet.create({
 });
 ```
 
+**직접 실행해보기:**
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+
+const TypographyExample = () => {
+  return (
+    <ScrollView style={styles.scroll}>
+      <View style={styles.container}>
+        <Text style={styles.h1}>Heading 1 (28px Bold)</Text>
+        <Text style={styles.h2}>Heading 2 (22px Semi Bold)</Text>
+        <Text style={styles.h3}>Heading 3 (18px Medium)</Text>
+        <Text style={styles.body}>
+          본문 텍스트 (16px Regular). lineHeight와 letterSpacing으로 가독성을 높입니다.
+          여러 줄의 텍스트에서 적절한 줄 간격은 읽기 편안함을 제공합니다.
+        </Text>
+        <Text style={styles.caption}>캡션 텍스트 (12px, 회색)</Text>
+        <Text style={styles.underline}>밑줄 텍스트</Text>
+        <Text style={styles.strikethrough}>취소선 텍스트</Text>
+        <Text style={styles.uppercase}>uppercase 변환</Text>
+        <Text style={styles.shadow}>그림자 텍스트</Text>
+      </View>
+    </ScrollView>
+  );
+};
+
+const styles = StyleSheet.create({
+  scroll: { flex: 1, backgroundColor: '#fff' },
+  container: { padding: 16, gap: 12 },
+  h1: { fontSize: 28, fontWeight: 'bold', color: '#1a1a1a' },
+  h2: { fontSize: 22, fontWeight: '600', color: '#333' },
+  h3: { fontSize: 18, fontWeight: '500', color: '#444' },
+  body: {
+    fontSize: 16,
+    fontWeight: '400',
+    color: '#555',
+    lineHeight: 24,
+    letterSpacing: 0.3,
+  },
+  caption: { fontSize: 12, color: '#999' },
+  underline: {
+    fontSize: 16,
+    textDecorationLine: 'underline',
+    textDecorationColor: '#2196F3',
+  },
+  strikethrough: {
+    fontSize: 16,
+    textDecorationLine: 'line-through',
+    color: '#999',
+  },
+  uppercase: {
+    fontSize: 14,
+    textTransform: 'uppercase',
+    letterSpacing: 1.5,
+    fontWeight: '600',
+    color: '#666',
+  },
+  shadow: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
+  },
+});
+
+export default TypographyExample;
+```
+
 ### 3-3. 배경 및 투명도 속성
 
 | 속성 | 타입 | 설명 | Android 대응 |
@@ -366,6 +572,57 @@ const OpacityExample = () => {
 ```
 
 > **핵심 차이**: `opacity`는 View와 모든 자식의 투명도를 함께 변경합니다. 배경만 반투명하게 하려면 `rgba()` 색상을 사용하세요.
+
+**직접 실행해보기:**
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+
+const OpacityExample = () => {
+  return (
+    <ScrollView style={{ flex: 1, backgroundColor: '#fff' }}>
+      <View style={styles.container}>
+        <Text style={styles.sectionTitle}>opacity 속성 (전체 투명도)</Text>
+        {[1.0, 0.7, 0.4, 0.1].map((op) => (
+          <View key={op} style={[styles.box, { opacity: op }]}>
+            <Text style={styles.boxText}>opacity: {op} — 텍스트도 함께 투명</Text>
+          </View>
+        ))}
+
+        <Text style={[styles.sectionTitle, { marginTop: 20 }]}>
+          rgba() 배경색 (배경만 투명)
+        </Text>
+        {[1.0, 0.7, 0.4, 0.1].map((alpha) => (
+          <View key={alpha} style={[styles.rgbaBox, {
+            backgroundColor: `rgba(33, 150, 243, ${alpha})`,
+          }]}>
+            <Text style={styles.darkText}>alpha: {alpha} — 텍스트는 온전</Text>
+          </View>
+        ))}
+      </View>
+    </ScrollView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { padding: 16, gap: 8 },
+  sectionTitle: { fontSize: 16, fontWeight: 'bold', color: '#333', marginBottom: 4 },
+  box: {
+    backgroundColor: '#2196F3',
+    padding: 14,
+    borderRadius: 8,
+  },
+  boxText: { color: '#fff', fontWeight: '500' },
+  rgbaBox: {
+    padding: 14,
+    borderRadius: 8,
+  },
+  darkText: { color: '#1a1a1a', fontWeight: '500' },
+});
+
+export default OpacityExample;
+```
 
 ### 3-4. 테두리 (Border) 속성
 
@@ -462,6 +719,100 @@ const styles = StyleSheet.create({
 });
 ```
 
+**직접 실행해보기:**
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+
+const BorderExample = () => {
+  return (
+    <ScrollView style={{ flex: 1, backgroundColor: '#fff' }}>
+      <View style={styles.container}>
+        <View style={styles.solidBorder}>
+          <Text>solid 테두리</Text>
+        </View>
+
+        <View style={styles.dashedBorder}>
+          <Text>dashed 테두리</Text>
+        </View>
+
+        <View style={styles.circle}>
+          <Text style={styles.circleText}>원</Text>
+        </View>
+
+        <View style={styles.partialRadius}>
+          <Text>상단만 둥글게</Text>
+        </View>
+
+        <View style={styles.bottomBorderOnly}>
+          <Text>하단 테두리만</Text>
+        </View>
+
+        <View style={styles.colorfulBorder}>
+          <Text style={{ color: '#fff', fontWeight: 'bold' }}>다양한 테두리 색상</Text>
+        </View>
+      </View>
+    </ScrollView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { padding: 16, gap: 12 },
+  solidBorder: {
+    borderWidth: 2,
+    borderColor: '#2196F3',
+    borderRadius: 8,
+    padding: 16,
+  },
+  dashedBorder: {
+    borderWidth: 2,
+    borderColor: '#FF9800',
+    borderStyle: 'dashed',
+    borderRadius: 8,
+    padding: 16,
+  },
+  circle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    borderWidth: 3,
+    borderColor: '#4CAF50',
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+  },
+  circleText: { fontWeight: 'bold', color: '#4CAF50' },
+  partialRadius: {
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+    backgroundColor: '#E3F2FD',
+    padding: 16,
+  },
+  bottomBorderOnly: {
+    borderBottomWidth: 2,
+    borderBottomColor: '#e0e0e0',
+    paddingBottom: 12,
+    paddingTop: 12,
+  },
+  colorfulBorder: {
+    borderWidth: 3,
+    borderTopColor: '#F44336',
+    borderRightColor: '#4CAF50',
+    borderBottomColor: '#2196F3',
+    borderLeftColor: '#FF9800',
+    borderRadius: 8,
+    padding: 16,
+    backgroundColor: '#333',
+    alignItems: 'center',
+  },
+});
+
+export default BorderExample;
+```
+
 ### 3-5. 그림자 (Shadow) 속성 — iOS vs Android
 
 React Native에서 그림자는 **플랫폼마다 다른 속성**을 사용합니다. 이것은 React Native의 대표적인 플랫폼 차이점입니다.
@@ -525,6 +876,56 @@ const styles = StyleSheet.create({
   },
   text: { fontSize: 14, color: '#333' },
 });
+```
+
+**직접 실행해보기:**
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, Platform, StyleSheet, ScrollView } from 'react-native';
+
+const createShadow = (elevation) => {
+  if (Platform.OS === 'android') {
+    return { elevation };
+  }
+  return {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: Math.round(elevation / 2) },
+    shadowOpacity: elevation > 0 ? 0.05 + elevation * 0.02 : 0,
+    shadowRadius: elevation * 0.7,
+  };
+};
+
+const ShadowExample = () => {
+  return (
+    <ScrollView style={{ flex: 1, backgroundColor: '#f5f5f5' }}>
+      <View style={styles.container}>
+        <Text style={styles.header}>elevation 단계별 그림자 비교</Text>
+        {[0, 1, 2, 4, 8, 12, 16, 24].map((elev) => (
+          <View key={elev} style={[styles.card, createShadow(elev)]}>
+            <Text style={styles.text}>elevation: {elev}</Text>
+          </View>
+        ))}
+        <Text style={[styles.header, { marginTop: 16 }]}>
+          현재 플랫폼: {Platform.OS}
+        </Text>
+      </View>
+    </ScrollView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { padding: 16, gap: 16 },
+  header: { fontSize: 16, fontWeight: 'bold', color: '#333', marginBottom: 4 },
+  card: {
+    padding: 16,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+  },
+  text: { fontSize: 14, color: '#333' },
+});
+
+export default ShadowExample;
 ```
 
 Android의 `elevation`은 Material Design 사양을 따릅니다:
@@ -601,6 +1002,67 @@ const styles = StyleSheet.create({
 });
 ```
 
+**직접 실행해보기:**
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+
+const TransformExample = () => {
+  return (
+    <View style={styles.container}>
+      <View style={[styles.box, { transform: [{ rotate: '15deg' }] }]}>
+        <Text style={styles.text}>15도 회전</Text>
+      </View>
+
+      <View style={[styles.box, styles.greenBox, { transform: [{ scale: 0.8 }] }]}>
+        <Text style={styles.text}>0.8x 축소</Text>
+      </View>
+
+      <View style={[styles.box, styles.orangeBox, {
+        transform: [
+          { translateX: 30 },
+          { rotate: '-10deg' },
+          { scale: 1.1 },
+        ]
+      }]}>
+        <Text style={styles.text}>복합 변환</Text>
+      </View>
+
+      <View style={[styles.box, styles.purpleBox, {
+        transform: [{ skewX: '10deg' }, { skewY: '5deg' }]
+      }]}>
+        <Text style={styles.text}>Skew 변환</Text>
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 40,
+    backgroundColor: '#f9f9f9',
+  },
+  box: {
+    width: 140,
+    height: 80,
+    backgroundColor: '#2196F3',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  greenBox: { backgroundColor: '#4CAF50' },
+  orangeBox: { backgroundColor: '#FF9800' },
+  purpleBox: { backgroundColor: '#9C27B0' },
+  text: { color: '#fff', fontWeight: 'bold', fontSize: 14 },
+});
+
+export default TransformExample;
+```
+
 ---
 
 ## 4. 동적 스타일링
@@ -670,6 +1132,106 @@ const styles = StyleSheet.create({
   activeButtonText: { color: '#fff' },
   box: { padding: 16, borderRadius: 8 },
 });
+```
+
+**직접 실행해보기:**
+
+```jsx [snack]
+import React, { useState } from 'react';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
+
+const ConditionalStyleExample = () => {
+  const [isActive, setIsActive] = useState(false);
+  const [variant, setVariant] = useState('default');
+
+  return (
+    <View style={styles.container}>
+      {/* 방법 1: 배열 + 조건부 */}
+      <Pressable
+        style={[
+          styles.button,
+          isActive && styles.activeButton,
+        ]}
+        onPress={() => setIsActive(!isActive)}
+      >
+        <Text style={[
+          styles.buttonText,
+          isActive && styles.activeButtonText,
+        ]}>
+          {isActive ? '활성 상태' : '비활성 상태'} (터치하세요)
+        </Text>
+      </Pressable>
+
+      {/* 방법 2: 계산된 스타일 객체 */}
+      <View style={[styles.box, { backgroundColor: isActive ? '#4CAF50' : '#e0e0e0' }]}>
+        <Text style={{ color: isActive ? '#fff' : '#333' }}>동적 배경색</Text>
+      </View>
+
+      {/* 방법 3: Pressable의 함수형 스타일 */}
+      <Pressable
+        style={({ pressed }) => [
+          styles.button,
+          {
+            backgroundColor: pressed ? '#1565C0' : '#2196F3',
+            transform: [{ scale: pressed ? 0.95 : 1 }],
+          },
+        ]}
+        onPress={() => {}}
+      >
+        <Text style={[styles.buttonText, { color: '#fff' }]}>누르면 변화</Text>
+      </Pressable>
+
+      {/* 방법 4: 다중 변형 */}
+      <View style={styles.variantRow}>
+        {['default', 'success', 'warning', 'error'].map((v) => (
+          <Pressable
+            key={v}
+            style={[
+              styles.chip,
+              variant === v && styles[v + 'Chip'],
+            ]}
+            onPress={() => setVariant(v)}
+          >
+            <Text style={[
+              styles.chipText,
+              variant === v && { color: '#fff' },
+            ]}>
+              {v}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { padding: 16, gap: 16, flex: 1, backgroundColor: '#fff' },
+  button: {
+    backgroundColor: '#e0e0e0',
+    padding: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  activeButton: { backgroundColor: '#2196F3' },
+  buttonText: { fontSize: 16, fontWeight: '600', color: '#333' },
+  activeButtonText: { color: '#fff' },
+  box: { padding: 16, borderRadius: 8, alignItems: 'center' },
+  variantRow: { flexDirection: 'row', gap: 8 },
+  chip: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    backgroundColor: '#f0f0f0',
+  },
+  chipText: { fontSize: 13, fontWeight: '600', color: '#666' },
+  defaultChip: { backgroundColor: '#9E9E9E' },
+  successChip: { backgroundColor: '#4CAF50' },
+  warningChip: { backgroundColor: '#FF9800' },
+  errorChip: { backgroundColor: '#F44336' },
+});
+
+export default ConditionalStyleExample;
 ```
 
 ### 계산된 스타일
@@ -873,6 +1435,111 @@ const styles = StyleSheet.create({
 });
 ```
 
+**직접 실행해보기:**
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, useWindowDimensions, StyleSheet, ScrollView } from 'react-native';
+
+const ResponsiveExample = () => {
+  const { width, height } = useWindowDimensions();
+  const isLandscape = width > height;
+  const isTablet = width >= 768;
+  const columns = isTablet ? 3 : 2;
+  const itemWidth = (width - 32 - (columns - 1) * 12) / columns;
+
+  return (
+    <ScrollView style={{ flex: 1, backgroundColor: '#f5f5f5' }}>
+      <View style={styles.infoBar}>
+        <Text style={styles.infoText}>
+          {width.toFixed(0)} x {height.toFixed(0)} | {isTablet ? '태블릿' : '폰'} | {isLandscape ? '가로' : '세로'}
+        </Text>
+      </View>
+
+      <View style={[
+        styles.layoutContainer,
+        { flexDirection: isLandscape ? 'row' : 'column' },
+      ]}>
+        <View style={[
+          styles.sidebar,
+          {
+            width: isLandscape ? 200 : '100%',
+            height: isLandscape ? 'auto' : 120,
+          },
+        ]}>
+          <Text style={styles.sidebarText}>사이드바 / 헤더</Text>
+        </View>
+        <View style={styles.mainContent}>
+          <Text style={styles.mainText}>메인 콘텐츠 영역</Text>
+        </View>
+      </View>
+
+      <Text style={styles.sectionTitle}>반응형 그리드 ({columns}열)</Text>
+      <View style={styles.grid}>
+        {[1, 2, 3, 4, 5, 6].map((item) => (
+          <View key={item} style={[styles.gridItem, { width: itemWidth }]}>
+            <Text style={styles.gridText}>아이템 {item}</Text>
+          </View>
+        ))}
+      </View>
+    </ScrollView>
+  );
+};
+
+const styles = StyleSheet.create({
+  infoBar: {
+    backgroundColor: '#333',
+    padding: 12,
+    alignItems: 'center',
+  },
+  infoText: { color: '#fff', fontSize: 14, fontWeight: '600' },
+  layoutContainer: { margin: 16, borderRadius: 8, overflow: 'hidden' },
+  sidebar: {
+    backgroundColor: '#E3F2FD',
+    padding: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  sidebarText: { fontSize: 16, fontWeight: '600', color: '#1565C0' },
+  mainContent: {
+    flex: 1,
+    backgroundColor: '#fff',
+    padding: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: 100,
+  },
+  mainText: { fontSize: 16, color: '#333' },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 8,
+    color: '#333',
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 16,
+    gap: 12,
+    paddingBottom: 24,
+  },
+  gridItem: {
+    height: 80,
+    backgroundColor: '#E8F5E9',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#C8E6C9',
+  },
+  gridText: { fontSize: 14, fontWeight: '500', color: '#2E7D32' },
+});
+
+export default ResponsiveExample;
+```
+
 ### 퍼센트 값
 
 ```tsx
@@ -974,6 +1641,123 @@ const styles = StyleSheet.create({
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 8 },
   body: { fontSize: 16, lineHeight: 24 },
 });
+```
+
+**직접 실행해보기 (수동 토글 포함):**
+
+```jsx [snack]
+import React, { useState } from 'react';
+import { View, Text, Pressable, StyleSheet, Switch } from 'react-native';
+
+const LightTheme = {
+  background: '#ffffff',
+  surface: '#f5f5f5',
+  primary: '#2196F3',
+  text: '#1a1a1a',
+  textSecondary: '#666666',
+  border: '#e0e0e0',
+};
+
+const DarkTheme = {
+  background: '#121212',
+  surface: '#1e1e1e',
+  primary: '#90CAF9',
+  text: '#ffffff',
+  textSecondary: '#b0b0b0',
+  border: '#333333',
+};
+
+const DarkModeExample = () => {
+  const [isDark, setIsDark] = useState(false);
+  const theme = isDark ? DarkTheme : LightTheme;
+
+  return (
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <View style={styles.toggleRow}>
+        <Text style={[styles.label, { color: theme.text }]}>
+          {isDark ? '다크 모드' : '라이트 모드'}
+        </Text>
+        <Switch
+          value={isDark}
+          onValueChange={setIsDark}
+          trackColor={{ false: '#ccc', true: '#90CAF9' }}
+          thumbColor={isDark ? '#2196F3' : '#f4f4f4'}
+        />
+      </View>
+
+      <Text style={[styles.title, { color: theme.text }]}>
+        테마 시스템 데모
+      </Text>
+      <Text style={[styles.body, { color: theme.textSecondary }]}>
+        토글 스위치를 눌러 다크/라이트 모드를 전환해보세요. 실제 앱에서는 useColorScheme()으로 시스템 설정을 감지합니다.
+      </Text>
+
+      <View style={[styles.card, {
+        backgroundColor: theme.surface,
+        borderColor: theme.border,
+      }]}>
+        <Text style={[styles.cardTitle, { color: theme.text }]}>카드 컴포넌트</Text>
+        <Text style={{ color: theme.textSecondary }}>
+          테마 색상이 자동으로 적용됩니다.
+        </Text>
+      </View>
+
+      <View style={[styles.card, {
+        backgroundColor: theme.primary,
+        borderColor: 'transparent',
+      }]}>
+        <Text style={[styles.cardTitle, { color: isDark ? '#121212' : '#fff' }]}>
+          Primary 카드
+        </Text>
+      </View>
+
+      <View style={styles.colorPalette}>
+        {Object.entries(theme).map(([key, value]) => (
+          <View key={key} style={styles.colorItem}>
+            <View style={[styles.colorSwatch, { backgroundColor: value }]} />
+            <Text style={{ color: theme.textSecondary, fontSize: 11 }}>{key}</Text>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 16 },
+  toggleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  label: { fontSize: 16, fontWeight: '600' },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 8 },
+  body: { fontSize: 15, lineHeight: 22, marginBottom: 16 },
+  card: {
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginBottom: 12,
+  },
+  cardTitle: { fontSize: 16, fontWeight: '600', marginBottom: 4 },
+  colorPalette: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 12,
+  },
+  colorItem: { alignItems: 'center', gap: 4 },
+  colorSwatch: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#00000020',
+  },
+});
+
+export default DarkModeExample;
 ```
 
 ### 테마 시스템 만들기
@@ -1166,6 +1950,108 @@ const ButtonShowcase = () => {
     </View>
   );
 };
+```
+
+**직접 실행해보기:**
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
+
+const Button = ({ title, variant = 'primary', size = 'medium', disabled = false, onPress }) => {
+  const variantStyle = {
+    primary: buttonStyles.primary,
+    secondary: buttonStyles.secondary,
+    outline: buttonStyles.outline,
+  }[variant];
+
+  const sizeStyle = {
+    small: buttonStyles.small,
+    medium: buttonStyles.medium,
+    large: buttonStyles.large,
+  }[size];
+
+  const textVariant = {
+    primary: buttonStyles.primaryText,
+    secondary: buttonStyles.secondaryText,
+    outline: buttonStyles.outlineText,
+  }[variant];
+
+  const textSize = {
+    small: buttonStyles.smallText,
+    medium: buttonStyles.mediumText,
+    large: buttonStyles.largeText,
+  }[size];
+
+  return (
+    <Pressable
+      style={({ pressed }) => [
+        buttonStyles.base,
+        variantStyle,
+        sizeStyle,
+        disabled && buttonStyles.disabled,
+        pressed && !disabled && buttonStyles.pressed,
+      ]}
+      disabled={disabled}
+      onPress={onPress}
+    >
+      <Text style={[
+        buttonStyles.text,
+        textVariant,
+        textSize,
+        disabled && buttonStyles.disabledText,
+      ]}>
+        {title}
+      </Text>
+    </Pressable>
+  );
+};
+
+const buttonStyles = StyleSheet.create({
+  base: { borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
+  primary: { backgroundColor: '#2196F3' },
+  secondary: { backgroundColor: '#FF4081' },
+  outline: { backgroundColor: 'transparent', borderWidth: 1.5, borderColor: '#2196F3' },
+  small: { paddingVertical: 8, paddingHorizontal: 16 },
+  medium: { paddingVertical: 12, paddingHorizontal: 24 },
+  large: { paddingVertical: 16, paddingHorizontal: 32 },
+  disabled: { backgroundColor: '#e0e0e0' },
+  pressed: { opacity: 0.8 },
+  text: { fontWeight: '600' },
+  primaryText: { color: '#fff', fontSize: 16 },
+  secondaryText: { color: '#fff', fontSize: 16 },
+  outlineText: { color: '#2196F3', fontSize: 16 },
+  smallText: { fontSize: 14 },
+  mediumText: { fontSize: 16 },
+  largeText: { fontSize: 18 },
+  disabledText: { color: '#999' },
+});
+
+const ButtonShowcase = () => {
+  return (
+    <ScrollView style={{ flex: 1, backgroundColor: '#fff' }}>
+      <View style={styles.container}>
+        <Text style={styles.sectionTitle}>Variant 변형</Text>
+        <Button title="Primary Large" variant="primary" size="large" onPress={() => alert('Primary!')} />
+        <Button title="Secondary Medium" variant="secondary" size="medium" onPress={() => alert('Secondary!')} />
+        <Button title="Outline Small" variant="outline" size="small" onPress={() => alert('Outline!')} />
+        <Button title="Disabled" variant="primary" disabled onPress={() => {}} />
+
+        <Text style={[styles.sectionTitle, { marginTop: 24 }]}>Size 크기</Text>
+        <Button title="Small" variant="primary" size="small" onPress={() => {}} />
+        <Button title="Medium" variant="primary" size="medium" onPress={() => {}} />
+        <Button title="Large" variant="primary" size="large" onPress={() => {}} />
+      </View>
+    </ScrollView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { padding: 16, gap: 12 },
+  sectionTitle: { fontSize: 18, fontWeight: 'bold', color: '#333', marginBottom: 4 },
+});
+
+export default ButtonShowcase;
 ```
 
 ---

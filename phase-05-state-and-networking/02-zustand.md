@@ -167,6 +167,89 @@ const styles = StyleSheet.create({
 });
 ```
 
+> **실행해보기**: 아래 Expo Snack에서 카운터 앱을 직접 사용해보세요. +, -, Reset 버튼이 Zustand store를 통해 상태를 관리합니다.
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { create } from 'zustand';
+
+// Zustand Store 정의 — Android ViewModel과 동일한 역할
+const useCounterStore = create((set) => ({
+  count: 0,
+  increment: () => set((state) => ({ count: state.count + 1 })),
+  decrement: () => set((state) => ({ count: state.count - 1 })),
+  reset: () => set({ count: 0 }),
+}));
+
+function CounterScreen() {
+  const count = useCounterStore((state) => state.count);
+  const increment = useCounterStore((state) => state.increment);
+  const decrement = useCounterStore((state) => state.decrement);
+  const reset = useCounterStore((state) => state.reset);
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Zustand Counter</Text>
+      <Text style={styles.count}>{count}</Text>
+      <View style={styles.buttons}>
+        <TouchableOpacity style={[styles.btn, styles.btnMinus]} onPress={decrement}>
+          <Text style={styles.btnText}>-</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.btn, styles.btnReset]} onPress={reset}>
+          <Text style={styles.btnText}>Reset</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.btn, styles.btnPlus]} onPress={increment}>
+          <Text style={styles.btnText}>+</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 20,
+  },
+  count: {
+    fontSize: 80,
+    fontWeight: 'bold',
+    color: '#2196F3',
+    marginBottom: 40,
+  },
+  buttons: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+  btn: {
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    borderRadius: 12,
+    minWidth: 70,
+    alignItems: 'center',
+  },
+  btnPlus: { backgroundColor: '#4CAF50' },
+  btnMinus: { backgroundColor: '#F44336' },
+  btnReset: { backgroundColor: '#9E9E9E' },
+  btnText: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+});
+
+export default CounterScreen;
+```
+
 ```exercise
 type: code-arrange
 question: "Zustand 스토어를 생성하는 코드를 조립하세요"
@@ -426,6 +509,193 @@ function CartSummary() {
     </View>
   );
 }
+```
+
+> **실행해보기**: 장바구니 Store에서 파생 상태(총 수량, 합계 금액)가 자동 계산되는 것을 확인해보세요.
+
+```jsx [snack]
+import React, { useMemo } from 'react';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+import { create } from 'zustand';
+
+// 장바구니 Store — 파생 상태를 getter로 정의
+const useCartStore = create((set, get) => ({
+  items: [
+    { id: 1, name: '노트북', price: 1500000, quantity: 1 },
+    { id: 2, name: '키보드', price: 80000, quantity: 2 },
+    { id: 3, name: '마우스', price: 50000, quantity: 1 },
+  ],
+
+  addQuantity: (id) =>
+    set((state) => ({
+      items: state.items.map((item) =>
+        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+      ),
+    })),
+
+  removeQuantity: (id) =>
+    set((state) => ({
+      items: state.items
+        .map((item) =>
+          item.id === id ? { ...item, quantity: item.quantity - 1 } : item
+        )
+        .filter((item) => item.quantity > 0),
+    })),
+
+  removeItem: (id) =>
+    set((state) => ({
+      items: state.items.filter((item) => item.id !== id),
+    })),
+
+  // 파생 상태 (getter)
+  getTotal: () =>
+    get().items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+  getItemCount: () =>
+    get().items.reduce((sum, item) => sum + item.quantity, 0),
+}));
+
+function CartItem({ item }) {
+  const addQuantity = useCartStore((s) => s.addQuantity);
+  const removeQuantity = useCartStore((s) => s.removeQuantity);
+  const removeItem = useCartStore((s) => s.removeItem);
+
+  return (
+    <View style={styles.cartItem}>
+      <View style={styles.itemInfo}>
+        <Text style={styles.itemName}>{item.name}</Text>
+        <Text style={styles.itemPrice}>
+          {(item.price * item.quantity).toLocaleString()}원
+        </Text>
+      </View>
+      <View style={styles.quantityRow}>
+        <TouchableOpacity
+          style={styles.qtyBtn}
+          onPress={() => removeQuantity(item.id)}
+        >
+          <Text style={styles.qtyBtnText}>-</Text>
+        </TouchableOpacity>
+        <Text style={styles.qtyText}>{item.quantity}</Text>
+        <TouchableOpacity
+          style={styles.qtyBtn}
+          onPress={() => addQuantity(item.id)}
+        >
+          <Text style={styles.qtyBtnText}>+</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.deleteBtn}
+          onPress={() => removeItem(item.id)}
+        >
+          <Text style={styles.deleteBtnText}>삭제</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+function CartScreen() {
+  const items = useCartStore((s) => s.items);
+  const getTotal = useCartStore((s) => s.getTotal);
+  const getItemCount = useCartStore((s) => s.getItemCount);
+
+  // useMemo로 파생 값 계산 — items가 변경될 때만 재계산
+  const total = useMemo(() => getTotal(), [items]);
+  const itemCount = useMemo(() => getItemCount(), [items]);
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.header}>장바구니</Text>
+      <Text style={styles.subHeader}>총 {itemCount}개 상품</Text>
+
+      {items.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>장바구니가 비어있습니다</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={items}
+          keyExtractor={(item) => String(item.id)}
+          renderItem={({ item }) => <CartItem item={item} />}
+          contentContainerStyle={styles.list}
+        />
+      )}
+
+      <View style={styles.footer}>
+        <Text style={styles.totalLabel}>합계</Text>
+        <Text style={styles.totalPrice}>{total.toLocaleString()}원</Text>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#f8f9fa' },
+  header: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    paddingTop: 60,
+    color: '#212529',
+  },
+  subHeader: {
+    fontSize: 14,
+    color: '#868e96',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  list: { paddingHorizontal: 16 },
+  cartItem: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+  },
+  itemInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  itemName: { fontSize: 16, fontWeight: '600', color: '#333' },
+  itemPrice: { fontSize: 16, fontWeight: '700', color: '#2196F3' },
+  quantityRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  qtyBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: '#e9ecef',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  qtyBtnText: { fontSize: 18, fontWeight: 'bold', color: '#495057' },
+  qtyText: { fontSize: 16, fontWeight: '600', minWidth: 24, textAlign: 'center' },
+  deleteBtn: {
+    marginLeft: 'auto',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    backgroundColor: '#ffe3e3',
+  },
+  deleteBtnText: { color: '#e03131', fontSize: 13, fontWeight: '600' },
+  emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  emptyText: { fontSize: 16, color: '#adb5bd' },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#e9ecef',
+  },
+  totalLabel: { fontSize: 18, fontWeight: '600', color: '#495057' },
+  totalPrice: { fontSize: 22, fontWeight: 'bold', color: '#2196F3' },
+});
+
+export default CartScreen;
 ```
 
 ```javascript [playground]
@@ -1284,6 +1554,207 @@ export const useCartStore = create<CartState>()(
 );
 ```
 
+> **실행해보기**: Todo 앱으로 Zustand의 추가/삭제/토글 패턴을 실습해보세요. 위 Cart Store와 동일한 불변 업데이트 패턴을 사용합니다.
+
+```jsx [snack]
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
+  StyleSheet,
+} from 'react-native';
+import { create } from 'zustand';
+
+// Todo Store — addItem, removeItem, toggleItem 패턴
+const useTodoStore = create((set, get) => ({
+  todos: [
+    { id: 1, text: 'Zustand 공식 문서 읽기', done: false },
+    { id: 2, text: 'Counter 예제 만들기', done: true },
+    { id: 3, text: 'Cart Store 구현하기', done: false },
+  ],
+  nextId: 4,
+
+  addTodo: (text) =>
+    set((state) => ({
+      todos: [...state.todos, { id: state.nextId, text, done: false }],
+      nextId: state.nextId + 1,
+    })),
+
+  removeTodo: (id) =>
+    set((state) => ({
+      todos: state.todos.filter((t) => t.id !== id),
+    })),
+
+  toggleTodo: (id) =>
+    set((state) => ({
+      todos: state.todos.map((t) =>
+        t.id === id ? { ...t, done: !t.done } : t
+      ),
+    })),
+
+  // 파생 상태
+  getDoneCount: () => get().todos.filter((t) => t.done).length,
+  getTotalCount: () => get().todos.length,
+}));
+
+function TodoItem({ todo }) {
+  const toggleTodo = useTodoStore((s) => s.toggleTodo);
+  const removeTodo = useTodoStore((s) => s.removeTodo);
+
+  return (
+    <View style={styles.todoItem}>
+      <TouchableOpacity
+        style={styles.checkbox}
+        onPress={() => toggleTodo(todo.id)}
+      >
+        <View
+          style={[styles.checkboxInner, todo.done && styles.checkboxChecked]}
+        >
+          {todo.done && <Text style={styles.checkmark}>✓</Text>}
+        </View>
+      </TouchableOpacity>
+      <Text style={[styles.todoText, todo.done && styles.todoDone]}>
+        {todo.text}
+      </Text>
+      <TouchableOpacity
+        style={styles.removeBtn}
+        onPress={() => removeTodo(todo.id)}
+      >
+        <Text style={styles.removeBtnText}>×</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+function TodoApp() {
+  const [input, setInput] = useState('');
+  const todos = useTodoStore((s) => s.todos);
+  const addTodo = useTodoStore((s) => s.addTodo);
+  const getDoneCount = useTodoStore((s) => s.getDoneCount);
+  const getTotalCount = useTodoStore((s) => s.getTotalCount);
+
+  const handleAdd = () => {
+    if (input.trim()) {
+      addTodo(input.trim());
+      setInput('');
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.header}>Zustand Todo</Text>
+      <Text style={styles.stats}>
+        {getDoneCount()} / {getTotalCount()} 완료
+      </Text>
+
+      <View style={styles.inputRow}>
+        <TextInput
+          style={styles.input}
+          placeholder="새 할 일 입력..."
+          value={input}
+          onChangeText={setInput}
+          onSubmitEditing={handleAdd}
+        />
+        <TouchableOpacity style={styles.addBtn} onPress={handleAdd}>
+          <Text style={styles.addBtnText}>추가</Text>
+        </TouchableOpacity>
+      </View>
+
+      <FlatList
+        data={todos}
+        keyExtractor={(item) => String(item.id)}
+        renderItem={({ item }) => <TodoItem todo={item} />}
+        contentContainerStyle={styles.list}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#f8f9fa', paddingTop: 60 },
+  header: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#212529',
+  },
+  stats: {
+    fontSize: 14,
+    color: '#868e96',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  inputRow: {
+    flexDirection: 'row',
+    paddingHorizontal: 16,
+    marginBottom: 16,
+    gap: 10,
+  },
+  input: {
+    flex: 1,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 15,
+    borderWidth: 1,
+    borderColor: '#dee2e6',
+  },
+  addBtn: {
+    backgroundColor: '#4263eb',
+    borderRadius: 10,
+    paddingHorizontal: 20,
+    justifyContent: 'center',
+  },
+  addBtnText: { color: '#fff', fontSize: 15, fontWeight: '600' },
+  list: { paddingHorizontal: 16 },
+  todoItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 14,
+    marginBottom: 8,
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+  },
+  checkbox: { marginRight: 12 },
+  checkboxInner: {
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: '#ced4da',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkboxChecked: {
+    backgroundColor: '#4263eb',
+    borderColor: '#4263eb',
+  },
+  checkmark: { color: '#fff', fontSize: 14, fontWeight: 'bold' },
+  todoText: { flex: 1, fontSize: 15, color: '#333' },
+  todoDone: { textDecorationLine: 'line-through', color: '#adb5bd' },
+  removeBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#ffe3e3',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  removeBtnText: { color: '#e03131', fontSize: 18, fontWeight: 'bold' },
+});
+
+export default TodoApp;
+```
+
 ---
 
 ## 12. 실전 패턴: UI Settings Store
@@ -1375,6 +1846,208 @@ export const useSettingsStore = create<SettingsState>()(
     }
   )
 );
+```
+
+> **실행해보기**: 설정 화면을 Zustand로 구현한 예제입니다. 테마, 폰트 크기, 알림 등의 설정이 Store에서 관리됩니다.
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, TouchableOpacity, Switch, StyleSheet } from 'react-native';
+import { create } from 'zustand';
+
+// Settings Store — 테마, 폰트 크기, 알림 설정 관리
+const useSettingsStore = create((set, get) => ({
+  themeMode: 'light',
+  fontSize: 'medium',
+  language: 'ko',
+  notificationsEnabled: true,
+
+  setThemeMode: (mode) => set({ themeMode: mode }),
+  setFontSize: (size) => set({ fontSize: size }),
+  setLanguage: (lang) => set({ language: lang }),
+  toggleNotifications: () =>
+    set((state) => ({ notificationsEnabled: !state.notificationsEnabled })),
+
+  // 파생 상태: 폰트 크기 수치
+  getFontScale: () => {
+    const { fontSize } = get();
+    switch (fontSize) {
+      case 'small': return 0.85;
+      case 'medium': return 1.0;
+      case 'large': return 1.2;
+      default: return 1.0;
+    }
+  },
+}));
+
+// 선택 버튼 그룹 컴포넌트
+function OptionGroup({ label, options, value, onChange }) {
+  return (
+    <View style={styles.optionGroup}>
+      <Text style={styles.optionLabel}>{label}</Text>
+      <View style={styles.optionRow}>
+        {options.map((opt) => (
+          <TouchableOpacity
+            key={opt.value}
+            style={[
+              styles.optionBtn,
+              value === opt.value && styles.optionBtnActive,
+            ]}
+            onPress={() => onChange(opt.value)}
+          >
+            <Text
+              style={[
+                styles.optionBtnText,
+                value === opt.value && styles.optionBtnTextActive,
+              ]}
+            >
+              {opt.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+function SettingsScreen() {
+  const themeMode = useSettingsStore((s) => s.themeMode);
+  const fontSize = useSettingsStore((s) => s.fontSize);
+  const language = useSettingsStore((s) => s.language);
+  const notificationsEnabled = useSettingsStore((s) => s.notificationsEnabled);
+  const setThemeMode = useSettingsStore((s) => s.setThemeMode);
+  const setFontSize = useSettingsStore((s) => s.setFontSize);
+  const setLanguage = useSettingsStore((s) => s.setLanguage);
+  const toggleNotifications = useSettingsStore((s) => s.toggleNotifications);
+  const getFontScale = useSettingsStore((s) => s.getFontScale);
+
+  const isDark = themeMode === 'dark';
+  const bg = isDark ? '#1a1a2e' : '#f8f9fa';
+  const cardBg = isDark ? '#16213e' : '#fff';
+  const textColor = isDark ? '#e2e8f0' : '#212529';
+  const subTextColor = isDark ? '#94a3b8' : '#868e96';
+  const scale = getFontScale();
+
+  return (
+    <View style={[styles.container, { backgroundColor: bg }]}>
+      <Text style={[styles.header, { color: textColor, fontSize: 26 * scale }]}>
+        설정
+      </Text>
+
+      <View style={[styles.card, { backgroundColor: cardBg }]}>
+        <OptionGroup
+          label="테마"
+          options={[
+            { value: 'light', label: '라이트' },
+            { value: 'dark', label: '다크' },
+          ]}
+          value={themeMode}
+          onChange={setThemeMode}
+        />
+
+        <OptionGroup
+          label="폰트 크기"
+          options={[
+            { value: 'small', label: '작게' },
+            { value: 'medium', label: '보통' },
+            { value: 'large', label: '크게' },
+          ]}
+          value={fontSize}
+          onChange={setFontSize}
+        />
+
+        <OptionGroup
+          label="언어"
+          options={[
+            { value: 'ko', label: '한국어' },
+            { value: 'en', label: 'English' },
+            { value: 'ja', label: '日本語' },
+          ]}
+          value={language}
+          onChange={setLanguage}
+        />
+
+        <View style={styles.switchRow}>
+          <Text style={[styles.switchLabel, { color: textColor }]}>
+            알림
+          </Text>
+          <Switch
+            value={notificationsEnabled}
+            onValueChange={toggleNotifications}
+            trackColor={{ false: '#ced4da', true: '#748ffc' }}
+            thumbColor={notificationsEnabled ? '#4263eb' : '#f4f3f4'}
+          />
+        </View>
+      </View>
+
+      <View style={[styles.preview, { backgroundColor: cardBg }]}>
+        <Text style={[styles.previewTitle, { color: textColor }]}>
+          미리보기
+        </Text>
+        <Text style={{ fontSize: 14 * scale, color: subTextColor }}>
+          현재 테마: {themeMode} | 폰트 배율: {scale}x
+        </Text>
+        <Text style={{ fontSize: 14 * scale, color: subTextColor, marginTop: 4 }}>
+          언어: {language} | 알림: {notificationsEnabled ? 'ON' : 'OFF'}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, paddingTop: 60 },
+  header: {
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  card: {
+    marginHorizontal: 16,
+    borderRadius: 16,
+    padding: 20,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  optionGroup: { marginBottom: 20 },
+  optionLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#868e96',
+    marginBottom: 8,
+    textTransform: 'uppercase',
+  },
+  optionRow: { flexDirection: 'row', gap: 8 },
+  optionBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 8,
+    backgroundColor: '#e9ecef',
+    alignItems: 'center',
+  },
+  optionBtnActive: { backgroundColor: '#4263eb' },
+  optionBtnText: { fontSize: 14, color: '#495057', fontWeight: '500' },
+  optionBtnTextActive: { color: '#fff', fontWeight: '700' },
+  switchRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 8,
+  },
+  switchLabel: { fontSize: 16, fontWeight: '500' },
+  preview: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    borderRadius: 12,
+    padding: 16,
+  },
+  previewTitle: { fontSize: 16, fontWeight: '600', marginBottom: 8 },
+});
+
+export default SettingsScreen;
 ```
 
 ---

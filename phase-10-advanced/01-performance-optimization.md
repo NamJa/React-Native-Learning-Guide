@@ -102,6 +102,70 @@ const UserCard = React.memo(
 );
 ```
 
+```jsx [snack]
+import React, { useState, useRef } from 'react';
+import { View, Text, Button, StyleSheet } from 'react-native';
+
+// React.memo 없이 — 부모 리렌더링 시 매번 리렌더링
+function NormalChild({ name }) {
+  const renderCount = useRef(0);
+  renderCount.current++;
+  return (
+    <View style={styles.card}>
+      <Text style={styles.label}>memo 없음</Text>
+      <Text>이름: {name}</Text>
+      <Text style={styles.count}>렌더링 횟수: {renderCount.current}</Text>
+    </View>
+  );
+}
+
+// React.memo 사용 — props가 바뀔 때만 리렌더링
+const MemoChild = React.memo(function MemoChild({ name }) {
+  const renderCount = useRef(0);
+  renderCount.current++;
+  return (
+    <View style={[styles.card, styles.memoCard]}>
+      <Text style={styles.label}>React.memo 적용</Text>
+      <Text>이름: {name}</Text>
+      <Text style={styles.count}>렌더링 횟수: {renderCount.current}</Text>
+    </View>
+  );
+});
+
+export default function App() {
+  const [count, setCount] = useState(0);
+  const [name] = useState('홍길동');
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>React.memo 비교 데모</Text>
+      <Text style={styles.subtitle}>카운터: {count}</Text>
+      <Button title="카운터 증가 (부모 리렌더링)" onPress={() => setCount(c => c + 1)} />
+      <View style={styles.row}>
+        <NormalChild name={name} />
+        <MemoChild name={name} />
+      </View>
+      <Text style={styles.hint}>
+        카운터를 눌러도 name은 변하지 않습니다.{'\n'}
+        memo 적용된 컴포넌트는 리렌더링되지 않습니다.
+      </Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 24, justifyContent: 'center', backgroundColor: '#f5f5f5' },
+  title: { fontSize: 20, fontWeight: 'bold', textAlign: 'center', marginBottom: 8 },
+  subtitle: { fontSize: 16, textAlign: 'center', marginBottom: 12, color: '#555' },
+  row: { flexDirection: 'row', justifyContent: 'space-around', marginTop: 20 },
+  card: { padding: 16, borderRadius: 12, backgroundColor: '#fff', elevation: 2, alignItems: 'center', width: '45%' },
+  memoCard: { borderColor: '#4CAF50', borderWidth: 2 },
+  label: { fontSize: 12, fontWeight: 'bold', color: '#888', marginBottom: 4 },
+  count: { marginTop: 8, fontSize: 18, fontWeight: 'bold', color: '#e53935' },
+  hint: { marginTop: 20, textAlign: 'center', color: '#777', fontSize: 13, lineHeight: 20 },
+});
+```
+
 ### 2.2 useMemo — 비싼 계산 메모이제이션
 
 ```typescript
@@ -168,6 +232,70 @@ const TodoItem = React.memo(function TodoItem({
       <Button title="삭제" onPress={() => onDelete(todo.id)} />
     </View>
   );
+});
+```
+
+```jsx [snack]
+import React, { useState, useCallback, useRef } from 'react';
+import { View, Text, Button, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+
+const TodoItem = React.memo(function TodoItem({ todo, onDelete }) {
+  const renderCount = useRef(0);
+  renderCount.current++;
+  return (
+    <View style={styles.item}>
+      <Text style={styles.todoText}>{todo.title}</Text>
+      <Text style={styles.renderBadge}>R:{renderCount.current}</Text>
+      <TouchableOpacity onPress={() => onDelete(todo.id)} style={styles.deleteBtn}>
+        <Text style={styles.deleteTxt}>삭제</Text>
+      </TouchableOpacity>
+    </View>
+  );
+});
+
+let nextId = 4;
+
+export default function App() {
+  const [todos, setTodos] = useState([
+    { id: '1', title: '장보기' },
+    { id: '2', title: '운동하기' },
+    { id: '3', title: 'React Native 공부' },
+  ]);
+
+  // useCallback으로 함수 참조 안정화 → TodoItem이 memo여도 리렌더링 방지
+  const handleDelete = useCallback((id) => {
+    setTodos(prev => prev.filter(t => t.id !== id));
+  }, []);
+
+  const addTodo = () => {
+    setTodos(prev => [...prev, { id: String(nextId++), title: `할 일 ${nextId}` }]);
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>useCallback + React.memo 데모</Text>
+      <Text style={styles.hint}>R:N = 해당 아이템의 렌더링 횟수</Text>
+      <Button title="할 일 추가" onPress={addTodo} />
+      <FlatList
+        data={todos}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => <TodoItem todo={item} onDelete={handleDelete} />}
+        style={styles.list}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 24, paddingTop: 60, backgroundColor: '#f5f5f5' },
+  title: { fontSize: 20, fontWeight: 'bold', textAlign: 'center', marginBottom: 4 },
+  hint: { textAlign: 'center', color: '#888', marginBottom: 12, fontSize: 13 },
+  list: { marginTop: 12 },
+  item: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', padding: 14, borderRadius: 10, marginBottom: 8, elevation: 1 },
+  todoText: { flex: 1, fontSize: 16 },
+  renderBadge: { backgroundColor: '#E3F2FD', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8, fontSize: 12, color: '#1565C0', marginRight: 10 },
+  deleteBtn: { backgroundColor: '#ffebee', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
+  deleteTxt: { color: '#c62828', fontWeight: 'bold' },
 });
 ```
 
@@ -323,6 +451,81 @@ const ListItem = React.memo(function ListItem({ item }: { item: Item }) {
       <Text>{item.title}</Text>
     </View>
   );
+});
+```
+
+```jsx [snack]
+import React, { useState, useCallback, useMemo } from 'react';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+
+const COLORS = ['#E3F2FD', '#FFF3E0', '#E8F5E9', '#FCE4EC', '#F3E5F5', '#E0F7FA'];
+
+// 더미 데이터 생성
+const DATA = Array.from({ length: 200 }, (_, i) => ({
+  id: String(i),
+  title: `아이템 #${i + 1}`,
+  subtitle: `이것은 ${i + 1}번째 항목의 설명입니다`,
+  color: COLORS[i % COLORS.length],
+}));
+
+const ListItem = React.memo(function ListItem({ item, onPress }) {
+  return (
+    <TouchableOpacity onPress={() => onPress(item.id)} style={[styles.item, { backgroundColor: item.color }]}>
+      <Text style={styles.itemTitle}>{item.title}</Text>
+      <Text style={styles.itemSub}>{item.subtitle}</Text>
+    </TouchableOpacity>
+  );
+});
+
+export default function App() {
+  const [selected, setSelected] = useState(null);
+
+  const handlePress = useCallback((id) => {
+    setSelected(id);
+  }, []);
+
+  const renderItem = useCallback(({ item }) => (
+    <ListItem item={item} onPress={handlePress} />
+  ), [handlePress]);
+
+  const keyExtractor = useCallback((item) => item.id, []);
+
+  // getItemLayout으로 고정 높이 아이템 최적화
+  const getItemLayout = useCallback((data, index) => ({
+    length: 80,
+    offset: 80 * index,
+    index,
+  }), []);
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>FlatList 최적화 데모</Text>
+        <Text style={styles.subtitle}>200개 아이템 | 선택: {selected ?? '없음'}</Text>
+      </View>
+      <FlatList
+        data={DATA}
+        renderItem={renderItem}
+        keyExtractor={keyExtractor}
+        getItemLayout={getItemLayout}
+        maxToRenderPerBatch={10}
+        windowSize={5}
+        initialNumToRender={10}
+        removeClippedSubviews={true}
+        ItemSeparatorComponent={() => <View style={{ height: 1 }} />}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#fafafa' },
+  header: { padding: 20, paddingTop: 50, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#eee' },
+  title: { fontSize: 20, fontWeight: 'bold' },
+  subtitle: { fontSize: 14, color: '#888', marginTop: 4 },
+  item: { height: 79, paddingHorizontal: 16, justifyContent: 'center' },
+  itemTitle: { fontSize: 16, fontWeight: '600' },
+  itemSub: { fontSize: 13, color: '#666', marginTop: 2 },
 });
 ```
 

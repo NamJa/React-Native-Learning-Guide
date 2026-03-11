@@ -475,6 +475,93 @@ const styles = StyleSheet.create({
 export default Counter;
 ```
 
+> **직접 실행해보세요!** 아래 Expo Snack에서 +1/-1 버튼을 눌러보고, 카운트가 5 이상이 되면 텍스트 색상과 메시지가 어떻게 변하는지 확인하세요.
+
+```jsx [snack]
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+
+function Counter() {
+  const [counter, setCounter] = useState(0);
+
+  return (
+    <View style={styles.container}>
+      <Text style={[
+        styles.counterText,
+        counter >= 5 && styles.counterTextRed
+      ]}>
+        {counter}
+      </Text>
+
+      {counter >= 5 && (
+        <Text style={styles.message}>카운트가 높습니다!</Text>
+      )}
+
+      <View style={styles.buttonRow}>
+        <TouchableOpacity
+          style={[styles.button, counter <= 0 && styles.buttonDisabled]}
+          onPress={() => setCounter(prev => prev - 1)}
+          disabled={counter <= 0}
+        >
+          <Text style={styles.buttonText}>-1</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => setCounter(prev => prev + 1)}
+        >
+          <Text style={styles.buttonText}>+1</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+    backgroundColor: '#F5F5F5',
+  },
+  counterText: {
+    fontSize: 48,
+    fontWeight: 'bold',
+    color: 'black',
+  },
+  counterTextRed: {
+    color: 'red',
+  },
+  message: {
+    fontSize: 16,
+    marginTop: 8,
+    color: '#E53935',
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 16,
+  },
+  button: {
+    backgroundColor: '#007AFF',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  buttonDisabled: {
+    backgroundColor: '#CCCCCC',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+});
+
+export default Counter;
+```
+
 ---
 
 ## 5. 세 가지 접근법 나란히 비교
@@ -647,6 +734,89 @@ function ProfileCard({ name, email, isOnline }: User) {
 }
 ```
 
+> **React Native 버전을 실행해보세요!** 프로필 카드 컴포넌트를 React Native로 구현한 예제입니다. `isOnline` 값에 따라 상태 표시가 자동으로 바뀌는 선언형 UI를 확인하세요.
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+
+function ProfileCard({ name, email, isOnline }) {
+  const statusColor = isOnline ? '#4CAF50' : '#9E9E9E';
+  const statusText = isOnline ? '온라인' : '오프라인';
+
+  return (
+    <View style={styles.card}>
+      <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
+      <View style={styles.info}>
+        <Text style={styles.name}>{name}</Text>
+        <Text style={styles.email}>{email}</Text>
+        <Text style={[styles.status, { color: statusColor }]}>{statusText}</Text>
+      </View>
+    </View>
+  );
+}
+
+function App() {
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>프로필 카드 — 선언형 UI</Text>
+      <ProfileCard name="김철수" email="cs@mail.com" isOnline={true} />
+      <ProfileCard name="이영희" email="yh@mail.com" isOnline={false} />
+      <ProfileCard name="박민수" email="ms@mail.com" isOnline={true} />
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#F5F5F5',
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  card: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  statusDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+  },
+  info: {
+    marginLeft: 12,
+  },
+  name: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  email: {
+    fontSize: 14,
+    color: '#666',
+  },
+  status: {
+    fontSize: 12,
+    marginTop: 2,
+  },
+});
+
+export default App;
+```
+
 ### 비교 요약 테이블
 
 | 특성 | Android XML | Jetpack Compose | React |
@@ -702,6 +872,140 @@ function Greeting({ name, hour }: { name: string; hour: number }) {
 
   return <h1>{greeting}, {name}님</h1>;
 }
+```
+
+> **React Native에서 UI = f(state) 원칙을 체험해보세요.** 시간대에 따라 인사말이 달라지는 컴포넌트입니다.
+
+```jsx [snack]
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+
+function Greeting({ name, hour }) {
+  const greeting = hour < 12 ? '좋은 아침이에요' :
+                   hour < 18 ? '안녕하세요' :
+                               '좋은 밤이에요';
+
+  const emoji = hour < 12 ? '🌅' : hour < 18 ? '☀️' : '🌙';
+
+  return (
+    <View style={styles.greetingBox}>
+      <Text style={styles.emoji}>{emoji}</Text>
+      <Text style={styles.greetingText}>{greeting}, {name}님</Text>
+      <Text style={styles.hourText}>현재 설정 시간: {hour}시</Text>
+    </View>
+  );
+}
+
+function App() {
+  const [hour, setHour] = useState(new Date().getHours());
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>UI = f(state) 원칙</Text>
+      <Text style={styles.subtitle}>같은 입력 → 항상 같은 출력</Text>
+
+      <Greeting name="개발자" hour={hour} />
+
+      <Text style={styles.label}>시간대를 변경해보세요:</Text>
+      <View style={styles.buttonRow}>
+        <TouchableOpacity
+          style={[styles.button, styles.morningBtn]}
+          onPress={() => setHour(8)}
+        >
+          <Text style={styles.buttonText}>🌅 오전 8시</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.button, styles.afternoonBtn]}
+          onPress={() => setHour(14)}
+        >
+          <Text style={styles.buttonText}>☀️ 오후 2시</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.button, styles.nightBtn]}
+          onPress={() => setHour(22)}
+        >
+          <Text style={styles.buttonText}>🌙 오후 10시</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+    backgroundColor: '#F5F5F5',
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 24,
+  },
+  greetingBox: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 24,
+    alignItems: 'center',
+    marginBottom: 24,
+    width: '100%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  emoji: {
+    fontSize: 48,
+    marginBottom: 8,
+  },
+  greetingText: {
+    fontSize: 20,
+    fontWeight: '600',
+  },
+  hourText: {
+    fontSize: 14,
+    color: '#999',
+    marginTop: 4,
+  },
+  label: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 12,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  button: {
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  morningBtn: {
+    backgroundColor: '#FF9800',
+  },
+  afternoonBtn: {
+    backgroundColor: '#2196F3',
+  },
+  nightBtn: {
+    backgroundColor: '#5C6BC0',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+});
+
+export default App;
 ```
 
 ### 6-2. 테스트 용이성 (Testability)
@@ -814,6 +1118,188 @@ function RegistrationForm() {
 //   + passwordStrength 재계산 + 강도 텍스트 업데이트 + 색상 업데이트
 // → agreed가 바뀔 때 isValid 재계산 + 버튼 enabled 업데이트
 // 총 10개 이상의 수동 업데이트 코드가 필요!
+```
+
+> **React Native로 폼 유효성 검사를 체험해보세요!** 모든 필드를 채우면 가입 버튼이 자동으로 활성화됩니다. 비밀번호 강도 표시도 실시간으로 변합니다.
+
+```jsx [snack]
+import React, { useState } from 'react';
+import { View, Text, TextInput, Switch, TouchableOpacity, StyleSheet } from 'react-native';
+
+function RegistrationForm() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [agreed, setAgreed] = useState(false);
+
+  // 모든 조건이 만족되었는지 자동 계산
+  const isValid = name.length > 0
+    && email.includes('@')
+    && password.length >= 8
+    && agreed;
+
+  // 비밀번호 강도도 자동 계산
+  const passwordStrength =
+    password.length === 0 ? 'none' :
+    password.length < 6 ? 'weak' :
+    password.length < 10 ? 'medium' : 'strong';
+
+  const strengthColor = {
+    none: '#CCC', weak: '#E53935', medium: '#FF9800', strong: '#4CAF50',
+  };
+  const strengthLabel = {
+    none: '', weak: '약함', medium: '보통', strong: '강함',
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>회원가입 (선언형 폼)</Text>
+
+      <Text style={styles.label}>이름</Text>
+      <TextInput
+        style={styles.input}
+        value={name}
+        onChangeText={setName}
+        placeholder="이름을 입력하세요"
+      />
+
+      <Text style={styles.label}>이메일</Text>
+      <TextInput
+        style={styles.input}
+        value={email}
+        onChangeText={setEmail}
+        placeholder="email@example.com"
+        keyboardType="email-address"
+        autoCapitalize="none"
+      />
+
+      <Text style={styles.label}>비밀번호 (8자 이상)</Text>
+      <TextInput
+        style={styles.input}
+        value={password}
+        onChangeText={setPassword}
+        placeholder="비밀번호를 입력하세요"
+        secureTextEntry
+      />
+
+      {/* 비밀번호 강도: 상태에서 자동 파생 */}
+      {passwordStrength !== 'none' && (
+        <View style={styles.strengthRow}>
+          <View style={[
+            styles.strengthBar,
+            {
+              backgroundColor: strengthColor[passwordStrength],
+              width: passwordStrength === 'weak' ? '33%' :
+                     passwordStrength === 'medium' ? '66%' : '100%',
+            },
+          ]} />
+          <Text style={[styles.strengthText, { color: strengthColor[passwordStrength] }]}>
+            비밀번호 강도: {strengthLabel[passwordStrength]}
+          </Text>
+        </View>
+      )}
+
+      <View style={styles.agreeRow}>
+        <Switch value={agreed} onValueChange={setAgreed} />
+        <Text style={styles.agreeText}>약관에 동의합니다</Text>
+      </View>
+
+      {/* 유효성에 따라 버튼 자동 활성화/비활성화 */}
+      <TouchableOpacity
+        style={[styles.submitBtn, !isValid && styles.submitBtnDisabled]}
+        disabled={!isValid}
+        onPress={() => alert('가입 완료!')}
+      >
+        <Text style={[styles.submitText, !isValid && styles.submitTextDisabled]}>
+          가입하기
+        </Text>
+      </TouchableOpacity>
+
+      <Text style={styles.hint}>
+        {!isValid
+          ? '모든 항목을 올바르게 입력하면 버튼이 활성화됩니다'
+          : '모든 조건 충족! 가입할 수 있습니다'}
+      </Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 24,
+    backgroundColor: '#F5F5F5',
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 6,
+    marginTop: 12,
+  },
+  input: {
+    backgroundColor: 'white',
+    borderRadius: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#DDD',
+  },
+  strengthRow: {
+    marginTop: 8,
+  },
+  strengthBar: {
+    height: 4,
+    borderRadius: 2,
+    marginBottom: 4,
+  },
+  strengthText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  agreeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 20,
+    gap: 8,
+  },
+  agreeText: {
+    fontSize: 15,
+  },
+  submitBtn: {
+    backgroundColor: '#1976D2',
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 24,
+  },
+  submitBtnDisabled: {
+    backgroundColor: '#CCC',
+  },
+  submitText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  submitTextDisabled: {
+    color: '#999',
+  },
+  hint: {
+    textAlign: 'center',
+    fontSize: 12,
+    color: '#999',
+    marginTop: 12,
+  },
+});
+
+export default RegistrationForm;
 ```
 
 ---
@@ -1127,6 +1613,166 @@ function LifecycleDemo() {
 //    현재 count: 1
 ```
 
+> **렌더링 생명주기를 시각적으로 확인해보세요!** +1 버튼을 누를 때마다 React의 렌더링 단계가 순서대로 로그에 표시됩니다.
+
+```jsx [snack]
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+
+function LifecycleDemo() {
+  const [count, setCount] = useState(0);
+  const [logs, setLogs] = useState([]);
+  const renderCount = useRef(0);
+
+  // 렌더 시마다 로그 추가
+  renderCount.current += 1;
+  const currentRender = renderCount.current;
+
+  useEffect(() => {
+    setLogs(prev => [
+      ...prev,
+      { step: 3, text: `useEffect 실행 (count: ${count})`, render: currentRender },
+    ]);
+
+    return () => {
+      setLogs(prev => [
+        ...prev,
+        { step: 0, text: 'useEffect cleanup 실행', render: currentRender },
+      ]);
+    };
+  }, [count]);
+
+  const handlePress = () => {
+    setLogs(prev => [
+      ...prev,
+      { step: 0, text: '--- 버튼 클릭 → setCount 호출 ---', render: currentRender },
+      { step: 1, text: '컴포넌트 함수 다시 실행 (리렌더)', render: currentRender + 1 },
+      { step: 2, text: `JSX 반환 (count: ${count + 1})`, render: currentRender + 1 },
+    ]);
+    setCount(c => c + 1);
+  };
+
+  // 초기 마운트 로그
+  useEffect(() => {
+    setLogs([
+      { step: 1, text: '컴포넌트 함수 최초 실행 (마운트)', render: 1 },
+      { step: 2, text: 'useState(0) → count = 0 초기화', render: 1 },
+    ]);
+  }, []);
+
+  const stepColors = {
+    0: '#9E9E9E',
+    1: '#2196F3',
+    2: '#FF9800',
+    3: '#4CAF50',
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>React 렌더링 생명주기</Text>
+
+      <View style={styles.countBox}>
+        <Text style={styles.countLabel}>Count</Text>
+        <Text style={styles.countValue}>{count}</Text>
+        <Text style={styles.renderInfo}>렌더 횟수: {renderCount.current}</Text>
+      </View>
+
+      <TouchableOpacity style={styles.button} onPress={handlePress}>
+        <Text style={styles.buttonText}>+1 (상태 변경 → 리렌더 트리거)</Text>
+      </TouchableOpacity>
+
+      <View style={styles.logContainer}>
+        <Text style={styles.logTitle}>생명주기 로그:</Text>
+        <ScrollView style={styles.logScroll}>
+          {logs.map((log, i) => (
+            <Text
+              key={i}
+              style={[styles.logEntry, { color: stepColors[log.step] || '#B0BEC5' }]}
+            >
+              {log.text}
+            </Text>
+          ))}
+        </ScrollView>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#F5F5F5',
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  countBox: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 20,
+    alignItems: 'center',
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  countLabel: {
+    fontSize: 14,
+    color: '#999',
+  },
+  countValue: {
+    fontSize: 48,
+    fontWeight: 'bold',
+    color: '#1976D2',
+  },
+  renderInfo: {
+    fontSize: 12,
+    color: '#999',
+    marginTop: 4,
+  },
+  button: {
+    backgroundColor: '#1976D2',
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  logContainer: {
+    flex: 1,
+    backgroundColor: '#263238',
+    borderRadius: 8,
+    padding: 12,
+  },
+  logTitle: {
+    color: '#4CAF50',
+    fontSize: 13,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  logScroll: {
+    flex: 1,
+  },
+  logEntry: {
+    fontSize: 12,
+    lineHeight: 20,
+    fontFamily: 'monospace',
+  },
+});
+
+export default LifecycleDemo;
+```
+
 ### Android Lifecycle과의 매핑
 
 ```
@@ -1190,6 +1836,188 @@ function App() {
     </div>
   );
 }
+```
+
+> **마운트/언마운트를 직접 체험해보세요!** 타이머 보이기/숨기기 버튼을 눌러보세요. 숨기면 컴포넌트가 언마운트되어 타이머가 정리되고, 다시 보이면 0초부터 새로 시작합니다.
+
+```jsx [snack]
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+
+function Timer() {
+  const [seconds, setSeconds] = useState(0);
+
+  useEffect(() => {
+    // 마운트: 타이머 시작 (Android의 onCreate에서 시작하는 것과 유사)
+    const interval = setInterval(() => {
+      setSeconds(s => s + 1);
+    }, 1000);
+
+    // 언마운트: 타이머 정리 (Android의 onDestroy에서 정리하는 것과 유사)
+    return () => {
+      clearInterval(interval);
+    };
+  }, []); // 빈 배열 = 마운트 시 1회만 실행
+
+  return (
+    <View style={styles.timerBox}>
+      <Text style={styles.timerEmoji}>⏱️</Text>
+      <Text style={styles.timerText}>{seconds}초 경과</Text>
+      <Text style={styles.timerHint}>
+        컴포넌트가 마운트된 상태입니다
+      </Text>
+    </View>
+  );
+}
+
+function App() {
+  const [showTimer, setShowTimer] = useState(true);
+  const [log, setLog] = useState(['앱 시작: Timer 마운트됨']);
+
+  const toggleTimer = () => {
+    const next = !showTimer;
+    setShowTimer(next);
+    setLog(prev => [
+      ...prev,
+      next ? '▶️ Timer 마운트 (useEffect 실행)' : '⏹️ Timer 언마운트 (cleanup 실행)',
+    ]);
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>마운트 / 언마운트 시각화</Text>
+
+      <TouchableOpacity
+        style={[styles.button, showTimer ? styles.hideBtn : styles.showBtn]}
+        onPress={toggleTimer}
+      >
+        <Text style={styles.buttonText}>
+          타이머 {showTimer ? '숨기기 (언마운트)' : '보이기 (마운트)'}
+        </Text>
+      </TouchableOpacity>
+
+      <View style={styles.timerArea}>
+        {showTimer ? (
+          <Timer />
+        ) : (
+          <View style={styles.emptyBox}>
+            <Text style={styles.emptyText}>컴포넌트가 언마운트됨</Text>
+            <Text style={styles.emptyHint}>
+              타이머가 정리(cleanup)되었습니다
+            </Text>
+          </View>
+        )}
+      </View>
+
+      <View style={styles.logBox}>
+        <Text style={styles.logTitle}>이벤트 로그:</Text>
+        {log.slice(-5).map((entry, i) => (
+          <Text key={i} style={styles.logEntry}>{entry}</Text>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+    backgroundColor: '#F5F5F5',
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  button: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginBottom: 20,
+  },
+  hideBtn: {
+    backgroundColor: '#E53935',
+  },
+  showBtn: {
+    backgroundColor: '#43A047',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  timerArea: {
+    width: '100%',
+    minHeight: 120,
+    marginBottom: 20,
+  },
+  timerBox: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 24,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  timerEmoji: {
+    fontSize: 36,
+    marginBottom: 8,
+  },
+  timerText: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#1976D2',
+  },
+  timerHint: {
+    fontSize: 12,
+    color: '#999',
+    marginTop: 4,
+  },
+  emptyBox: {
+    backgroundColor: '#EEEEEE',
+    borderRadius: 16,
+    padding: 24,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#BDBDBD',
+    borderStyle: 'dashed',
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#999',
+    fontWeight: '600',
+  },
+  emptyHint: {
+    fontSize: 12,
+    color: '#BDBDBD',
+    marginTop: 4,
+  },
+  logBox: {
+    width: '100%',
+    backgroundColor: '#263238',
+    borderRadius: 8,
+    padding: 12,
+  },
+  logTitle: {
+    color: '#4CAF50',
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  logEntry: {
+    color: '#B0BEC5',
+    fontSize: 11,
+    lineHeight: 18,
+  },
+});
+
+export default App;
 ```
 
 ---

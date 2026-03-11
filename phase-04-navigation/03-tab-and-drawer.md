@@ -132,6 +132,117 @@ const styles = StyleSheet.create({
 });
 ```
 
+> **직접 실행해보기**: 아래 Expo Snack에서 탭을 눌러 화면을 전환해보세요.
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+
+function HomeScreen() {
+  return (
+    <View style={styles.center}>
+      <Text style={styles.emoji}>🏠</Text>
+      <Text style={styles.title}>홈</Text>
+      <Text style={styles.subtitle}>메인 화면입니다</Text>
+    </View>
+  );
+}
+
+function SearchScreen() {
+  return (
+    <View style={styles.center}>
+      <Text style={styles.emoji}>🔍</Text>
+      <Text style={styles.title}>검색</Text>
+      <Text style={styles.subtitle}>검색 화면입니다</Text>
+    </View>
+  );
+}
+
+function ProfileScreen() {
+  return (
+    <View style={styles.center}>
+      <Text style={styles.emoji}>👤</Text>
+      <Text style={styles.title}>프로필</Text>
+      <Text style={styles.subtitle}>프로필 화면입니다</Text>
+    </View>
+  );
+}
+
+const Tab = createBottomTabNavigator();
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Tab.Navigator
+        initialRouteName="Home"
+        screenOptions={{
+          tabBarActiveTintColor: '#6200EE',
+          tabBarInactiveTintColor: '#757575',
+          tabBarStyle: {
+            backgroundColor: '#FFFFFF',
+            borderTopWidth: 1,
+            borderTopColor: '#E0E0E0',
+            height: 60,
+            paddingBottom: 8,
+            paddingTop: 8,
+          },
+          headerStyle: { backgroundColor: '#6200EE' },
+          headerTintColor: '#fff',
+        }}
+      >
+        <Tab.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{
+            title: '홈',
+            tabBarLabel: '홈',
+            tabBarIcon: ({ color, size }) => (
+              <Text style={{ color, fontSize: size }}>🏠</Text>
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Search"
+          component={SearchScreen}
+          options={{
+            title: '검색',
+            tabBarLabel: '검색',
+            tabBarIcon: ({ color, size }) => (
+              <Text style={{ color, fontSize: size }}>🔍</Text>
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Profile"
+          component={ProfileScreen}
+          options={{
+            title: '프로필',
+            tabBarLabel: '프로필',
+            tabBarIcon: ({ color, size }) => (
+              <Text style={{ color, fontSize: size }}>👤</Text>
+            ),
+          }}
+        />
+      </Tab.Navigator>
+    </NavigationContainer>
+  );
+}
+
+const styles = StyleSheet.create({
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5F5F5',
+  },
+  emoji: { fontSize: 48, marginBottom: 12 },
+  title: { fontSize: 24, fontWeight: 'bold', color: '#333' },
+  subtitle: { fontSize: 14, color: '#757575', marginTop: 8 },
+});
+```
+
 ### 1-3. react-native-vector-icons를 사용한 아이콘
 
 ```bash
@@ -372,6 +483,172 @@ const customStyles = StyleSheet.create({
   <Tab.Screen name="Search" component={SearchScreen} />
   <Tab.Screen name="Profile" component={ProfileScreen} />
 </Tab.Navigator>
+```
+
+> **직접 실행해보기**: 커스텀 탭 바의 둥근 모서리, 선택 인디케이터 등을 확인해보세요.
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+
+function HomeScreen() {
+  return (
+    <View style={screenStyles.container}>
+      <Text style={screenStyles.emoji}>🏠</Text>
+      <Text style={screenStyles.title}>홈</Text>
+    </View>
+  );
+}
+
+function SearchScreen() {
+  return (
+    <View style={screenStyles.container}>
+      <Text style={screenStyles.emoji}>🔍</Text>
+      <Text style={screenStyles.title}>검색</Text>
+    </View>
+  );
+}
+
+function ProfileScreen() {
+  return (
+    <View style={screenStyles.container}>
+      <Text style={screenStyles.emoji}>👤</Text>
+      <Text style={screenStyles.title}>프로필</Text>
+    </View>
+  );
+}
+
+const screenStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#16213e',
+  },
+  emoji: { fontSize: 48, marginBottom: 12 },
+  title: { fontSize: 24, fontWeight: 'bold', color: '#fff' },
+});
+
+const tabIcons = {
+  Home: '🏠',
+  Search: '🔍',
+  Profile: '👤',
+};
+
+function CustomTabBar({ state, descriptors, navigation }) {
+  return (
+    <View style={customStyles.tabBar}>
+      {state.routes.map((route, index) => {
+        const { options } = descriptors[route.key];
+        const label = options.tabBarLabel ?? options.title ?? route.name;
+        const isFocused = state.index === index;
+
+        const onPress = () => {
+          const event = navigation.emit({
+            type: 'tabPress',
+            target: route.key,
+            canPreventDefault: true,
+          });
+
+          if (!isFocused && !event.defaultPrevented) {
+            navigation.navigate(route.name);
+          }
+        };
+
+        const onLongPress = () => {
+          navigation.emit({
+            type: 'tabLongPress',
+            target: route.key,
+          });
+        };
+
+        return (
+          <TouchableOpacity
+            key={route.key}
+            accessibilityRole="button"
+            accessibilityState={isFocused ? { selected: true } : {}}
+            onPress={onPress}
+            onLongPress={onLongPress}
+            style={customStyles.tabItem}
+          >
+            <Text style={{ fontSize: 22 }}>
+              {tabIcons[route.name] || '📄'}
+            </Text>
+            <Text
+              style={[
+                customStyles.tabLabel,
+                { color: isFocused ? '#e94560' : '#a0a0a0' },
+              ]}
+            >
+              {typeof label === 'string' ? label : route.name}
+            </Text>
+            {isFocused && <View style={customStyles.activeIndicator} />}
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
+}
+
+const customStyles = StyleSheet.create({
+  tabBar: {
+    flexDirection: 'row',
+    backgroundColor: '#1a1a2e',
+    height: 70,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingHorizontal: 10,
+    elevation: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  tabItem: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 8,
+  },
+  tabLabel: {
+    fontSize: 10,
+    marginTop: 4,
+    fontWeight: '600',
+  },
+  activeIndicator: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#e94560',
+    marginTop: 4,
+  },
+});
+
+const Tab = createBottomTabNavigator();
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Tab.Navigator
+        tabBar={(props) => <CustomTabBar {...props} />}
+        screenOptions={{
+          headerStyle: { backgroundColor: '#1a1a2e' },
+          headerTintColor: '#e94560',
+        }}
+      >
+        <Tab.Screen name="Home" component={HomeScreen} options={{ title: '홈' }} />
+        <Tab.Screen name="Search" component={SearchScreen} options={{ title: '검색' }} />
+        <Tab.Screen name="Profile" component={ProfileScreen} options={{ title: '프로필' }} />
+      </Tab.Navigator>
+    </NavigationContainer>
+  );
+}
 ```
 
 ---
@@ -1219,6 +1496,255 @@ export default function App() {
             <RootStack.Screen name="Register" component={RegisterScreen} />
           </>
         )}
+      </RootStack.Navigator>
+    </NavigationContainer>
+  );
+}
+```
+
+> **직접 실행해보기**: Drawer(햄버거 메뉴) + Bottom Tab + Stack이 중첩된 완전한 SNS 앱 구조를 체험해보세요. 헤더의 햄버거 아이콘을 눌러 Drawer를 열고, 하단 탭을 전환해보세요.
+
+```jsx [snack]
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import {
+  createDrawerNavigator,
+  DrawerContentScrollView,
+  DrawerItemList,
+} from '@react-navigation/drawer';
+
+// ========== 화면 컴포넌트 ==========
+function FeedScreen() {
+  const navigation = useNavigation();
+  return (
+    <ScrollView style={feedStyles.container}>
+      {[1, 2, 3, 4, 5].map((id) => (
+        <TouchableOpacity
+          key={id}
+          style={feedStyles.card}
+          onPress={() => navigation.navigate('PostDetail', { postId: id })}
+        >
+          <View style={feedStyles.cardHeader}>
+            <View style={feedStyles.avatar}>
+              <Text style={feedStyles.avatarText}>U{id}</Text>
+            </View>
+            <Text style={feedStyles.userName}>사용자 {id}</Text>
+          </View>
+          <Text style={feedStyles.cardContent}>
+            게시물 #{id} — 탭하면 상세 화면으로 이동합니다 (탭 바 없이 표시)
+          </Text>
+          <View style={feedStyles.cardFooter}>
+            <Text style={feedStyles.footerText}>❤️ {id * 12}</Text>
+            <Text style={feedStyles.footerText}>💬 {id * 3}</Text>
+          </View>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
+  );
+}
+
+const feedStyles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#16213e', padding: 12 },
+  card: {
+    backgroundColor: '#1a1a2e',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#333',
+  },
+  cardHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
+  avatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#e94560',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  avatarText: { color: '#fff', fontSize: 12, fontWeight: 'bold' },
+  userName: { color: '#fff', fontSize: 14, fontWeight: '600' },
+  cardContent: { color: '#ccc', fontSize: 14, lineHeight: 20, marginBottom: 10 },
+  cardFooter: { flexDirection: 'row', gap: 16 },
+  footerText: { color: '#a0a0a0', fontSize: 13 },
+});
+
+function makeScreen(name, emoji, color) {
+  return function Screen() {
+    return (
+      <View style={[simpleStyles.container, { backgroundColor: color }]}>
+        <Text style={simpleStyles.emoji}>{emoji}</Text>
+        <Text style={simpleStyles.title}>{name}</Text>
+      </View>
+    );
+  };
+}
+
+const simpleStyles = StyleSheet.create({
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  emoji: { fontSize: 48, marginBottom: 12 },
+  title: { fontSize: 24, fontWeight: 'bold', color: '#fff' },
+});
+
+const ExploreScreen = makeScreen('탐색', '🔍', '#1a1a2e');
+const NotificationsScreen = makeScreen('알림', '🔔', '#0f3460');
+const MyProfileScreen = makeScreen('내 프로필', '👤', '#16213e');
+const PostDetailScreen = makeScreen('게시물 상세', '📄', '#1a1a2e');
+const SettingsScreen = makeScreen('설정', '⚙️', '#16213e');
+const BookmarksScreen = makeScreen('북마크', '🔖', '#1a1a2e');
+
+// ========== 1. Bottom Tab Navigator ==========
+const Tab = createBottomTabNavigator();
+
+function MainTabs() {
+  return (
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarStyle: {
+          backgroundColor: '#1a1a2e',
+          borderTopColor: '#333',
+          height: 60,
+          paddingBottom: 8,
+        },
+        tabBarActiveTintColor: '#e94560',
+        tabBarInactiveTintColor: '#666',
+      }}
+    >
+      <Tab.Screen
+        name="FeedTab"
+        component={FeedScreen}
+        options={{
+          title: '피드',
+          tabBarIcon: ({ color, size }) => (
+            <Text style={{ color, fontSize: size - 4 }}>🏠</Text>
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="ExploreTab"
+        component={ExploreScreen}
+        options={{
+          title: '탐색',
+          tabBarIcon: ({ color, size }) => (
+            <Text style={{ color, fontSize: size - 4 }}>🔍</Text>
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="NotificationsTab"
+        component={NotificationsScreen}
+        options={{
+          title: '알림',
+          tabBarBadge: 5,
+          tabBarIcon: ({ color, size }) => (
+            <Text style={{ color, fontSize: size - 4 }}>🔔</Text>
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="MyProfileTab"
+        component={MyProfileScreen}
+        options={{
+          title: '프로필',
+          tabBarIcon: ({ color, size }) => (
+            <Text style={{ color, fontSize: size - 4 }}>👤</Text>
+          ),
+        }}
+      />
+    </Tab.Navigator>
+  );
+}
+
+// ========== 2. Drawer Navigator ==========
+const Drawer = createDrawerNavigator();
+
+function DrawerContent(props) {
+  return (
+    <View style={{ flex: 1, backgroundColor: '#1a1a2e' }}>
+      <View style={{ padding: 20, paddingTop: 50, backgroundColor: '#0f3460' }}>
+        <View style={drawerStyles.avatar}>
+          <Text style={drawerStyles.avatarText}>JW</Text>
+        </View>
+        <Text style={{ color: '#fff', fontSize: 20, fontWeight: 'bold' }}>김종우</Text>
+        <Text style={{ color: '#a0a0a0', marginTop: 4 }}>@jongwoo</Text>
+      </View>
+      <DrawerContentScrollView {...props}>
+        <DrawerItemList {...props} />
+      </DrawerContentScrollView>
+    </View>
+  );
+}
+
+const drawerStyles = StyleSheet.create({
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#e94560',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  avatarText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
+});
+
+function MainDrawer() {
+  return (
+    <Drawer.Navigator
+      drawerContent={(props) => <DrawerContent {...props} />}
+      screenOptions={{
+        headerStyle: { backgroundColor: '#1a1a2e' },
+        headerTintColor: '#e94560',
+        drawerStyle: { backgroundColor: '#1a1a2e', width: 260 },
+        drawerActiveTintColor: '#e94560',
+        drawerInactiveTintColor: '#a0a0a0',
+      }}
+    >
+      <Drawer.Screen
+        name="Tabs"
+        component={MainTabs}
+        options={{ title: 'SNS App' }}
+      />
+      <Drawer.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{ title: '설정' }}
+      />
+      <Drawer.Screen
+        name="Bookmarks"
+        component={BookmarksScreen}
+        options={{ title: '북마크' }}
+      />
+    </Drawer.Navigator>
+  );
+}
+
+// ========== 3. Root Stack Navigator ==========
+const RootStack = createNativeStackNavigator();
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <RootStack.Navigator screenOptions={{ headerShown: false }}>
+        <RootStack.Screen name="MainDrawer" component={MainDrawer} />
+        <RootStack.Group
+          screenOptions={{
+            headerShown: true,
+            headerStyle: { backgroundColor: '#1a1a2e' },
+            headerTintColor: '#e94560',
+          }}
+        >
+          <RootStack.Screen
+            name="PostDetail"
+            component={PostDetailScreen}
+            options={{ title: '게시물 상세' }}
+          />
+        </RootStack.Group>
       </RootStack.Navigator>
     </NavigationContainer>
   );
