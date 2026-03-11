@@ -476,6 +476,64 @@ navigation.pop(2);                      // 2개 뒤로 (Stack Navigator에서만
 
 두 메서드 모두 스택에서 현재 화면을 제거하고 이전 화면으로 돌아간다. Android에서 시스템 뒤로가기 버튼이 자동으로 popBackStack을 호출하는 것처럼, React Navigation에서도 Android의 하드웨어 뒤로가기 버튼이 자동으로 goBack을 호출한다.
 
+### 네비게이션 파라미터 처리 실습
+
+```javascript [playground]
+// 🧪 네비게이션 파라미터 처리 실습
+
+// React Navigation에서 화면 간 데이터 전달 로직
+function createNavigationState() {
+  const stack = [];
+
+  return {
+    navigate(screen, params = {}) {
+      stack.push({ screen, params, key: `${screen}-${Date.now()}` });
+      console.log(`→ ${screen} 이동`, params);
+      return this;
+    },
+    goBack() {
+      if (stack.length <= 1) {
+        console.log("← 뒤로갈 수 없음 (루트 화면)");
+        return this;
+      }
+      const popped = stack.pop();
+      console.log(`← ${popped.screen}에서 뒤로가기`);
+      return this;
+    },
+    getParams() {
+      return stack.length ? stack[stack.length - 1].params : {};
+    },
+    getCurrentScreen() {
+      return stack.length ? stack[stack.length - 1].screen : null;
+    },
+    getStackDepth() { return stack.length; },
+    printStack() {
+      console.log("스택:", stack.map(s => s.screen).join(" → "));
+    }
+  };
+}
+
+const nav = createNavigationState();
+
+// 화면 이동 시뮬레이션
+nav.navigate("Home");
+nav.navigate("ProductList", { category: "전자기기" });
+nav.navigate("ProductDetail", { productId: 42, title: "노트북" });
+
+console.log("\n현재 화면:", nav.getCurrentScreen());
+console.log("파라미터:", JSON.stringify(nav.getParams()));
+console.log("스택 깊이:", nav.getStackDepth());
+nav.printStack();
+
+nav.goBack();
+console.log("\n뒤로 후:", nav.getCurrentScreen());
+console.log("파라미터:", JSON.stringify(nav.getParams()));
+nav.printStack();
+
+nav.goBack();
+nav.goBack(); // 루트에서 더 뒤로 가려고 하면?
+```
+
 ---
 
 ## 7. Static vs Dynamic Navigation API (v7)

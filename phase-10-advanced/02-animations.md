@@ -345,6 +345,69 @@ function ParallaxHeader() {
 }
 ```
 
+```javascript [playground]
+// 🧪 애니메이션 보간(Interpolation) 실습
+
+// 1) Easing 함수들 — 애니메이션의 가속/감속 곡선
+const easing = {
+  linear: t => t,
+  easeIn: t => t * t,
+  easeOut: t => t * (2 - t),
+  easeInOut: t => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t,
+  bounce: t => {
+    if (t < 1/2.75) return 7.5625 * t * t;
+    if (t < 2/2.75) return 7.5625 * (t -= 1.5/2.75) * t + 0.75;
+    if (t < 2.5/2.75) return 7.5625 * (t -= 2.25/2.75) * t + 0.9375;
+    return 7.5625 * (t -= 2.625/2.75) * t + 0.984375;
+  },
+};
+
+// 2) Interpolation — 값 범위 변환 (Animated.interpolate 핵심)
+function interpolate(value, inputRange, outputRange) {
+  // 입력 범위에서의 위치 찾기
+  let i = 0;
+  while (i < inputRange.length - 1 && value > inputRange[i + 1]) i++;
+  i = Math.min(i, inputRange.length - 2);
+
+  // 선형 보간
+  const ratio = (value - inputRange[i]) / (inputRange[i + 1] - inputRange[i]);
+  return outputRange[i] + ratio * (outputRange[i + 1] - outputRange[i]);
+}
+
+// 스크롤에 따른 헤더 opacity 변환
+console.log("=== 스크롤 → 헤더 투명도 ===");
+[0, 50, 100, 150, 200].forEach(scroll => {
+  const opacity = interpolate(scroll, [0, 100, 200], [1, 1, 0]);
+  console.log(`scroll=${scroll}px → opacity=${opacity.toFixed(2)}`);
+});
+
+// 3) 다양한 Easing 비교 (10단계)
+console.log("\n=== Easing 비교 (0→1 진행) ===");
+const steps = 10;
+for (const [name, fn] of Object.entries(easing)) {
+  const values = [];
+  for (let i = 0; i <= steps; i++) {
+    values.push(fn(i / steps).toFixed(2));
+  }
+  console.log(`${name.padEnd(10)}: ${values.join(' → ')}`);
+}
+
+// 4) 스프링 애니메이션 시뮬레이션
+console.log("\n=== 스프링 애니메이션 ===");
+let position = 0, velocity = 0;
+const target = 100, stiffness = 0.1, damping = 0.7;
+
+for (let frame = 0; frame < 20; frame++) {
+  const force = (target - position) * stiffness;
+  velocity = (velocity + force) * damping;
+  position += velocity;
+  if (frame % 3 === 0) {
+    const bar = '█'.repeat(Math.round(position / 5));
+    console.log(`f${String(frame).padStart(2)}: ${position.toFixed(1).padStart(6)} ${bar}`);
+  }
+}
+```
+
 ```exercise
 type: code-arrange
 question: "Reanimated의 useSharedValue + useAnimatedStyle 패턴을 조립하세요"

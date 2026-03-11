@@ -78,6 +78,25 @@ console.log("2. 동기 코드 끝");    // (2) 바로 실행
 5. Call Stack이 비었으므로 이벤트 루프가 **마이크로태스크 큐**를 먼저 확인 → `"3. Promise 콜백"` 실행
 6. 마이크로태스크 큐가 비었으므로 **매크로태스크 큐** 확인 → `"4. setTimeout 콜백"` 실행
 
+```javascript [playground]
+// 🧪 이벤트 루프 실행 순서 실습
+
+console.log("1. 동기 코드 시작");
+
+setTimeout(() => {
+  console.log("4. setTimeout 콜백 (매크로태스크)");
+}, 0);
+
+Promise.resolve().then(() => {
+  console.log("3. Promise 콜백 (마이크로태스크)");
+});
+
+console.log("2. 동기 코드 끝");
+
+// 출력 순서를 예측해보세요!
+// 마이크로태스크(Promise)가 매크로태스크(setTimeout)보다 먼저 실행됩니다.
+```
+
 ### 1-4. Kotlin Coroutine과의 비교
 
 ```kotlin
@@ -190,6 +209,41 @@ getUser(userId, (error, user) => {
 // → Promise와 async/await로 해결!
 ```
 
+```javascript [playground]
+// 🧪 콜백 패턴 실습
+
+// 비동기 작업을 시뮬레이션하는 함수
+function fetchData(id, callback) {
+  setTimeout(() => {
+    if (id > 0) {
+      callback(null, { id, name: `사용자${id}` });
+    } else {
+      callback(new Error("유효하지 않은 ID"), null);
+    }
+  }, 100);
+}
+
+// 성공 케이스
+fetchData(1, (error, data) => {
+  if (error) {
+    console.error("에러:", error.message);
+    return;
+  }
+  console.log("성공:", JSON.stringify(data));
+});
+
+// 실패 케이스
+fetchData(-1, (error, data) => {
+  if (error) {
+    console.error("에러:", error.message);
+    return;
+  }
+  console.log("데이터:", data);
+});
+
+console.log("요청 전송 완료 (결과는 아직 안 옴)");
+```
+
 ---
 
 ## 3. Promise — 비동기의 핵심
@@ -297,6 +351,41 @@ fetchUser(1)
   .catch(error => console.error("에러:", error.message));
 ```
 
+```javascript [playground]
+// 🧪 Promise 체이닝 실습
+
+// API 호출 시뮬레이션
+function fetchUser(id) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (id > 0) resolve({ id, name: `사용자${id}`, role: "개발자" });
+      else reject(new Error("유효하지 않은 ID"));
+    }, 100);
+  });
+}
+
+// 1) 기본 체이닝
+fetchUser(1)
+  .then(user => {
+    console.log("사용자:", user.name);
+    return user.role; // 다음 then에 전달
+  })
+  .then(role => {
+    console.log("역할:", role);
+  })
+  .catch(error => {
+    console.error("에러:", error.message);
+  })
+  .finally(() => {
+    console.log("요청 완료!");
+  });
+
+// 2) 에러 처리
+fetchUser(-1)
+  .then(user => console.log(user))
+  .catch(error => console.error("실패:", error.message));
+```
+
 ### 3-4. Promise.all — 병렬 실행 후 모든 결과 기다리기
 
 ```javascript
@@ -330,6 +419,29 @@ Promise.all([
     // 하나라도 실패하면 여기로 — 나머지 결과는 무시됨
     console.error("하나 이상 실패:", error.message);
   });
+```
+
+```javascript [playground]
+// 🧪 Promise.all 병렬 실행 실습
+
+function fetchItem(name, delay) {
+  return new Promise(resolve => {
+    setTimeout(() => resolve(`${name} 완료`), delay);
+  });
+}
+
+const start = Date.now();
+
+// 병렬 실행 — 모든 Promise가 완료될 때까지 기다림
+Promise.all([
+  fetchItem("사용자 조회", 100),
+  fetchItem("주문 조회", 200),
+  fetchItem("알림 조회", 150)
+]).then(results => {
+  const elapsed = Date.now() - start;
+  console.log("결과:", results);
+  console.log(`소요 시간: 약 ${elapsed}ms (순차면 450ms)`);
+});
 ```
 
 ```kotlin
@@ -465,6 +577,40 @@ async function main() {
 main();
 ```
 
+```javascript [playground]
+// 🧪 async/await 기본 실습
+
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function fetchUser(id) {
+  await delay(100); // API 호출 시뮬레이션
+  return { id, name: `사용자${id}`, level: id * 10 };
+}
+
+// async 함수 사용
+async function main() {
+  console.log("시작...");
+
+  // 순차 실행
+  const user1 = await fetchUser(1);
+  console.log("user1:", JSON.stringify(user1));
+
+  // 병렬 실행 (Promise.all + await)
+  const [user2, user3] = await Promise.all([
+    fetchUser(2),
+    fetchUser(3)
+  ]);
+  console.log("user2:", JSON.stringify(user2));
+  console.log("user3:", JSON.stringify(user3));
+
+  console.log("완료!");
+}
+
+main();
+```
+
 ```kotlin
 // Kotlin — suspend 함수와 비교
 // suspend fun은 JavaScript의 async function에 해당
@@ -526,6 +672,48 @@ async function main() {
     console.log("사용자를 찾을 수 없습니다");
   }
 }
+```
+
+```javascript [playground]
+// 🧪 async/await 에러 처리 실습
+
+async function riskyOperation(shouldFail) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (shouldFail) reject(new Error("작업 실패!"));
+      else resolve("작업 성공!");
+    }, 100);
+  });
+}
+
+async function main() {
+  // 1) try/catch로 에러 처리
+  try {
+    const result = await riskyOperation(false);
+    console.log("성공:", result);
+
+    const result2 = await riskyOperation(true); // 여기서 에러!
+    console.log("이 줄은 실행 안 됨");
+  } catch (error) {
+    console.error("잡힌 에러:", error.message);
+  } finally {
+    console.log("항상 실행되는 finally");
+  }
+
+  // 2) [data, error] 패턴
+  async function to(promise) {
+    try {
+      return [await promise, null];
+    } catch (error) {
+      return [null, error];
+    }
+  }
+
+  const [data, error] = await to(riskyOperation(true));
+  if (error) console.log("[data, error] 패턴:", error.message);
+}
+
+main();
 ```
 
 ```kotlin
@@ -1079,6 +1267,37 @@ searchAPI("hel");     // 이전 타이머 취소, 새 타이머
 searchAPI("hell");    // 이전 타이머 취소, 새 타이머
 searchAPI("hello");   // 이전 타이머 취소, 새 타이머
 // 300ms 후 "hello"로 한 번만 API 호출!
+```
+
+```javascript [playground]
+// 🧪 디바운스 실습
+
+function debounce(func, delay) {
+  let timeoutId;
+  return function(...args) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => func(...args), delay);
+  };
+}
+
+// 검색 시뮬레이션
+let callCount = 0;
+const search = debounce((query) => {
+  callCount++;
+  console.log(`API 호출 #${callCount}: "${query}" 검색`);
+}, 300);
+
+// 빠르게 입력하면 마지막 입력만 실행됨
+search("h");
+search("he");
+search("hel");
+search("hell");
+search("hello");
+
+// 300ms 후 "hello"로 한 번만 호출됨!
+setTimeout(() => {
+  console.log(`총 API 호출 횟수: ${callCount} (5번 입력 중 1번만 호출)`);
+}, 500);
 ```
 
 ### 7-3. 재시도 (Retry) 패턴

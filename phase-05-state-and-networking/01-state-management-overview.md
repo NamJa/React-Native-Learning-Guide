@@ -419,6 +419,69 @@ function useCreateProduct() {
 
 Android 대응: `Repository` + `Retrofit` + 캐싱 로직
 
+```javascript [playground]
+// 🧪 상태 관리 패턴 비교 — 순수 JS로 이해하기
+
+// 패턴 1: 단순 상태 (useState 대응)
+let count = 0;
+function increment() { count++; return count; }
+function decrement() { count--; return count; }
+console.log("단순 상태:", increment(), increment(), decrement());
+
+// 패턴 2: Reducer 패턴 (useReducer 대응)
+function counterReducer(state, action) {
+  switch (action.type) {
+    case 'INC': return { ...state, count: state.count + 1 };
+    case 'DEC': return { ...state, count: state.count - 1 };
+    case 'RESET': return { ...state, count: 0 };
+    default: return state;
+  }
+}
+
+let rState = { count: 0 };
+rState = counterReducer(rState, { type: 'INC' });
+rState = counterReducer(rState, { type: 'INC' });
+rState = counterReducer(rState, { type: 'INC' });
+console.log("Reducer:", rState.count); // 3
+
+// 패턴 3: Store 패턴 (Zustand 대응)
+function createStore(initialState, actions) {
+  let state = initialState;
+  const listeners = [];
+  const store = {
+    getState: () => state,
+    subscribe: (fn) => { listeners.push(fn); },
+    dispatch: (actionName, ...args) => {
+      state = actions[actionName](state, ...args);
+      listeners.forEach(fn => fn(state));
+    }
+  };
+  return store;
+}
+
+const todoStore = createStore(
+  { todos: [], filter: 'all' },
+  {
+    add: (state, text) => ({
+      ...state,
+      todos: [...state.todos, { text, done: false }]
+    }),
+    toggle: (state, index) => ({
+      ...state,
+      todos: state.todos.map((t, i) =>
+        i === index ? { ...t, done: !t.done } : t
+      )
+    }),
+    setFilter: (state, filter) => ({ ...state, filter }),
+  }
+);
+
+todoStore.subscribe(s => console.log("Store 변경:", JSON.stringify(s.todos)));
+todoStore.dispatch('add', 'React 배우기');
+todoStore.dispatch('add', 'RN 앱 만들기');
+todoStore.dispatch('toggle', 0);
+```
+
 ---
 
 ## 6. 상태 관리 결정 트리

@@ -525,6 +525,84 @@ global.fetch = jest.fn().mockResolvedValue({
 });
 ```
 
+```javascript [playground]
+// 🧪 단위 테스트 개념 실습 — 테스트 러너를 직접 만들어보기
+
+// 간단한 테스트 프레임워크
+let passed = 0, failed = 0;
+
+function describe(name, fn) {
+  console.log(`\n📋 ${name}`);
+  fn();
+}
+
+function it(name, fn) {
+  try {
+    fn();
+    passed++;
+    console.log(`  ✅ ${name}`);
+  } catch (error) {
+    failed++;
+    console.log(`  ❌ ${name}: ${error.message}`);
+  }
+}
+
+function expect(actual) {
+  return {
+    toBe(expected) {
+      if (actual !== expected)
+        throw new Error(`기대: ${expected}, 실제: ${actual}`);
+    },
+    toEqual(expected) {
+      if (JSON.stringify(actual) !== JSON.stringify(expected))
+        throw new Error(`기대: ${JSON.stringify(expected)}, 실제: ${JSON.stringify(actual)}`);
+    },
+    toContain(item) {
+      if (!actual.includes(item))
+        throw new Error(`${JSON.stringify(actual)}에 ${item}이 없음`);
+    },
+    toThrow() {
+      try { actual(); throw new Error("에러가 발생하지 않음"); }
+      catch(e) { if (e.message === "에러가 발생하지 않음") throw e; }
+    }
+  };
+}
+
+// 테스트 대상 함수들
+function add(a, b) { return a + b; }
+function formatPrice(price) { return `${price.toLocaleString()}원`; }
+function filterAdults(users) { return users.filter(u => u.age >= 18); }
+
+// 테스트 실행
+describe("add 함수", () => {
+  it("두 양수를 더한다", () => expect(add(1, 2)).toBe(3));
+  it("음수를 처리한다", () => expect(add(-1, 1)).toBe(0));
+  it("0을 처리한다", () => expect(add(0, 0)).toBe(0));
+});
+
+describe("formatPrice 함수", () => {
+  it("숫자를 원화로 포맷한다", () => expect(formatPrice(1000)).toBe("1,000원"));
+  it("0원을 처리한다", () => expect(formatPrice(0)).toBe("0원"));
+});
+
+describe("filterAdults 함수", () => {
+  const users = [
+    { name: "홍길동", age: 30 },
+    { name: "김아이", age: 10 },
+    { name: "이청년", age: 20 },
+  ];
+  it("성인만 필터링한다", () => {
+    expect(filterAdults(users).length).toBe(2);
+  });
+  it("필터 결과에 미성년이 없다", () => {
+    const result = filterAdults(users);
+    expect(result.every(u => u.age >= 18)).toBe(true);
+  });
+});
+
+console.log(`\n결과: ${passed} passed, ${failed} failed`);
+```
+
 ---
 
 ## 7. 비동기 테스트

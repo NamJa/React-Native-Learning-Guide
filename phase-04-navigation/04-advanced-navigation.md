@@ -210,6 +210,76 @@ items:
 xp: 6
 ```
 
+```javascript [playground]
+// 🧪 딥링크 URL 파싱 실습
+
+// React Navigation에서 딥링크 URL을 화면+파라미터로 변환하는 로직
+function parsePath(url, config) {
+  // URL에서 경로 추출
+  const path = url.replace(/^.*:\/\//, '').replace(/\?.*$/, '');
+  const queryString = url.includes('?') ? url.split('?')[1] : '';
+  const segments = path.split('/').filter(Boolean);
+
+  // 쿼리 파라미터 파싱
+  const params = {};
+  if (queryString) {
+    queryString.split('&').forEach(pair => {
+      const [key, value] = pair.split('=');
+      params[decodeURIComponent(key)] = decodeURIComponent(value || '');
+    });
+  }
+
+  // config에서 매칭되는 화면 찾기
+  for (const [screen, pattern] of Object.entries(config)) {
+    const patternSegments = pattern.split('/').filter(Boolean);
+    if (patternSegments.length !== segments.length) continue;
+
+    const routeParams = {};
+    let match = true;
+
+    for (let i = 0; i < patternSegments.length; i++) {
+      if (patternSegments[i].startsWith(':')) {
+        routeParams[patternSegments[i].slice(1)] = segments[i];
+      } else if (patternSegments[i] !== segments[i]) {
+        match = false;
+        break;
+      }
+    }
+
+    if (match) {
+      return { screen, params: { ...routeParams, ...params } };
+    }
+  }
+  return null;
+}
+
+// 딥링크 설정 (React Navigation linking config와 동일한 구조)
+const linkingConfig = {
+  'Home': '',
+  'ProductList': 'products',
+  'ProductDetail': 'products/:id',
+  'UserProfile': 'users/:userId',
+  'Settings': 'settings',
+};
+
+// 테스트
+const urls = [
+  "myapp://products",
+  "myapp://products/42?ref=home",
+  "myapp://users/hong123",
+  "https://myapp.com/settings",
+];
+
+urls.forEach(url => {
+  const result = parsePath(url, linkingConfig);
+  if (result) {
+    console.log(`${url}\n  → 화면: ${result.screen}, 파라미터: ${JSON.stringify(result.params)}\n`);
+  } else {
+    console.log(`${url}\n  → 매칭 없음\n`);
+  }
+});
+```
+
 ---
 
 ## 2. 네비게이션 상태 영속화

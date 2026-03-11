@@ -137,6 +137,34 @@ val x = 10
 println(x) // 10
 ```
 
+```javascript [playground]
+// 🧪 변수 선언 실습 — 직접 수정하고 실행해보세요!
+
+// 1) let과 const의 차이를 확인해보세요
+let myName = "홍길동";
+myName = "김철수"; // let은 재할당 가능
+console.log("이름:", myName);
+
+const PI = 3.14159;
+// PI = 3.0; // ← 주석을 해제하면 에러! const는 재할당 불가
+
+// 2) const 객체의 내부 속성은 변경 가능
+const user = { name: "홍길동", age: 30 };
+user.age = 31;
+console.log("user:", JSON.stringify(user));
+
+// 3) 블록 스코프 확인
+if (true) {
+  let blockVar = "블록 안";
+  console.log("블록 내부:", blockVar);
+}
+// console.log(blockVar); // ← 주석 해제하면 에러! (블록 스코프)
+
+// 4) 호이스팅 확인
+console.log("hoisted:", typeof hoistedVar); // undefined
+var hoistedVar = "나는 var";
+```
+
 ---
 
 ## 2. 데이터 타입
@@ -248,6 +276,31 @@ val longVal: Long = 42L
 val floatVal: Float = 3.14f
 val doubleVal: Double = 3.14
 // Kotlin에서도 0.1 + 0.2 == 0.3은 false (부동소수점 오차는 동일)
+```
+
+```javascript [playground]
+// 🧪 데이터 타입 실습
+
+// 1) typeof로 타입 확인해보세요
+console.log("typeof 42:", typeof 42);
+console.log("typeof 'hello':", typeof "hello");
+console.log("typeof true:", typeof true);
+console.log("typeof null:", typeof null);       // "object" — 유명한 버그!
+console.log("typeof undefined:", typeof undefined);
+
+// 2) null vs undefined
+let a = null;
+let b;
+console.log("null == undefined:", null == undefined);   // true
+console.log("null === undefined:", null === undefined);  // false
+
+// 3) 부동소수점 오차
+console.log("0.1 + 0.2:", 0.1 + 0.2);
+console.log("0.1 + 0.2 === 0.3:", 0.1 + 0.2 === 0.3); // false!
+
+// 4) NaN의 특이한 성질
+console.log("NaN === NaN:", NaN === NaN);             // false!
+console.log("Number.isNaN(NaN):", Number.isNaN(NaN)); // true
 ```
 
 ---
@@ -369,6 +422,33 @@ val user2 = User("홍길동", null)
 println(user2.address?.city) // null (JavaScript의 undefined에 해당)
 ```
 
+```javascript [playground]
+// 🧪 연산자 실습
+
+// 1) == vs === 차이 확인
+console.log('1 == "1":', 1 == "1");     // true (타입 변환)
+console.log('1 === "1":', 1 === "1");   // false (엄격 비교)
+console.log("0 == false:", 0 == false); // true
+console.log("0 === false:", 0 === false); // false
+
+// 2) ?? (Nullish Coalescing) vs || (OR)
+const val1 = 0 ?? "기본값";
+const val2 = 0 || "기본값";
+console.log("0 ?? '기본값':", val1); // 0
+console.log("0 || '기본값':", val2); // "기본값"
+
+const val3 = "" ?? "기본값";
+const val4 = "" || "기본값";
+console.log('"" ?? "기본값":', val3); // ""
+console.log('"" || "기본값":', val4); // "기본값"
+
+// 3) Optional Chaining
+const user = { name: "홍길동", address: { city: "서울" } };
+console.log("city:", user.address?.city);       // "서울"
+console.log("phone:", user.phone?.number);      // undefined
+console.log("safe:", user.missing?.deep?.value); // undefined
+```
+
 ---
 
 ## 4. 문자열 템플릿
@@ -426,6 +506,33 @@ val multiLine = """
 - JavaScript: 백틱(`` ` ``) + `${}`
 - Kotlin: 큰따옴표(`"`) + `$` 또는 `${}`
 - JavaScript의 일반 따옴표(`'` 또는 `"`)는 템플릿을 지원하지 않음
+
+```javascript [playground]
+// 🧪 문자열 템플릿 실습
+
+const name = "홍길동";
+const age = 30;
+
+// 1) 기본 템플릿 리터럴
+console.log(`안녕하세요, ${name}님!`);
+console.log(`내년 나이: ${age + 1}세`);
+
+// 2) 표현식 사용
+console.log(`성인 여부: ${age >= 18 ? "성인" : "미성년자"}`);
+
+// 3) 여러 줄 문자열
+const card = `
+┌──────────────┐
+│ 이름: ${name.padEnd(8)}│
+│ 나이: ${String(age).padEnd(8)}│
+└──────────────┘`;
+console.log(card);
+
+// 4) 직접 수정해보세요!
+const item = "커피";
+const price = 4500;
+console.log(`${item}: ${price.toLocaleString()}원`);
+```
 
 ---
 
@@ -611,6 +718,35 @@ val name = ""
 if (name.isNotEmpty()) {
     println("이름이 있습니다")
 }
+```
+
+```javascript [playground]
+// 🧪 제어 흐름 실습
+
+// 1) 삼항 연산자
+const score = 85;
+const grade = score >= 90 ? "A" : score >= 80 ? "B" : "C";
+console.log(`점수: ${score}, 등급: ${grade}`);
+
+// 2) switch 문
+const fruit = "사과";
+switch (fruit) {
+  case "사과": console.log("빨간색"); break;
+  case "바나나": console.log("노란색"); break;
+  default: console.log("알 수 없음");
+}
+
+// 3) 반복문
+const fruits = ["사과", "바나나", "포도"];
+for (const f of fruits) {
+  console.log("과일:", f);
+}
+
+// 4) Falsy 값 확인 — 어떤 것이 출력될까요?
+const values = [0, "", null, undefined, NaN, false, 1, "hello", [], {}];
+values.forEach((v, i) => {
+  console.log(`values[${i}] = ${JSON.stringify(v)} → ${v ? "truthy" : "falsy"}`);
+});
 ```
 
 ---
@@ -821,6 +957,38 @@ val evens = numbers.filter { it % 2 == 0 } // [2, 4]
 val sum = numbers.reduce { acc, n -> acc + n } // 15
 ```
 
+```javascript [playground]
+// 🧪 함수 실습
+
+// 1) 화살표 함수 여러 형태
+const add = (a, b) => a + b;
+const double = x => x * 2;
+const greet = () => "안녕하세요!";
+console.log("add(3, 4):", add(3, 4));
+console.log("double(5):", double(5));
+console.log("greet():", greet());
+
+// 2) 기본 매개변수
+function introduce(name = "손님", role = "학습자") {
+  return `${name}님은 ${role}입니다.`;
+}
+console.log(introduce());
+console.log(introduce("홍길동", "개발자"));
+
+// 3) 나머지 매개변수
+function sum(...nums) {
+  return nums.reduce((acc, n) => acc + n, 0);
+}
+console.log("sum(1,2,3,4,5):", sum(1, 2, 3, 4, 5));
+
+// 4) 콜백 + 배열 메서드
+const numbers = [1, 2, 3, 4, 5];
+const result = numbers
+  .filter(n => n % 2 !== 0)
+  .map(n => n * n);
+console.log("홀수의 제곱:", result);
+```
+
 ---
 
 ## 7. 객체(Object) — Kotlin의 Map/Data Class에 해당
@@ -920,6 +1088,38 @@ numbers.joinToString(", ") // join에 해당
 numbers.subList(1, 3)    // slice에 해당
 ```
 
+```javascript [playground]
+// 🧪 객체와 배열 실습
+
+// 1) 객체 생성과 접근
+const user = {
+  name: "홍길동",
+  age: 30,
+  greet() {
+    return `안녕하세요, ${this.name}입니다.`;
+  }
+};
+console.log(user.greet());
+console.log("동적 접근:", user["name"]);
+
+// 2) 속성 추가/수정
+user.email = "hong@example.com";
+user.age = 31;
+console.log("수정 후:", JSON.stringify(user));
+
+// 3) 배열 메서드 체험
+const nums = [1, 2, 3, 4, 5];
+nums.push(6);
+console.log("push 후:", nums);
+console.log("includes(3):", nums.includes(3));
+console.log("slice(1,3):", nums.slice(1, 3));
+console.log("join('-'):", nums.join("-"));
+
+// 4) 배열 vs 객체 typeof
+console.log("typeof []:", typeof []);           // "object"
+console.log("Array.isArray([]):", Array.isArray([])); // true
+```
+
 ---
 
 ## 8. 타입 변환과 체크
@@ -968,6 +1168,31 @@ val safeNum = "abc".toIntOrNull() // null
 // 타입 체크 — is 연산자
 println("hello" is String) // true
 println(42 is Int)         // true
+```
+
+```javascript [playground]
+// 🧪 타입 변환 실습
+
+// 1) 문자열 → 숫자
+console.log('Number("42"):', Number("42"));
+console.log('parseInt("42.7"):', parseInt("42.7"));
+console.log('parseFloat("42.7"):', parseFloat("42.7"));
+console.log('+"100":', +"100");
+
+// 2) 숫자 → 문자열
+console.log("String(42):", String(42));
+console.log("(42).toString():", (42).toString());
+console.log("`${42}`:", `${42}`);
+
+// 3) 변환 실패
+console.log('Number("abc"):', Number("abc")); // NaN
+console.log('parseInt("abc"):', parseInt("abc")); // NaN
+
+// 4) typeof로 타입 확인 퀴즈 — 결과를 예측해보세요!
+const tests = ["hello", 42, true, null, undefined, [], {}, function(){}];
+tests.forEach(v => {
+  console.log(`typeof ${JSON.stringify(v)} = "${typeof v}"`);
+});
 ```
 
 ---

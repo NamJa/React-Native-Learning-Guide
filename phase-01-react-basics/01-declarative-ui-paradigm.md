@@ -954,6 +954,73 @@ function App() {
 }
 ```
 
+```javascript [playground]
+// 🧪 Virtual DOM diffing 개념을 순수 JS로 이해하기
+
+// Virtual DOM은 UI를 JavaScript 객체로 표현한 것
+const oldVDOM = {
+  type: 'div',
+  props: { className: 'container' },
+  children: [
+    { type: 'h1', props: {}, children: ['안녕하세요'] },
+    { type: 'p', props: { style: 'color: black' }, children: ['카운트: 0'] },
+    { type: 'button', props: {}, children: ['클릭'] },
+  ]
+};
+
+const newVDOM = {
+  type: 'div',
+  props: { className: 'container' },
+  children: [
+    { type: 'h1', props: {}, children: ['안녕하세요'] },        // 변경 없음
+    { type: 'p', props: { style: 'color: red' }, children: ['카운트: 1'] }, // 변경!
+    { type: 'button', props: {}, children: ['클릭'] },          // 변경 없음
+  ]
+};
+
+// 간단한 diff 알고리즘
+function diff(oldNode, newNode, path = '') {
+  const changes = [];
+  if (!oldNode || !newNode) {
+    changes.push(`${path}: 노드 추가/제거`);
+  } else if (typeof oldNode !== typeof newNode) {
+    changes.push(`${path}: 타입 변경`);
+  } else if (typeof oldNode === 'string') {
+    if (oldNode !== newNode) changes.push(`${path}: "${oldNode}" → "${newNode}"`);
+  } else {
+    // props 비교
+    const allProps = new Set([...Object.keys(oldNode.props || {}), ...Object.keys(newNode.props || {})]);
+    allProps.forEach(prop => {
+      if (oldNode.props[prop] !== newNode.props[prop]) {
+        changes.push(`${path}.props.${prop}: "${oldNode.props[prop]}" → "${newNode.props[prop]}"`);
+      }
+    });
+    // children 비교
+    const maxLen = Math.max(
+      (oldNode.children || []).length,
+      (newNode.children || []).length
+    );
+    for (let i = 0; i < maxLen; i++) {
+      changes.push(...diff(
+        (oldNode.children || [])[i],
+        (newNode.children || [])[i],
+        `${path}/${newNode.type}[${i}]`
+      ));
+    }
+  }
+  return changes;
+}
+
+const changes = diff(oldVDOM, newVDOM, 'root');
+console.log("=== Virtual DOM Diff 결과 ===");
+if (changes.length === 0) {
+  console.log("변경 없음!");
+} else {
+  changes.forEach(c => console.log("변경:", c));
+}
+console.log(`\n→ 전체 ${oldVDOM.children.length}개 중 ${changes.length}개만 업데이트`);
+```
+
 ---
 
 ## 8. 렌더링 생명주기

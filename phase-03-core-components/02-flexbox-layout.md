@@ -638,6 +638,63 @@ Android 대응:
 └──────┴────────────────────────────┴──────┘
 ```
 
+### Flex 크기 배분 계산 실습
+
+```javascript [playground]
+// 🧪 Flex 크기 배분 계산 실습
+
+// React Native에서 flex 값에 따른 크기 분배 로직
+function calculateFlexSizes(containerSize, items) {
+  const totalFlex = items.reduce((sum, item) => sum + (item.flex || 0), 0);
+  const fixedSize = items
+    .filter(item => !item.flex)
+    .reduce((sum, item) => sum + (item.size || 0), 0);
+  const flexSpace = containerSize - fixedSize;
+
+  return items.map(item => {
+    if (item.flex) {
+      const size = Math.round((item.flex / totalFlex) * flexSpace);
+      return { ...item, calculatedSize: size };
+    }
+    return { ...item, calculatedSize: item.size };
+  });
+}
+
+// 예제 1: 간단한 비율 분배
+console.log("=== 화면 너비 375px ===");
+const layout1 = calculateFlexSizes(375, [
+  { name: "사이드바", flex: 1 },
+  { name: "메인", flex: 2 },
+  { name: "패널", flex: 1 },
+]);
+layout1.forEach(item =>
+  console.log(`${item.name}: flex=${item.flex} → ${item.calculatedSize}px`)
+);
+
+// 예제 2: 고정 + 유연 혼합
+console.log("\n=== 고정 + flex 혼합 ===");
+const layout2 = calculateFlexSizes(375, [
+  { name: "아바타", size: 50 },        // 고정 50px
+  { name: "내용", flex: 1 },            // 나머지 공간
+  { name: "버튼", size: 80 },           // 고정 80px
+]);
+layout2.forEach(item => {
+  const type = item.flex ? `flex=${item.flex}` : `fixed=${item.size}`;
+  console.log(`${item.name}: ${type} → ${item.calculatedSize}px`);
+});
+
+// 예제 3: 3단 레이아웃
+console.log("\n=== 3단 레이아웃 (1:3:1) ===");
+const layout3 = calculateFlexSizes(375, [
+  { name: "왼쪽", flex: 1 },
+  { name: "가운데", flex: 3 },
+  { name: "오른쪽", flex: 1 },
+]);
+layout3.forEach(item =>
+  console.log(`${item.name}: ${item.calculatedSize}px (${Math.round(item.calculatedSize/375*100)}%)`)
+);
+```
+
 ---
 
 ## 8. gap, rowGap, columnGap — 간격

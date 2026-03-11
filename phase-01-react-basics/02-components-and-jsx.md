@@ -738,6 +738,46 @@ function UserList({ users }: { users: User[] }) {
 // 4. index는 "리스트 순서가 절대 바뀌지 않는 경우"에만 사용
 ```
 
+```javascript [playground]
+// 🧪 리스트 데이터 변환 실습 — React의 map/filter를 순수 JS로 연습
+
+const users = [
+  { id: 1, name: "홍길동", age: 30, role: "개발자" },
+  { id: 2, name: "김철수", age: 25, role: "디자이너" },
+  { id: 3, name: "이영희", age: 35, role: "개발자" },
+  { id: 4, name: "박민수", age: 28, role: "PM" },
+  { id: 5, name: "최수진", age: 32, role: "개발자" },
+];
+
+// 1) map — 표시할 데이터 변환 (React에서 JSX를 반환하는 것과 동일한 로직)
+const displayNames = users.map(u => `${u.name} (${u.age}세)`);
+console.log("이름 목록:", displayNames);
+
+// 2) filter + map — 조건부 렌더링
+const developers = users
+  .filter(u => u.role === "개발자")
+  .map(u => u.name);
+console.log("개발자:", developers);
+
+// 3) sort — 정렬 (원본 유지!)
+const byAge = [...users].sort((a, b) => a.age - b.age);
+console.log("나이순:", byAge.map(u => `${u.name}(${u.age})`));
+
+// 4) key의 중요성 — 인덱스 vs 고유 ID
+const items = ["A", "B", "C"];
+// ❌ 인덱스를 key로 사용하면 중간에 삽입 시 문제
+const withIndex = items.map((item, i) => ({ key: i, value: item }));
+console.log("인덱스 key:", JSON.stringify(withIndex));
+
+// 중간에 "X" 삽입 → 인덱스가 밀림!
+const inserted = ["A", "X", "B", "C"];
+const afterInsert = inserted.map((item, i) => ({ key: i, value: item }));
+console.log("삽입 후:", JSON.stringify(afterInsert));
+console.log("→ key=1이 B에서 X로 바뀜! React가 전체를 다시 렌더링");
+
+// ✅ 고유 ID를 key로 사용하면 정확한 업데이트 가능
+```
+
 ### 예제 18: 필터링과 정렬이 있는 리스트
 
 ```typescript

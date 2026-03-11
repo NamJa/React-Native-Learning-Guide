@@ -987,6 +987,78 @@ function App() {
 [ ] 무거운 계산은 네이티브 모듈로
 ```
 
+```javascript [playground]
+// 🧪 성능 최적화 패턴 실습
+
+// 1) 메모이제이션 — 비싼 계산 캐싱
+function memoize(fn) {
+  const cache = new Map();
+  return function(...args) {
+    const key = JSON.stringify(args);
+    if (cache.has(key)) return cache.get(key);
+    const result = fn(...args);
+    cache.set(key, result);
+    return result;
+  };
+}
+
+// 피보나치 — 메모이제이션 효과 비교
+function fibSlow(n) {
+  if (n <= 1) return n;
+  return fibSlow(n - 1) + fibSlow(n - 2);
+}
+
+const fibFast = memoize(function fib(n) {
+  if (n <= 1) return n;
+  return fibFast(n - 1) + fibFast(n - 2);
+});
+
+let t1 = performance.now();
+const slow = fibSlow(30);
+const slowTime = performance.now() - t1;
+
+let t2 = performance.now();
+const fast = fibFast(30);
+const fastTime = performance.now() - t2;
+
+console.log(`fib(30) = ${slow}`);
+console.log(`일반: ${slowTime.toFixed(2)}ms`);
+console.log(`메모: ${fastTime.toFixed(2)}ms`);
+console.log(`속도 향상: ${(slowTime / Math.max(fastTime, 0.01)).toFixed(0)}배\n`);
+
+// 2) 배치 업데이트 — 불필요한 중간 계산 방지
+function batchProcess(items, batchSize = 100) {
+  const batches = [];
+  for (let i = 0; i < items.length; i += batchSize) {
+    batches.push(items.slice(i, i + batchSize));
+  }
+  return batches;
+}
+
+const bigList = Array.from({ length: 1000 }, (_, i) => i);
+const batches = batchProcess(bigList, 200);
+console.log(`1000개 → ${batches.length}개 배치`);
+batches.forEach((batch, i) =>
+  console.log(`  배치 ${i}: ${batch.length}개 (${batch[0]}~${batch[batch.length-1]})`)
+);
+
+// 3) 객체 비교 최적화 — 얕은 비교(shallow compare)
+function shallowEqual(a, b) {
+  if (a === b) return true;
+  const keysA = Object.keys(a);
+  const keysB = Object.keys(b);
+  if (keysA.length !== keysB.length) return false;
+  return keysA.every(key => a[key] === b[key]);
+}
+
+const props1 = { name: "홍길동", count: 5 };
+const props2 = { name: "홍길동", count: 5 };
+const props3 = { name: "홍길동", count: 6 };
+console.log("\n얕은 비교:");
+console.log("동일 값:", shallowEqual(props1, props2)); // true
+console.log("다른 값:", shallowEqual(props1, props3)); // false
+```
+
 ## ✅ 학습 확인 퀴즈
 
 ```quiz

@@ -1183,6 +1183,67 @@ items:
 xp: 6
 ```
 
+```javascript [playground]
+// 🧪 고급 패턴 실습 — 이벤트 시스템 구현
+
+// EventEmitter 구현 (React Native에서 모듈 간 통신에 사용)
+class EventEmitter {
+  constructor() {
+    this.listeners = {};
+  }
+
+  on(event, callback) {
+    if (!this.listeners[event]) this.listeners[event] = [];
+    this.listeners[event].push(callback);
+    // unsubscribe 함수 반환
+    return () => {
+      this.listeners[event] = this.listeners[event].filter(cb => cb !== callback);
+    };
+  }
+
+  emit(event, data) {
+    const callbacks = this.listeners[event] || [];
+    callbacks.forEach(cb => cb(data));
+    console.log(`[emit] ${event} → ${callbacks.length}개 리스너`);
+  }
+
+  once(event, callback) {
+    const unsub = this.on(event, (data) => {
+      callback(data);
+      unsub();
+    });
+  }
+}
+
+// 사용 예: 앱 이벤트 시스템
+const appEvents = new EventEmitter();
+
+// 리스너 등록
+const unsub1 = appEvents.on('user-login', (user) => {
+  console.log(`환영합니다, ${user.name}님!`);
+});
+
+appEvents.on('user-login', (user) => {
+  console.log(`마지막 로그인: ${new Date().toLocaleTimeString()}`);
+});
+
+appEvents.once('user-login', () => {
+  console.log("첫 로그인 보너스 지급! (once — 한 번만 실행)");
+});
+
+// 이벤트 발생
+console.log("=== 첫 번째 로그인 ===");
+appEvents.emit('user-login', { name: '홍길동', id: 1 });
+
+console.log("\n=== 두 번째 로그인 ===");
+appEvents.emit('user-login', { name: '홍길동', id: 1 });
+
+// 구독 해제
+unsub1();
+console.log("\n=== 구독 해제 후 ===");
+appEvents.emit('user-login', { name: '홍길동', id: 1 });
+```
+
 ---
 
 ## 10. 학습 로드맵 요약

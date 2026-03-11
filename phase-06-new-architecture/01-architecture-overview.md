@@ -445,6 +445,47 @@ Legacy Native Modules와 TurboModules의 차이:
 └────────────────────────────────────────────────────────────────┘
 ```
 
+```javascript [playground]
+// 🧪 React Native Bridge vs JSI 개념 실습
+
+// Old Architecture: Bridge (JSON 직렬화/역직렬화)
+function bridgeCall(moduleName, method, args) {
+  // 1. JS → JSON 직렬화
+  const serialized = JSON.stringify({ module: moduleName, method, args });
+  console.log(`[Bridge 전송] ${serialized}`);
+  console.log(`  직렬화 크기: ${serialized.length} bytes`);
+
+  // 2. 네이티브에서 역직렬화 + 실행 (시뮬레이션)
+  const parsed = JSON.parse(serialized);
+  console.log(`  역직렬화 완료: ${parsed.module}.${parsed.method}()`);
+  return `결과: ${parsed.method} 실행됨`;
+}
+
+// New Architecture: JSI (직접 참조)
+function jsiCall(nativeRef, method, args) {
+  // JSON 변환 없이 직접 호출 (C++ 바인딩)
+  console.log(`[JSI 직접 호출] ${method}(${args.join(', ')})`);
+  console.log(`  직렬화 없음! 직접 메모리 참조`);
+  return `결과: ${method} 즉시 실행됨`;
+}
+
+console.log("=== Old Architecture (Bridge) ===");
+const t1 = performance.now();
+for (let i = 0; i < 100; i++) {
+  bridgeCall("CameraModule", "takePicture", [{ quality: 0.8 }]);
+}
+console.log(`Bridge 100회: ${(performance.now() - t1).toFixed(2)}ms\n`);
+
+console.log("=== New Architecture (JSI) ===");
+const t2 = performance.now();
+for (let i = 0; i < 100; i++) {
+  jsiCall(null, "takePicture", ["quality=0.8"]);
+}
+console.log(`JSI 100회: ${(performance.now() - t2).toFixed(2)}ms`);
+
+console.log("\n→ JSI는 JSON 직렬화 오버헤드가 없어 훨씬 빠릅니다!");
+```
+
 ---
 
 ## 4. Legacy vs New 비교표

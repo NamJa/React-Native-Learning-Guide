@@ -150,6 +150,38 @@ fun printUser(user: UserInfo) {
 }
 ```
 
+```javascript [playground]
+// 🧪 구조 분해 할당 실습
+
+// 1) 객체 구조 분해
+const user = { name: "홍길동", age: 30, email: "hong@test.com" };
+const { name, age, phone = "없음" } = user;
+console.log(`이름: ${name}, 나이: ${age}, 전화: ${phone}`);
+
+// 2) 이름 변경 + 기본값
+const { name: userName, email: userEmail } = user;
+console.log(`userName: ${userName}, userEmail: ${userEmail}`);
+
+// 3) 배열 구조 분해
+const [first, , third] = ["빨강", "파랑", "초록"];
+console.log(`first: ${first}, third: ${third}`);
+
+// 4) 나머지 모으기
+const [head, ...tail] = [1, 2, 3, 4, 5];
+console.log(`head: ${head}, tail: ${tail}`);
+
+// 5) 변수 교환
+let x = "A", y = "B";
+[x, y] = [y, x];
+console.log(`x: ${x}, y: ${y}`);
+
+// 6) 함수 매개변수 구조 분해
+function printUser({ name, age, role = "사용자" }) {
+  console.log(`${name}(${age}) - ${role}`);
+}
+printUser({ name: "김철수", age: 25 });
+```
+
 ```exercise
 type: code-arrange
 question: "배열 구조 분해 할당으로 firstName과 lastName을 추출하는 코드를 조립하세요"
@@ -273,6 +305,37 @@ val userPrefs = mapOf("fontSize" to 20)
 val settings = defaults + userPrefs // fontSize가 20으로 덮어씌워짐
 ```
 
+```javascript [playground]
+// 🧪 스프레드 연산자 실습
+
+// 1) 배열 합치기
+const arr1 = [1, 2, 3];
+const arr2 = [4, 5, 6];
+const combined = [...arr1, ...arr2];
+console.log("합치기:", combined);
+
+// 2) 배열 복사 (얕은 복사)
+const copy = [...arr1];
+copy.push(99);
+console.log("원본:", arr1);  // [1, 2, 3] 유지
+console.log("복사본:", copy); // [1, 2, 3, 99]
+
+// 3) 객체 스프레드 — 불변 업데이트
+const user = { name: "홍길동", age: 30, city: "서울" };
+const updated = { ...user, age: 31 };
+console.log("원본:", JSON.stringify(user));
+console.log("업데이트:", JSON.stringify(updated));
+
+// 4) 객체 병합 (뒤가 우선)
+const defaults = { theme: "dark", fontSize: 16 };
+const prefs = { fontSize: 20, lang: "ko" };
+const settings = { ...defaults, ...prefs };
+console.log("설정:", JSON.stringify(settings));
+
+// 5) 문자열 → 배열
+console.log("spread 문자열:", [..."Hello"]);
+```
+
 ```exercise
 type: output-predict
 question: "다음 코드의 출력은?"
@@ -332,6 +395,35 @@ console.log(output);
 // buildString 등으로 유사하게 구현은 가능하지만 동일하지 않음
 ```
 
+```javascript [playground]
+// 🧪 태그드 템플릿 실습
+
+// 태그 함수 만들기
+function highlight(strings, ...values) {
+  let result = "";
+  strings.forEach((str, i) => {
+    result += str;
+    if (i < values.length) {
+      result += `【${values[i]}】`;
+    }
+  });
+  return result;
+}
+
+const name = "홍길동";
+const score = 95;
+console.log(highlight`${name}님의 점수는 ${score}점입니다.`);
+
+// 직접 태그 함수를 만들어보세요!
+function upper(strings, ...values) {
+  return strings.reduce((result, str, i) => {
+    return result + str + (values[i] !== undefined ? String(values[i]).toUpperCase() : "");
+  }, "");
+}
+const city = "seoul";
+console.log(upper`I live in ${city}`);
+```
+
 ---
 
 ## 4. 향상된 객체 리터럴 (Enhanced Object Literals)
@@ -382,6 +474,36 @@ val age = 30
 val user = mapOf("name" to name, "age" to age)
 ```
 
+```javascript [playground]
+// 🧪 향상된 객체 리터럴 실습
+
+// 1) 속성 축약
+const name = "홍길동";
+const age = 30;
+const user = { name, age }; // { name: name, age: age } 와 동일
+console.log("축약:", JSON.stringify(user));
+
+// 2) 메서드 축약
+const calc = {
+  add(a, b) { return a + b; },
+  subtract(a, b) { return a - b; }
+};
+console.log("add:", calc.add(10, 3));
+console.log("subtract:", calc.subtract(10, 3));
+
+// 3) 계산된 속성명
+const key = "score";
+const obj = {
+  [key]: 100,
+  [`${key}Grade`]: "A",
+  [`get${key[0].toUpperCase() + key.slice(1)}`]() {
+    return this[key];
+  }
+};
+console.log("obj:", JSON.stringify(obj));
+console.log("getScore():", obj.getScore());
+```
+
 ---
 
 ## 5. Optional Chaining (?.)과 Nullish Coalescing (??)
@@ -430,6 +552,32 @@ console.log(timeout2); // 0 — 올바른 결과!
 // 깊은 속성 접근에서의 기본값 지정
 const userName = response?.data?.user?.name ?? "익명";
 console.log(userName); // "익명"
+```
+
+```javascript [playground]
+// 🧪 Optional Chaining + Nullish Coalescing 실습
+
+const users = [
+  { name: "홍길동", scores: [90, 85, 95] },
+  { name: "김철수" },
+  null
+];
+
+// 1) 안전한 접근
+console.log("scores[2]:", users[0]?.scores?.[2]);  // 95
+console.log("scores[0]:", users[1]?.scores?.[0]);  // undefined
+console.log("name:", users[2]?.name);               // undefined
+
+// 2) ?? vs || 차이
+const config = { timeout: 0, retries: null };
+console.log("timeout ||:", config.timeout || 5000);   // 5000 (버그!)
+console.log("timeout ??:", config.timeout ?? 5000);   // 0 (정확!)
+console.log("retries ??:", config.retries ?? 3);      // 3
+
+// 3) ?. 와 ?? 조합
+const response = { data: { user: null } };
+const userName = response?.data?.user?.name ?? "익명";
+console.log("사용자:", userName); // "익명"
 ```
 
 ---
@@ -783,6 +931,45 @@ val totalExpensive = orders
     .reduce { acc, price -> acc + price }
 ```
 
+```javascript [playground]
+// 🧪 배열 메서드 종합 실습
+
+const products = [
+  { name: "노트북", price: 1500000, category: "전자" },
+  { name: "키보드", price: 80000, category: "전자" },
+  { name: "커피", price: 5000, category: "음료" },
+  { name: "마우스", price: 50000, category: "전자" },
+  { name: "주스", price: 3000, category: "음료" },
+];
+
+// 1) map — 이름만 추출
+const names = products.map(p => p.name);
+console.log("이름들:", names);
+
+// 2) filter — 10만원 미만
+const cheap = products.filter(p => p.price < 100000);
+console.log("저렴한 상품:", cheap.map(p => p.name));
+
+// 3) reduce — 총 가격
+const total = products.reduce((sum, p) => sum + p.price, 0);
+console.log("총 가격:", total.toLocaleString() + "원");
+
+// 4) find / findIndex
+const keyboard = products.find(p => p.name === "키보드");
+console.log("키보드:", JSON.stringify(keyboard));
+
+// 5) some / every
+console.log("10만원 이상 있나?:", products.some(p => p.price >= 100000));
+console.log("모두 1만원 이상?:", products.every(p => p.price >= 10000));
+
+// 6) 체이닝 — 전자제품의 평균 가격
+const avgElectronics = products
+  .filter(p => p.category === "전자")
+  .map(p => p.price)
+  .reduce((sum, p, _, arr) => sum + p / arr.length, 0);
+console.log("전자제품 평균:", Math.round(avgElectronics).toLocaleString() + "원");
+```
+
 ---
 
 ## 8. Object 정적 메서드
@@ -849,6 +1036,35 @@ const nested = Object.freeze({
 });
 nested.b.c = 99; // 중첩 객체는 변경 가능!
 console.log(nested.b.c); // 99
+```
+
+```javascript [playground]
+// 🧪 Object 메서드 실습
+
+const user = { name: "홍길동", age: 30, city: "서울" };
+
+// 1) keys / values / entries
+console.log("keys:", Object.keys(user));
+console.log("values:", Object.values(user));
+console.log("entries:", Object.entries(user));
+
+// 2) entries로 순회
+for (const [key, value] of Object.entries(user)) {
+  console.log(`${key} → ${value}`);
+}
+
+// 3) fromEntries — 배열 → 객체
+const pairs = [["a", 1], ["b", 2], ["c", 3]];
+console.log("fromEntries:", JSON.stringify(Object.fromEntries(pairs)));
+
+// 4) assign — 객체 병합
+const merged = Object.assign({}, { a: 1 }, { b: 2, a: 10 });
+console.log("assign:", JSON.stringify(merged));
+
+// 5) freeze — 객체 동결
+const config = Object.freeze({ API: "https://api.test.com", TIMEOUT: 5000 });
+config.API = "changed"; // 무시됨!
+console.log("frozen:", config.API); // 원래 값 유지
 ```
 
 ---
@@ -934,6 +1150,45 @@ class Dog(name: String) : Animal(name, "멍멍") {
 }
 ```
 
+```javascript [playground]
+// 🧪 클래스 실습
+
+class Animal {
+  constructor(name, sound) {
+    this.name = name;
+    this.sound = sound;
+  }
+  speak() {
+    return `${this.name}: ${this.sound}!`;
+  }
+  static create(name, sound) {
+    return new Animal(name, sound);
+  }
+}
+
+class Dog extends Animal {
+  constructor(name) {
+    super(name, "멍멍");
+    this.tricks = [];
+  }
+  addTrick(trick) {
+    this.tricks.push(trick);
+    return this; // 체이닝 지원
+  }
+  speak() {
+    return `${super.speak()} 꼬리도 흔듭니다!`;
+  }
+}
+
+const dog = new Dog("바둑이");
+dog.addTrick("앉아").addTrick("손");
+console.log(dog.speak());
+console.log("특기:", dog.tricks);
+
+const cat = Animal.create("나비", "야옹");
+console.log(cat.speak());
+```
+
 ---
 
 ## 10. 이터레이터와 제너레이터 (간략)
@@ -987,6 +1242,45 @@ val fib = sequence {
     }
 }
 println(fib.take(6).toList()) // [0, 1, 1, 2, 3, 5]
+```
+
+```javascript [playground]
+// 🧪 제너레이터 실습
+
+// 1) 기본 제너레이터
+function* countUp(start, end) {
+  for (let i = start; i <= end; i++) {
+    yield i;
+  }
+}
+
+for (const n of countUp(1, 5)) {
+  console.log("count:", n);
+}
+
+// 2) 피보나치 제너레이터
+function* fibonacci() {
+  let a = 0, b = 1;
+  while (true) {
+    yield a;
+    [a, b] = [b, a + b];
+  }
+}
+
+const fib = fibonacci();
+const first10 = [];
+for (let i = 0; i < 10; i++) {
+  first10.push(fib.next().value);
+}
+console.log("피보나치 10개:", first10);
+
+// 3) 제너레이터로 range 함수 만들기
+function* range(start, end, step = 1) {
+  for (let i = start; i < end; i += step) {
+    yield i;
+  }
+}
+console.log("range(0,10,2):", [...range(0, 10, 2)]);
 ```
 
 ---

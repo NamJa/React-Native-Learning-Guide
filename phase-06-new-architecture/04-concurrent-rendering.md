@@ -114,6 +114,72 @@
 └────────────────────────────────────────────────────────────────┘
 ```
 
+```javascript [playground]
+// 🧪 동시성 렌더링 개념 실습 — 우선순위 스케줄링
+
+// 작업 우선순위 스케줄러 구현
+function createScheduler() {
+  const queues = { high: [], normal: [], low: [] };
+
+  return {
+    schedule(priority, task) {
+      queues[priority].push(task);
+    },
+    flush() {
+      // 높은 우선순위부터 처리
+      const order = ['high', 'normal', 'low'];
+      const results = [];
+
+      for (const priority of order) {
+        while (queues[priority].length > 0) {
+          const task = queues[priority].shift();
+          results.push({ priority, result: task() });
+        }
+      }
+      return results;
+    }
+  };
+}
+
+const scheduler = createScheduler();
+
+// useTransition 시뮬레이션: 긴급 업데이트 vs 전환 업데이트
+console.log("=== 검색 입력 시나리오 ===");
+
+// 사용자가 "hello" 입력
+const input = "hello";
+
+// 긴급: 입력 필드 업데이트 (즉시 반영)
+scheduler.schedule('high', () => {
+  console.log(`[긴급] 입력 필드 → "${input}"`);
+  return input;
+});
+
+// 낮은 우선순위: 검색 결과 필터링 (지연 가능)
+scheduler.schedule('low', () => {
+  const items = ["hello world", "help me", "helmet", "hero", "heaven"];
+  const filtered = items.filter(item => item.startsWith(input));
+  console.log(`[전환] 검색 결과 필터링: ${filtered.length}개`);
+  return filtered;
+});
+
+// 일반: UI 상태 업데이트
+scheduler.schedule('normal', () => {
+  console.log(`[일반] 로딩 스피너 표시`);
+  return "loading";
+});
+
+// 스케줄러 실행
+console.log("\n처리 순서:");
+const results = scheduler.flush();
+results.forEach((r, i) =>
+  console.log(`${i + 1}. [${r.priority}] → ${JSON.stringify(r.result)}`)
+);
+
+console.log("\n→ 긴급 업데이트(입력)가 먼저, 전환(검색)이 나중에 처리됨");
+console.log("→ React의 useTransition이 바로 이 원리!");
+```
+
 ---
 
 ## 2. Automatic Batching

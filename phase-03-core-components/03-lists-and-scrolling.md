@@ -929,6 +929,60 @@ const HighPerformanceList = () => {
 
 ## 5. 성능 최적화 팁
 
+```javascript [playground]
+// 🧪 리스트 성능 최적화 개념 실습
+
+// 1) keyExtractor — 올바른 key 생성 패턴
+const items = [
+  { id: "user-1", name: "홍길동", score: 95 },
+  { id: "user-2", name: "김철수", score: 87 },
+  { id: "user-3", name: "이영희", score: 92 },
+];
+
+// ✅ 고유 ID 기반 key
+const keysById = items.map(item => item.id);
+console.log("ID key:", keysById);
+
+// ❌ 인덱스 기반 key — 정렬/필터 시 문제
+const keysByIndex = items.map((_, i) => i);
+console.log("Index key:", keysByIndex);
+
+// 2) 대량 데이터 윈도잉 시뮬레이션
+function simulateWindowedList(totalItems, windowSize, scrollPosition) {
+  const startIndex = Math.max(0, Math.floor(scrollPosition / 50) - 5);
+  const endIndex = Math.min(totalItems, startIndex + windowSize + 10);
+
+  return {
+    rendered: endIndex - startIndex,
+    total: totalItems,
+    range: `${startIndex}~${endIndex}`,
+    memoryRatio: `${((endIndex - startIndex) / totalItems * 100).toFixed(1)}%`
+  };
+}
+
+console.log("\n=== 윈도잉 시뮬레이션 (10,000개 아이템) ===");
+[0, 2500, 5000, 7500].forEach(scroll => {
+  const result = simulateWindowedList(10000, 20, scroll);
+  console.log(`스크롤 ${scroll}px: ${result.rendered}개 렌더 (${result.range}), 메모리 ${result.memoryRatio}`);
+});
+
+// 3) getItemLayout 계산 (고정 높이일 때)
+function getItemLayout(itemHeight, separatorHeight = 0) {
+  return (_, index) => ({
+    length: itemHeight,
+    offset: (itemHeight + separatorHeight) * index,
+    index,
+  });
+}
+
+const layout = getItemLayout(60, 1);
+console.log("\ngetItemLayout (높이 60px + 구분선 1px):");
+[0, 5, 99].forEach(i => {
+  const l = layout(null, i);
+  console.log(`  index=${i}: offset=${l.offset}px`);
+});
+```
+
 ### 팁 1: React.memo로 불필요한 리렌더링 방지
 
 ```tsx

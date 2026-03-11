@@ -404,6 +404,81 @@ items:
 xp: 6
 ```
 
+```javascript [playground]
+// 🧪 로컬 스토리지 패턴 실습 — AsyncStorage/MMKV 핵심 로직
+
+// 인메모리 스토리지 시뮬레이션
+function createStorage() {
+  const store = {};
+
+  return {
+    async getItem(key) {
+      const value = store[key];
+      console.log(`[GET] ${key} → ${value ?? 'null'}`);
+      return value ?? null;
+    },
+    async setItem(key, value) {
+      store[key] = value;
+      console.log(`[SET] ${key} = ${value}`);
+    },
+    async removeItem(key) {
+      delete store[key];
+      console.log(`[DEL] ${key}`);
+    },
+    async multiGet(keys) {
+      return keys.map(key => [key, store[key] ?? null]);
+    },
+    async getAllKeys() {
+      return Object.keys(store);
+    }
+  };
+}
+
+const storage = createStorage();
+
+// JSON 직렬화 헬퍼 (복잡한 데이터 저장)
+async function storeObject(key, obj) {
+  await storage.setItem(key, JSON.stringify(obj));
+}
+
+async function getObject(key) {
+  const value = await storage.getItem(key);
+  return value ? JSON.parse(value) : null;
+}
+
+// 사용 예시
+async function main() {
+  // 사용자 설정 저장
+  await storeObject('settings', {
+    theme: 'dark',
+    fontSize: 16,
+    language: 'ko',
+    notifications: true
+  });
+
+  // 인증 토큰 저장
+  await storage.setItem('auth_token', 'eyJhbG...');
+
+  // 읽기
+  const settings = await getObject('settings');
+  console.log("설정:", JSON.stringify(settings));
+
+  // 부분 업데이트 (불변 패턴)
+  const updated = { ...settings, theme: 'light' };
+  await storeObject('settings', updated);
+
+  // 모든 키 확인
+  const keys = await storage.getAllKeys();
+  console.log("저장된 키:", keys);
+
+  // 다중 읽기
+  const multi = await storage.multiGet(['settings', 'auth_token']);
+  console.log("다중 읽기:", multi.map(([k, v]) => `${k}: ${v?.substring(0, 20)}...`));
+}
+
+main();
+```
+
 ---
 
 ## 3. Zustand persist 미들웨어

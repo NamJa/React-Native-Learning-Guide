@@ -1058,6 +1058,83 @@ function UserScreen() {
 }
 ```
 
+```javascript [playground]
+// 🧪 데이터 캐싱 + 재시도 패턴 실습 — TanStack Query 핵심 로직
+
+// 간단한 Query Cache 구현
+function createQueryCache() {
+  const cache = {};
+
+  return {
+    get(key) {
+      const entry = cache[key];
+      if (!entry) return null;
+      const age = Date.now() - entry.timestamp;
+      console.log(`  캐시 ${age}ms 경과 (stale: ${age > entry.staleTime})`);
+      return age > entry.staleTime ? null : entry.data;
+    },
+    set(key, data, staleTime = 5000) {
+      cache[key] = { data, timestamp: Date.now(), staleTime };
+      console.log(`  캐시 저장: "${key}"`);
+    },
+    invalidate(key) {
+      delete cache[key];
+      console.log(`  캐시 무효화: "${key}"`);
+    },
+    getAll() { return Object.keys(cache); }
+  };
+}
+
+// 재시도 로직
+async function fetchWithRetry(fn, retries = 3) {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      console.log(`  시도 ${attempt}/${retries} 실패: ${error.message}`);
+      if (attempt === retries) throw error;
+    }
+  }
+}
+
+// 시뮬레이션
+const cache = createQueryCache();
+let callCount = 0;
+
+async function fetchUser(id) {
+  callCount++;
+  // 50% 확률로 실패 시뮬레이션
+  if (callCount <= 2) throw new Error("네트워크 오류");
+  return { id, name: `사용자${id}`, fetchCount: callCount };
+}
+
+async function queryUser(id) {
+  const key = `user-${id}`;
+
+  // 1. 캐시 확인
+  const cached = cache.get(key);
+  if (cached) {
+    console.log("캐시 히트!", JSON.stringify(cached));
+    return cached;
+  }
+
+  // 2. 없으면 fetch + 재시도
+  console.log("캐시 미스 → API 호출");
+  const data = await fetchWithRetry(() => fetchUser(id));
+  cache.set(key, data, 3000);
+  console.log("결과:", JSON.stringify(data));
+  return data;
+}
+
+// 실행
+queryUser(1).then(() => {
+  console.log("\n--- 같은 쿼리 다시 호출 ---");
+  return queryUser(1); // 캐시에서 반환
+}).then(() => {
+  console.log("\n캐시 키 목록:", cache.getAll());
+});
+```
+
 ---
 
 ## 10. Android 패턴과 비교

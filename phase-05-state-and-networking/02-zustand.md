@@ -428,6 +428,37 @@ function CartSummary() {
 }
 ```
 
+```javascript [playground]
+// 🧪 파생 상태(Derived State) 실습
+
+// Zustand store를 순수 JS로 시뮬레이션
+const cartState = {
+  items: [
+    { id: 1, name: "노트북", price: 1500000, qty: 1 },
+    { id: 2, name: "키보드", price: 80000, qty: 2 },
+    { id: 3, name: "마우스", price: 50000, qty: 3 },
+  ]
+};
+
+// 파생 상태: store에 저장하지 않고 계산으로 얻는 값
+const totalItems = cartState.items.reduce((sum, item) => sum + item.qty, 0);
+const totalPrice = cartState.items.reduce((sum, item) => sum + item.price * item.qty, 0);
+const avgPrice = totalPrice / totalItems;
+
+console.log(`총 ${totalItems}개 상품`);
+console.log(`총 금액: ${totalPrice.toLocaleString()}원`);
+console.log(`평균 단가: ${Math.round(avgPrice).toLocaleString()}원`);
+
+// 파생 상태는 원본이 변하면 자동으로 업데이트
+const updatedItems = cartState.items.map(item =>
+  item.id === 1 ? { ...item, qty: 2 } : item // 노트북 2개로 변경
+);
+
+const newTotal = updatedItems.reduce((sum, item) => sum + item.price * item.qty, 0);
+console.log(`\n수량 변경 후: ${newTotal.toLocaleString()}원`);
+console.log(`차이: +${(newTotal - totalPrice).toLocaleString()}원`);
+```
+
 ---
 
 ## 6. 미들웨어
@@ -624,6 +655,61 @@ const useStore = create<StoreState>()(
     { name: 'MyStore' }
   )
 );
+```
+
+```javascript [playground]
+// 🧪 미들웨어 패턴 실습 — Zustand middleware를 순수 JS로 이해하기
+
+// 기본 store
+function createStore(initialState) {
+  let state = initialState;
+  return {
+    getState: () => state,
+    setState: (partial) => {
+      state = typeof partial === 'function'
+        ? { ...state, ...partial(state) }
+        : { ...state, ...partial };
+    }
+  };
+}
+
+// 미들웨어 1: Logger — 상태 변경을 콘솔에 기록
+function withLogger(createStoreFn) {
+  return (initial) => {
+    const store = createStoreFn(initial);
+    const originalSetState = store.setState;
+    store.setState = (partial) => {
+      const prev = store.getState();
+      originalSetState(partial);
+      const next = store.getState();
+      console.log('%c이전:', 'color: gray', JSON.stringify(prev));
+      console.log('%c다음:', 'color: green', JSON.stringify(next));
+    };
+    return store;
+  };
+}
+
+// 미들웨어 2: Persist — 상태를 저장소에 유지
+function withPersist(createStoreFn, storageKey) {
+  return (initial) => {
+    const store = createStoreFn(initial);
+    const originalSetState = store.setState;
+    store.setState = (partial) => {
+      originalSetState(partial);
+      console.log(`[persist] "${storageKey}" 저장됨`);
+    };
+    return store;
+  };
+}
+
+// 미들웨어 적용
+const store = withLogger(
+  (initial) => withPersist(createStore, 'my-store')(initial)
+)({ count: 0, name: "테스트" });
+
+console.log("=== 상태 변경 ===");
+store.setState({ count: 1 });
+store.setState(prev => ({ count: prev.count + 1 }));
 ```
 
 ---

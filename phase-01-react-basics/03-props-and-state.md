@@ -705,6 +705,45 @@ explanations:
 xp: 10
 ```
 
+```javascript [playground]
+// 🧪 useState Updater 함수 개념 실습
+// React의 useState updater 패턴을 순수 JavaScript로 이해해보세요
+
+// 간단한 useState 시뮬레이터
+function simulateState(initialValue) {
+  let state = initialValue;
+  const getState = () => state;
+  const setState = (valueOrFn) => {
+    if (typeof valueOrFn === 'function') {
+      state = valueOrFn(state); // updater 함수: 이전 값 기반
+    } else {
+      state = valueOrFn; // 직접 값 설정
+    }
+  };
+  return [getState, setState];
+}
+
+const [getCount, setCount] = simulateState(0);
+
+// 직접 값 설정
+setCount(5);
+console.log("직접 설정:", getCount()); // 5
+
+// updater 함수 사용 — 이전 값 기반 업데이트
+setCount(prev => prev + 1); // 5 + 1
+setCount(prev => prev + 1); // 6 + 1
+setCount(prev => prev + 1); // 7 + 1
+console.log("updater 3번:", getCount()); // 8
+
+// ❌ 직접 값으로 3번 호출하면? (React에서의 함정)
+setCount(0);
+const currentCount = getCount(); // 0
+setCount(currentCount + 1); // 0 + 1 = 1
+setCount(currentCount + 1); // 0 + 1 = 1 (currentCount는 여전히 0!)
+setCount(currentCount + 1); // 0 + 1 = 1
+console.log("직접 값 3번:", getCount()); // 1 (3이 아님!)
+```
+
 ---
 
 ## 8. State 불변성 규칙
@@ -866,6 +905,57 @@ function ProfileEditor() {
 // data class User(val name: String, val age: Int)
 // val user = User("김철수", 25)
 // val updated = user.copy(age = 26)  ← React의 {...user, age: 26}과 동일
+```
+
+```javascript [playground]
+// 🧪 State 불변성 패턴 실습
+// React에서 State를 업데이트하는 올바른 패턴을 연습해보세요
+
+// === 배열 불변 업데이트 ===
+const todos = ["리액트 배우기", "RN 시작하기"];
+
+// ✅ 추가 (push 대신 spread)
+const added = [...todos, "앱 배포하기"];
+console.log("추가:", added);
+
+// ✅ 제거 (splice 대신 filter)
+const removed = todos.filter((_, i) => i !== 0);
+console.log("제거:", removed);
+
+// ✅ 수정 (직접 변경 대신 map)
+const updated = todos.map((todo, i) =>
+  i === 0 ? "React Native 배우기" : todo
+);
+console.log("수정:", updated);
+
+// ✅ 특정 위치에 삽입
+const inserted = [...todos.slice(0, 1), "새 항목", ...todos.slice(1)];
+console.log("삽입:", inserted);
+
+console.log("원본 유지:", todos); // 원본은 변하지 않음!
+
+// === 객체 불변 업데이트 ===
+const user = {
+  name: "김철수",
+  address: { city: "서울", zip: "06001" },
+  tags: ["개발자"]
+};
+
+// ✅ 속성 변경
+const nameChanged = { ...user, name: "이영희" };
+console.log("이름 변경:", nameChanged.name);
+
+// ✅ 중첩 객체 변경 (address 내부)
+const cityChanged = {
+  ...user,
+  address: { ...user.address, city: "부산" }
+};
+console.log("도시 변경:", cityChanged.address.city);
+console.log("원본 도시:", user.address.city); // "서울" 유지!
+
+// ✅ 배열 속성에 추가
+const tagAdded = { ...user, tags: [...user.tags, "React"] };
+console.log("태그 추가:", tagAdded.tags);
 ```
 
 ---
@@ -1815,6 +1905,52 @@ function ShoppingApp() {
     </div>
   );
 }
+```
+
+```javascript [playground]
+// 🧪 안티패턴 vs 올바른 패턴 실습
+
+// 안티패턴 1: State 직접 변경 vs 새 객체 생성
+const original = [
+  { id: 1, text: "할일 1", done: false },
+  { id: 2, text: "할일 2", done: false },
+];
+
+// ❌ 직접 변경 (mutation) — React에서 변경 감지 불가
+const bad = original;
+bad[0].done = true; // 원본도 변경됨!
+console.log("mutation:", original[0].done); // true (원본 오염!)
+
+// 원복
+original[0].done = false;
+
+// ✅ 새 객체 생성 (immutable update)
+const good = original.map(todo =>
+  todo.id === 1 ? { ...todo, done: true } : todo
+);
+console.log("immutable 원본:", original[0].done); // false (원본 유지!)
+console.log("immutable 새 객체:", good[0].done);  // true
+
+// 참조 비교로 변경 감지
+console.log("같은 참조?:", original === good); // false → React가 변경 감지!
+
+// 안티패턴 3: 계산 가능한 값은 State 대신 변수로
+const firstName = "길동";
+const lastName = "홍";
+// ❌ fullName을 별도 state로 관리할 필요 없음
+// ✅ 그냥 계산하면 됨
+const fullName = `${lastName}${firstName}`;
+console.log("계산된 값:", fullName);
+
+// 파생 상태 예시
+const items = [
+  { name: "사과", price: 3000, qty: 2 },
+  { name: "바나나", price: 2000, qty: 3 },
+];
+// ✅ 파생 계산 (별도 state 불필요)
+const totalPrice = items.reduce((sum, item) => sum + item.price * item.qty, 0);
+const totalItems = items.reduce((sum, item) => sum + item.qty, 0);
+console.log(`총 ${totalItems}개, ${totalPrice.toLocaleString()}원`);
 ```
 
 ---

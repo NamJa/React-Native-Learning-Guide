@@ -1655,6 +1655,53 @@ const styles = StyleSheet.create({
 
 ---
 
+### 데이터 처리 실습
+
+```javascript [playground]
+// 🧪 기본 컴포넌트 데이터 처리 실습
+
+// View/Text에서 사용하는 조건부 렌더링 로직
+function formatUserInfo(user) {
+  const parts = [];
+  parts.push(user.name);
+  if (user.isVip) parts.push("⭐ VIP");
+  if (user.age) parts.push(`${user.age}세`);
+  return parts.join(" · ");
+}
+
+const users = [
+  { name: "홍길동", age: 30, isVip: true },
+  { name: "김철수", age: 25, isVip: false },
+  { name: "이영희", age: null, isVip: true },
+];
+
+users.forEach(u => console.log(formatUserInfo(u)));
+
+// TextInput 검증 로직
+function validateInput(type, value) {
+  const rules = {
+    email: { pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "유효한 이메일을 입력하세요" },
+    phone: { pattern: /^01[0-9]-\d{3,4}-\d{4}$/, message: "010-1234-5678 형식" },
+    password: { pattern: /^(?=.*[A-Za-z])(?=.*\d).{8,}$/, message: "영문+숫자 8자 이상" },
+  };
+  const rule = rules[type];
+  if (!rule) return { valid: true };
+  return {
+    valid: rule.pattern.test(value),
+    message: rule.pattern.test(value) ? "✅ 유효" : `❌ ${rule.message}`
+  };
+}
+
+console.log("\n입력 검증:");
+console.log("이메일:", validateInput("email", "test@mail.com").message);
+console.log("이메일:", validateInput("email", "invalid").message);
+console.log("전화:", validateInput("phone", "010-1234-5678").message);
+console.log("비번:", validateInput("password", "abc12345").message);
+console.log("비번:", validateInput("password", "short").message);
+```
+
+---
+
 ## 15. 컴포넌트 종합 매핑 표
 
 | React Native | Android | 용도 |

@@ -862,6 +862,48 @@ function ProductList({ products }: { products: Product[] }) {
 }
 ```
 
+```javascript [playground]
+// 🧪 useMemo 개념 실습 — 메모이제이션을 순수 JS로 이해하기
+
+// 간단한 memoize 함수 구현
+function memoize(fn) {
+  let lastArgs = null;
+  let lastResult = null;
+  let callCount = 0;
+
+  return function(...args) {
+    // 이전 인자와 같으면 캐시된 결과 반환
+    if (lastArgs && args.every((arg, i) => arg === lastArgs[i])) {
+      console.log(`  → 캐시 사용 (계산 스킵)`);
+      return lastResult;
+    }
+    callCount++;
+    console.log(`  → 계산 실행 #${callCount}`);
+    lastResult = fn(...args);
+    lastArgs = args;
+    return lastResult;
+  };
+}
+
+// 비싼 계산을 시뮬레이션
+const expensiveFilter = memoize((items, search) => {
+  return items.filter(item =>
+    item.toLowerCase().includes(search.toLowerCase())
+  );
+});
+
+const products = ["노트북", "키보드", "마우스", "노트패드", "모니터"];
+
+console.log("1차 검색 '노트':");
+console.log(expensiveFilter(products, "노트"));
+
+console.log("2차 같은 검색 '노트':");
+console.log(expensiveFilter(products, "노트")); // 캐시 사용!
+
+console.log("3차 다른 검색 '마':");
+console.log(expensiveFilter(products, "마"));    // 다시 계산
+```
+
 ### useMemo vs useCallback
 
 ```typescript
@@ -1410,6 +1452,68 @@ function UserList() {
     </ul>
   );
 }
+```
+
+```javascript [playground]
+// 🧪 useReducer 패턴 실습 — 순수 JavaScript로 Reducer 이해하기
+
+// Reducer는 순수 함수: (이전상태, 액션) => 새상태
+function todoReducer(state, action) {
+  switch (action.type) {
+    case 'ADD':
+      return {
+        ...state,
+        todos: [...state.todos, {
+          id: state.nextId,
+          text: action.payload,
+          done: false
+        }],
+        nextId: state.nextId + 1
+      };
+    case 'TOGGLE':
+      return {
+        ...state,
+        todos: state.todos.map(todo =>
+          todo.id === action.payload
+            ? { ...todo, done: !todo.done }
+            : todo
+        )
+      };
+    case 'DELETE':
+      return {
+        ...state,
+        todos: state.todos.filter(todo => todo.id !== action.payload)
+      };
+    case 'CLEAR_DONE':
+      return {
+        ...state,
+        todos: state.todos.filter(todo => !todo.done)
+      };
+    default:
+      return state;
+  }
+}
+
+// 초기 상태
+let state = { todos: [], nextId: 1 };
+
+// dispatch 시뮬레이션
+function dispatch(action) {
+  state = todoReducer(state, action);
+  console.log(`[${action.type}]`, JSON.stringify(state.todos));
+}
+
+dispatch({ type: 'ADD', payload: 'React 배우기' });
+dispatch({ type: 'ADD', payload: 'RN 앱 만들기' });
+dispatch({ type: 'ADD', payload: '앱스토어 배포' });
+dispatch({ type: 'TOGGLE', payload: 1 }); // 첫 번째 완료
+dispatch({ type: 'DELETE', payload: 2 }); // 두 번째 삭제
+
+console.log("\n완료된 할일:", state.todos.filter(t => t.done).map(t => t.text));
+console.log("미완료 할일:", state.todos.filter(t => !t.done).map(t => t.text));
+
+dispatch({ type: 'CLEAR_DONE' }); // 완료된 항목 정리
+console.log("정리 후:", state.todos.map(t => t.text));
 ```
 
 ### useState vs useReducer
@@ -2101,6 +2205,66 @@ function RegistrationForm() {
     </form>
   );
 }
+```
+
+```javascript [playground]
+// 🧪 Custom Hook 패턴 실습 — 로직 재사용을 순수 JS로 이해하기
+
+// Custom Hook의 핵심: 상태 로직을 재사용 가능한 함수로 추출
+
+// useToggle 시뮬레이션
+function createToggle(initial = false) {
+  let value = initial;
+  return {
+    get: () => value,
+    toggle: () => { value = !value; return value; },
+    setTrue: () => { value = true; return value; },
+    setFalse: () => { value = false; return value; },
+  };
+}
+
+const modal = createToggle();
+console.log("초기:", modal.get());
+console.log("토글:", modal.toggle());
+console.log("토글:", modal.toggle());
+
+// useLocalStorage 시뮬레이션
+function createStorage(key, initialValue) {
+  const storage = {};
+  storage[key] = initialValue;
+
+  return {
+    get: () => storage[key],
+    set: (value) => {
+      storage[key] = typeof value === 'function' ? value(storage[key]) : value;
+      return storage[key];
+    },
+  };
+}
+
+const theme = createStorage('theme', 'light');
+console.log("테마:", theme.get());
+theme.set('dark');
+console.log("변경:", theme.get());
+theme.set(prev => prev === 'dark' ? 'light' : 'dark');
+console.log("토글:", theme.get());
+
+// usePrevious 시뮬레이션
+function createPrevTracker() {
+  let current = undefined;
+  let previous = undefined;
+  return {
+    update: (value) => { previous = current; current = value; },
+    getCurrent: () => current,
+    getPrevious: () => previous,
+  };
+}
+
+const counter = createPrevTracker();
+[0, 1, 2, 5, 3].forEach(v => {
+  counter.update(v);
+  console.log(`현재: ${counter.getCurrent()}, 이전: ${counter.getPrevious()}`);
+});
 ```
 
 ---

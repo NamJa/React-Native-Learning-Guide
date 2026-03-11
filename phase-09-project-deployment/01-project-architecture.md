@@ -206,6 +206,75 @@ hint: "일반적인 React Native 프로젝트는 components, screens, stores 디
 xp: 5
 ```
 
+```javascript [playground]
+// 🧪 프로젝트 아키텍처 패턴 실습
+
+// 1) Feature-based 모듈 구조 시뮬레이션
+const projectStructure = {
+  'src/features/auth': ['AuthScreen', 'LoginForm', 'useAuth', 'authStore', 'authApi'],
+  'src/features/products': ['ProductList', 'ProductDetail', 'useProducts', 'productStore', 'productApi'],
+  'src/features/cart': ['CartScreen', 'CartItem', 'useCart', 'cartStore', 'cartApi'],
+  'src/shared/components': ['Button', 'Input', 'Modal', 'Card'],
+  'src/shared/hooks': ['useDebounce', 'useLocalStorage', 'useNetworkStatus'],
+  'src/shared/utils': ['formatPrice', 'validateEmail', 'dateUtils'],
+};
+
+// 모듈 의존성 분석
+const dependencies = {
+  'auth': [],
+  'products': ['auth'],
+  'cart': ['auth', 'products'],
+  'shared': [],
+};
+
+console.log("=== Feature 모듈 구조 ===");
+for (const [path, files] of Object.entries(projectStructure)) {
+  console.log(`📁 ${path}/`);
+  files.forEach(f => console.log(`   📄 ${f}`));
+}
+
+// 2) 의존성 그래프 — 순환 참조 검출
+function detectCircular(deps, module, visited = new Set(), path = []) {
+  if (visited.has(module)) {
+    return [...path, module]; // 순환 발견!
+  }
+  visited.add(module);
+  for (const dep of (deps[module] || [])) {
+    const result = detectCircular(deps, dep, new Set(visited), [...path, module]);
+    if (result) return result;
+  }
+  return null;
+}
+
+console.log("\n=== 의존성 분석 ===");
+for (const mod of Object.keys(dependencies)) {
+  const deps = dependencies[mod];
+  console.log(`${mod} → ${deps.length ? deps.join(', ') : '(없음)'}`);
+}
+
+// 순환 참조 검출
+const circular = detectCircular(dependencies, 'cart');
+console.log("\n순환 참조:", circular ? circular.join(' → ') : "없음 ✅");
+
+// 빌드 순서 결정 (토폴로지 정렬)
+function topologicalSort(deps) {
+  const result = [];
+  const visited = new Set();
+
+  function visit(mod) {
+    if (visited.has(mod)) return;
+    visited.add(mod);
+    for (const dep of (deps[mod] || [])) visit(dep);
+    result.push(mod);
+  }
+
+  for (const mod of Object.keys(deps)) visit(mod);
+  return result;
+}
+
+console.log("빌드 순서:", topologicalSort(dependencies).join(' → '));
+```
+
 ---
 
 ## 3. API 레이어 설정

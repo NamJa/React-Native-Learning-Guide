@@ -716,6 +716,53 @@ const styles = StyleSheet.create({
 });
 ```
 
+```javascript [playground]
+// 🧪 동적 스타일 계산 실습 — React Native StyleSheet 로직
+
+// 진행률에 따른 색상 계산
+function getProgressColor(progress) {
+  if (progress < 0.3) return '#FF4444'; // 빨강
+  if (progress < 0.7) return '#FFAA00'; // 주황
+  return '#44BB44'; // 초록
+}
+
+// 진행률에 따른 스타일 객체 생성
+function getProgressStyle(progress) {
+  return {
+    width: `${Math.round(progress * 100)}%`,
+    backgroundColor: getProgressColor(progress),
+    height: 20,
+    borderRadius: 10,
+  };
+}
+
+[0.1, 0.3, 0.5, 0.7, 0.9, 1.0].forEach(p => {
+  const style = getProgressStyle(p);
+  console.log(`${(p*100).toFixed(0)}%: ${style.backgroundColor} (width: ${style.width})`);
+});
+
+// 조건부 스타일 합성 (React Native 패턴)
+function mergeStyles(isActive, isDisabled, size) {
+  const base = { padding: 10, borderRadius: 8 };
+  const sizeStyles = {
+    small: { padding: 6, fontSize: 12 },
+    medium: { padding: 10, fontSize: 16 },
+    large: { padding: 14, fontSize: 20 },
+  };
+  return {
+    ...base,
+    ...sizeStyles[size],
+    backgroundColor: isDisabled ? '#ccc' : isActive ? '#007AFF' : '#eee',
+    opacity: isDisabled ? 0.5 : 1,
+    color: isActive ? '#fff' : '#333',
+  };
+}
+
+console.log("\n활성:", JSON.stringify(mergeStyles(true, false, 'medium')));
+console.log("비활성:", JSON.stringify(mergeStyles(false, false, 'small')));
+console.log("비활성화:", JSON.stringify(mergeStyles(true, true, 'large')));
+```
+
 ---
 
 ## 5. 플랫폼별 스타일링
@@ -837,6 +884,53 @@ const styles = StyleSheet.create({
 ```
 
 > **주의**: `margin`과 `padding`에서 퍼센트는 **부모의 너비(width)**를 기준으로 합니다. `paddingTop: '10%'`는 부모 너비의 10%입니다 (높이가 아님). 이것은 CSS와 동일한 동작입니다.
+
+```javascript [playground]
+// 🧪 반응형 디자인 계산 실습
+
+// 화면 크기에 따른 열 수 계산
+function getColumnCount(screenWidth) {
+  if (screenWidth >= 1024) return 4;  // 태블릿 가로
+  if (screenWidth >= 768) return 3;   // 태블릿 세로
+  if (screenWidth >= 480) return 2;   // 큰 폰
+  return 1;                           // 작은 폰
+}
+
+// 화면 크기에 따른 아이템 크기 계산
+function getItemSize(screenWidth, gap = 16, padding = 16) {
+  const cols = getColumnCount(screenWidth);
+  const totalGap = gap * (cols - 1);
+  const totalPadding = padding * 2;
+  const itemWidth = (screenWidth - totalGap - totalPadding) / cols;
+  return { cols, itemWidth: Math.floor(itemWidth) };
+}
+
+// 다양한 화면 크기에서 테스트
+const screens = [
+  { name: "iPhone SE", width: 375 },
+  { name: "iPhone 15", width: 393 },
+  { name: "iPhone 15 Plus", width: 430 },
+  { name: "iPad Mini", width: 768 },
+  { name: "iPad Pro", width: 1024 },
+];
+
+screens.forEach(({ name, width }) => {
+  const { cols, itemWidth } = getItemSize(width);
+  console.log(`${name} (${width}px): ${cols}열, 아이템 ${itemWidth}px`);
+});
+
+// 글꼴 크기 스케일링
+function scaleFontSize(baseSize, screenWidth, designWidth = 375) {
+  const scale = screenWidth / designWidth;
+  const maxScale = 1.3; // 최대 130%
+  return Math.round(baseSize * Math.min(scale, maxScale));
+}
+
+console.log("\n글꼴 스케일링 (기본 16px):");
+screens.forEach(({ name, width }) => {
+  console.log(`${name}: ${scaleFontSize(16, width)}px`);
+});
+```
 
 ---
 
